@@ -1,27 +1,70 @@
+:root{
+    --nav-height: 56px;
+    --primary: #1e88e5;
+    --primary-dark: #0d47a1;
+    --nav-bg-top: #ffffff;
+    --nav-bg-bottom: #bbdefb;
+}
+
 nav {
     display: flex;
     position: sticky;
     top: 0;
     left: 0;
-    height: 3vmax;
-    background: linear-gradient(180deg, #ffffff 0%, #bbdefb 100%);
+    height: var(--nav-height);
+    background: linear-gradient(180deg, var(--nav-bg-top) 0%, var(--nav-bg-bottom) 100%);
     align-items: center;
+    padding: 8px 14px;
+    z-index: 50;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.04);
 }
+
 nav a {
-    border-radius: 4px;
-    background: #113d7e;
-    border: 1px  solid #000000;
-    font-family: 'Segoe UI', serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 1vmax;
-    line-height: 1vmax;
+    border-radius: 10px;
+    background: linear-gradient(#2b9bf6, var(--primary));
+    border: 1px solid rgba(0,0,0,0.18);
+    font-family: 'Segoe UI', system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 1;
     white-space: nowrap;
     text-align: center;
     color: #ffffff;
-    padding: 0.5vmin;
-    margin: 0.5vmin;
+    padding: 6px 14px;
+    margin-right: 10px;
+    text-decoration: none;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.12);
+    transition: transform .08s ease, box-shadow .12s ease, opacity .12s;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
 }
+
+nav a.secondary {
+    background: linear-gradient(#0f6fc6, var(--primary-dark));
+}
+
+nav a:hover,
+nav a:focus{
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+    outline: none;
+}
+nav a:focus{
+    box-shadow: 0 0 0 3px rgba(30,136,229,0.18);
+}
+
 #trial-menu {
     display: none;
+}
+
+/* Make nav responsive: collapse spacing on narrow screens */
+@media (max-width: 700px){
+    nav {
+        padding: 6px 8px;
+    }
+    nav a {
+        padding: 6px 10px;
+        font-size: 0.88rem;
+    }
 }

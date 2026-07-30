@@ -1,3 +1,10 @@
 #controls, #task-area, #answer-area, #review-area {
     padding: 1vmin;
 }
+
+/* Make container elements stack better on smaller screens */
+@media (max-width:600px){
+    #controls, #task-area, #answer-area, #review-area {
+        padding: 2vmin;
+    }
+}
