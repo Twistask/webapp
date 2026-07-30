@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %> - Challenge Mode</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/time-trial.css' />
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+</head>
+<body>
+<%- include('menu') %>
+    <div id="work-area">
+        <div id="controls">
+            <label for="task-number">Select number of tasks: </label>
+            <input id="task-number" type="number" min="1" value="1">
+            <button type="submit" id="trial-start">Start</button>
+            <script>
+                document.getElementById("trial-start").onclick = () => {
+                    let answer = confirm("Once you start the Time Trial, you must complete all of the tasks. Are you sure?");
+                    if (answer === true) {
+                        window.location.href += "/test";
+                    }
+                }
+            </script>
+        </div>
+    </div>
+</body>
+</html>

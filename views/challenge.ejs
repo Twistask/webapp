@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %> - Challenge Mode</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/challenge.css' />
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+    <script src="/javascripts/submit.js" type="module"></script>
+</head>
+<body>
+    <%- include('menu') %>
+    <%- include('trial-menu') %>
+    <div id="work-area">
+        <div id="controls">
+            <label for="challenge-select">Select a challenge:</label>
+            <select id="challenge-select"></select>
+        </div>
+        <div id="task-area">
+            The task goes here.
+        </div>
+        <div id="answer-area">
+            <div id="editor">
+                <p>Type your answer here. </p>
+                <p><br /></p>
+            </div>
+            <script>
+                const quill = new Quill('#editor', {
+                    theme: 'snow'
+                });
+            </script>
+            <button type="submit" id="submit">Submit</button>
+        </div>
+    </div>
+<% if (timed) { %>
+    <script type="module" src="/javascripts/trialHandler.js"></script>
+<% } %>
+</body>
+</html>

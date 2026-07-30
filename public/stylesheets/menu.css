@@ -1,0 +1,27 @@
+nav {
+    display: flex;
+    position: sticky;
+    top: 0;
+    left: 0;
+    height: 3vmax;
+    background: linear-gradient(180deg, #ffffff 0%, #bbdefb 100%);
+    align-items: center;
+}
+nav a {
+    border-radius: 4px;
+    background: #113d7e;
+    border: 1px  solid #000000;
+    font-family: 'Segoe UI', serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 1vmax;
+    line-height: 1vmax;
+    white-space: nowrap;
+    text-align: center;
+    color: #ffffff;
+    padding: 0.5vmin;
+    margin: 0.5vmin;
+}
+#trial-menu {
+    display: none;
+}
