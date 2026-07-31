@@ -2,6 +2,10 @@
     padding: 1vmin;
 }
 
+#task-area {
+    border: 1vmin dashed black;
+}
+
 /* Make container elements stack better on smaller screens */
 @media (max-width:600px){
     #controls, #task-area, #answer-area, #review-area {

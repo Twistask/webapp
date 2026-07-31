@@ -5,6 +5,7 @@
  */
 
 var app = require('../app');
+var pb = require('../db');
 var debug = require('debug')('webapp:server');
 var http = require('http');
 
