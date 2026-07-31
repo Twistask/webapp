@@ -7,6 +7,10 @@ async function loadTasks() {
     return await pb.collection('tasks').getFullList()
 }
 
+async function sendAnswer(body) {
+    const record = await pb.collection('answers').create(body);
+}
+
 /* GET challenge page. */
 router.get('/', async (req, res, next) => {
     try {
@@ -17,5 +21,15 @@ router.get('/', async (req, res, next) => {
         next(err); // lets Express error middleware handle/log and return a 500
     }
 });
+
+router.post('/submit', async (req, res, next) => {
+    try {
+        let body = req.body;
+        const result = await sendAnswer(body);
+        console.log(result);
+    } catch (err) {
+        next(err); // lets Express error middleware handle/log and return a 500
+    }
+})
 
 module.exports = router;
