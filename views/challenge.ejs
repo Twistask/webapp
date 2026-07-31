@@ -55,7 +55,7 @@
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         "task_id": document.getElementById("challenge-select").value,
-                        "answer_text": quill.getText()
+                        "answer_text": quill.getSemanticHTML()
                     })
                 });
             })
