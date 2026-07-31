@@ -23,13 +23,57 @@
                 <p>Type your review here. </p>
                 <p><br /></p>
             </div>
-            <script>
-                const quill = new Quill('#editor', {
-                    theme: 'snow'
-                });
-            </script>
-            <button type="submit">Submit</button>
+            <button type="submit" id="submit">Submit</button>
         </div>
     </div>
+    <% if (tasks && tasks.length) { %>
+        <script src="/javascripts/challengeHandler.js" type="module"></script>
+        <script type="module">
+            const quill = new Quill('#editor', {
+                theme: 'snow'
+            });
+            const tasks = <%- JSON.stringify(tasks) %>;
+            const answers = <%- JSON.stringify(answers) %>;
+            let chosenAnswer;
+
+            function setTask() {
+                const answersForTask = answers.filter(a => a.answer_text && a.answer_text.trim() !== '');
+                if (!answersForTask.length || !tasks.length) {
+                    console.warn('no answers or tasks available');
+                    return;
+                }
+
+                const randIndex = Math.floor(Math.random() * answersForTask.length);
+                chosenAnswer = answersForTask[randIndex];
+                const task = tasks.find(t => t.id === chosenAnswer.task_id);
+
+                if (!task) {
+                    console.warn('no matching task for answer', chosenAnswer);
+                    return;
+                }
+
+                // If description is plain text use textContent; if it contains HTML (e.g. Quill output) sanitize then set innerHTML
+                document.getElementById('task-area').innerHTML = task.description;
+                document.getElementById('answer-area').innerHTML = chosenAnswer.answer_text;
+            }
+            setTask();
+            document.getElementById("submit").addEventListener("click", async () => {
+                let sound = new Audio()
+                sound.src = "../sounds/emblem.wav";
+                document.body.appendChild(sound);
+                sound.volume = 0.5;
+                await sound.play();
+                const res = await fetch('/review/submit', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        "answer_id": chosenAnswer.id,
+                        "grade": document.getElementById("grade").value,
+                        "comment_text": quill.getSemanticHTML()
+                    })
+                });
+            })
+        </script>
+    <% } %>
 </body>
 </html>
