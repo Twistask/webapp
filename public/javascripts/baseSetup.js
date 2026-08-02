@@ -31,33 +31,7 @@ let setupEditor = () => {
     }
 }
 
-let setupSubmit = () => {
-    let submitbtn = document.getElementById("submit");
-    if (submitbtn) {
-        submitbtn.addEventListener("click", async () => {
-            let target = localStorage.getItem("currentTargetID");
-            let grade = undefined;
-            if (document.getElementById("review-grade") !== null) {
-                grade = document.getElementById("review-grade").value;
-            }
-            let sound = new Audio()
-            sound.src = "../sounds/emblem.wav";
-            document.body.appendChild(sound);
-            sound.volume = 0.5;
-            await sound.play();
-            const res = await fetch(`/${mode}/submit`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    "target_id": target,
-                    "grade": grade,
-                    "value": quill.getSemanticHTML()
-                })
-            });
-        })
-    }
-}
-
 setupPage();
 setupEditor();
-setupSubmit();
+
+export default quill;

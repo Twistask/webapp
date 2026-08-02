@@ -25,4 +25,6 @@ const Database = {
     }
 }
 
+Database.connection.autoCancellation(false);
+
 export default Database;

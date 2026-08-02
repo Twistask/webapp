@@ -1,8 +1,8 @@
+import {TrialControls} from "./utils/trialControls.js";
+import quill from "./baseSetup.js";
+
 const { tasks = [], answers = [] } = window.APP || {};
 let mode = localStorage.getItem("mode");
-
-import {blockInput} from "/javascripts/utils/blockInput.js";
-import {setupTimer} from "./utils/timerSetup.js";
 
 let setupMode = () => {
         switch (mode) {
@@ -17,9 +17,6 @@ let setupMode = () => {
             break;
         }
         case "timeTrial": {
-            let trialTime = localStorage.getItem("trialTime");
-            let tasksNum = localStorage.getItem("tasks_number");
-
             let sound = new Audio()
             sound.src = "../sounds/trial-theme.mp3";
             document.body.appendChild(sound);
@@ -27,10 +24,8 @@ let setupMode = () => {
             sound.loop = true;
             sound.play();
             setupTask();
-
-            setupTimer(trialTime);
-
-            blockInput();
+            TrialControls.setupTimer();
+            TrialControls.blockInput();
         }
     }
 }
@@ -85,4 +80,42 @@ let setupTask = () => {
         }
 }
 
+let setupSubmit = () => {
+    let submitbtn = document.getElementById("submit");
+    if (submitbtn) {
+        submitbtn.addEventListener("click", async () => {
+            let target = localStorage.getItem("currentTargetID");
+            let grade = undefined;
+            if (document.getElementById("review-grade") !== null) {
+                grade = document.getElementById("review-grade").value;
+            }
+            let sound = new Audio()
+            sound.src = "../sounds/emblem.wav";
+            document.body.appendChild(sound);
+            sound.volume = 0.5;
+            await sound.play();
+            switch (mode) {
+                case "review":
+                case "challenge": {
+                    const res = await fetch(`/${mode}/submit`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            "target_id": target,
+                            "grade": grade,
+                            "value": quill.getSemanticHTML()
+                        })
+                    });
+                    break;
+                }
+                case "timeTrial": {
+                    setupTask();
+                    TrialControls.submitPuzzle(target, quill.getSemanticHTML());
+                }
+            }
+        })
+    }
+}
+
 setupMode();
+setupSubmit();

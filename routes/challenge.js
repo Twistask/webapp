@@ -25,4 +25,12 @@ router.post('/submit', async (req, res, next) => {
     }
 })
 
+router.get('/result', async (req, res, next) => {
+    try {
+        res.render('result', { title: 'Twistask' });
+    } catch (err) {
+        next(err); // lets Express error middleware handle/log and return a 500
+    }
+});
+
 export default router;
