@@ -18,10 +18,11 @@
                 document.getElementById("trial-start").onclick = () => {
                     let answer = confirm("Once you start the Time Trial, you must complete all of the tasks. Are you sure?");
                     if (answer === true) {
+                        localStorage.setItem("mode", "timeTrial");
+                        localStorage.setItem("tasks_number", document.getElementById("task-number").value);
                         window.location.href += "/test";
                     }
                 }
-                localStorage.setItem("tasks_number", document.getElementById("task-number").value)
             </script>
         </div>
     </div>

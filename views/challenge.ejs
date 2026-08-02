@@ -9,7 +9,6 @@
 </head>
 <body>
     <%- include('menu') %>
-    <%- include('trial-menu') %>
     <div id="work-area">
         <div id="controls">
             <label for="challenge-select">Select a challenge:</label>
@@ -84,9 +83,7 @@
         setTask();
 
         let start = Date.now();
-        document.getElementById("menu").style.display = "none";
         document.getElementById("controls").style.display = "none";
-        document.getElementById("trial-menu").style.display = "flex";
         let timer = setTimeout(() => {
             alert("Time's up!");
             window.location.href = "/";

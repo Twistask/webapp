@@ -40,6 +40,12 @@ nav a {
     justify-content:center;
 }
 
+nav #menu-right {
+    flex: 0 50%;
+    float: right;
+    justify-content: right;
+}
+
 nav a.secondary {
     background: linear-gradient(#0f6fc6, var(--primary-dark));
 }
@@ -52,10 +58,6 @@ nav a:focus{
 }
 nav a:focus{
     box-shadow: 0 0 0 3px rgba(30,136,229,0.18);
-}
-
-#trial-menu {
-    display: none;
 }
 
 /* Make nav responsive: collapse spacing on narrow screens */
