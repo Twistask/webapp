@@ -1,22 +1,15 @@
-var express = require('express');
-var router = express.Router();
+import express from "express";
+let router = express.Router();
 
-const pb = require("../db")
-
-async function loadTasks() {
-    return await pb.collection('tasks').getFullList()
-}
-
-async function sendAnswer(body) {
-    const record = await pb.collection('answers').create(body);
-}
+import Database from "../db.js";
 
 /* GET challenge page. */
 router.get('/', async (req, res, next) => {
     try {
-        const tasks = await loadTasks();
+        const tasks = await Database.functions.loadContent("tasks");
         console.log(tasks);
-        res.render('challenge', { title: 'Twistask', timed: false, tasks });
+        const answers = [];
+        res.render('challenge', { title: 'Twistask', tasks, answers });
     } catch (err) {
         next(err); // lets Express error middleware handle/log and return a 500
     }
@@ -25,11 +18,11 @@ router.get('/', async (req, res, next) => {
 router.post('/submit', async (req, res, next) => {
     try {
         let body = req.body;
-        const result = await sendAnswer(body);
+        const result = await Database.functions.sendContent("answer", body);
         console.log(result);
     } catch (err) {
         next(err); // lets Express error middleware handle/log and return a 500
     }
 })
 
-module.exports = router;
+export default router;

@@ -1,6 +1,28 @@
-require("dotenv/config");
-var PocketBase = require('pocketbase').default
+import 'dotenv/config'
+import PocketBase from 'pocketbase';
 
-const pb = new PocketBase(process.env.DB_CONN);
+const Database = {
+    connection: new PocketBase(process.env.DB_CONN),
+    functions: {
+        loadContent: async (type) => {
+            return await Database.connection.collection(type).getFullList()
+        },
 
-module.exports = pb;
+        sendContent: async (type, body) => {
+            return await Database.connection.collection(`${type}s`).create(body);
+        },
+
+        createUser: async (body) => {
+            await Database.connection.collection('users').create(body);
+        },
+
+        loginUser: async (username, pass) => {
+            return await Database.connection.collection('users').authWithPassword(
+                username,
+                pass,
+            );
+        }
+    }
+}
+
+export default Database;

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title><%= title %> - Challenge Mode</title>
+    <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel='stylesheet' href='/stylesheets/challenge.css' />
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
@@ -10,122 +10,33 @@
 <body>
     <%- include('menu') %>
     <div id="work-area">
-        <div id="controls">
+        <div id="controls" data-modes="challenge">
             <label for="challenge-select">Select a challenge:</label>
             <select id="challenge-select"></select>
         </div>
-        <div id="task-area">
+        <div id="task-area" data-modes="review challenge timeTrial">
             The task goes here.
         </div>
-        <div id="answer-area">
-            <div id="editor">
-                <p>Type your answer here. </p>
+        <div id="review-answer-area" data-modes="review">
+            The random answer goes here.
+        </div>
+        <div id="answer-area" data-modes="review challenge timeTrial">
+            <label for="review-grade" data-modes="review">Select a grade (0-100): </label>
+            <input id="review-grade" type="number" min="0" max="100" value="0" data-modes="review">
+            <div id="editor" data-modes="review challenge timeTrial">
+                <p>Type here. </p>
                 <p><br /></p>
             </div>
-            <button type="submit" id="submit">Submit</button>
+            <button type="submit" id="submit" data-modes="review challenge timeTrial">Submit</button>
         </div>
     </div>
-    <% if (tasks && tasks.length) { %>
-        <script src="/javascripts/challengeHandler.js" type="module"></script>
-        <script type="module">
-            const quill = new Quill('#editor', {
-                theme: 'snow'
-            });
-            // inject server-side JS object into client as real JS
-            import {createItems} from "/javascripts/challengeHandler.js";
-
-            const tasks = <%- JSON.stringify(tasks) %>;
-            createItems(tasks);
-            async function setTask () {
-                const value = document.getElementById("challenge-select").value;
-                const task = tasks.find(t => t.id === value); // task is object or undefined
-                document.getElementById("task-area").innerHTML = task.description;
-            };
-            document.getElementById("challenge-select").onchange = setTask;
-            setTask();
-            document.getElementById("submit").addEventListener("click", async () => {
-                let sound = new Audio()
-                sound.src = "../sounds/emblem.wav";
-                document.body.appendChild(sound);
-                sound.volume = 0.5;
-                await sound.play();
-                await fetch('/challenge/submit', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        "task_id": document.getElementById("challenge-select").value,
-                        "answer_text": quill.getSemanticHTML()
-                    })
-                });
-            });
-        </script>
-    <% } %>
-<% if (timed) { %>
-    <script type="module">
-        import {convertToString} from "/javascripts/timeConverter.js";
-
-        let trialTime = 20 * 60 * 1000;
-        let sound = new Audio()
-        sound.src = "../sounds/trial-theme.mp3";
-        document.body.appendChild(sound);
-        sound.volume = 0.3;
-        sound.loop = true;
-        sound.play();
-        let tasksNum = localStorage.getItem("tasks_number");
-        const tasks = <%- JSON.stringify(tasks) %>;
-        async function setTask () {
-            const randIndex = Math.floor(Math.random() * tasks.length);
-            let chosenTask;
-            chosenTask = tasks[randIndex];
-            document.getElementById("task-area").innerHTML = chosenTask.description;
+    <script>
+        window.APP = {
+            tasks: <%- JSON.stringify(tasks || []) %>,
+            answers: <%- JSON.stringify(answers || []) %>,
         };
-        document.getElementById("challenge-select").onchange = setTask;
-        setTask();
-
-        let start = Date.now();
-        document.getElementById("controls").style.display = "none";
-        let timer = setTimeout(() => {
-            alert("Time's up!");
-            window.location.href = "/";
-        }, trialTime);
-        let time_div = document.createElement("div");
-        let timer_value = document.createElement("p");
-        setInterval(() => {
-            timer_value.innerText = `Time left: ${convertToString(Math.max(0, trialTime - (Date.now() - start)))}`
-        }, 1)
-        time_div.append(timer_value);
-        let work_area = document.getElementById("work-area");
-        work_area.append(time_div);
-        window.addEventListener("beforeunload", function (event) {
-            event.preventDefault();
-            event.returnValue = "";
-        });
-        document.addEventListener("keydown", function (event) {
-            const isF5 = event.key === "F5" || event.keyCode === 116;
-            const isCtrlR = event.ctrlKey && (event.key === "r" || event.key === "R" || event.keyCode === 82);
-
-            if (isF5 || isCtrlR) {
-                event.preventDefault();
-                event.stopPropagation();
-                return false;
-            }
-        });
-        document.getElementById("submit").addEventListener("click", async () => {
-            let sound = new Audio()
-            sound.src = "../sounds/emblem.wav";
-            document.body.appendChild(sound);
-            sound.volume = 0.5;
-            await sound.play();
-            await fetch('/challenge/submit', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    "task_id": document.getElementById("challenge-select").value,
-                    "answer_text": quill.getSemanticHTML()
-                })
-            });
-        });
     </script>
-<% } %>
+    <script type="module" src="/javascripts/baseSetup.js"></script>
+    <script type="module" src="/javascripts/modeSetup.js"></script>
 </body>
 </html>

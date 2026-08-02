@@ -11,25 +11,6 @@
     <label for="password">Password: </label><input type="password" id="password" required>
     <label for="password_repeat">Confirm password: </label><input type="password" id="password_repeat" required>
     <button type="submit" id="submit">Register</button>
-    <script>
-        document.getElementById("submit").addEventListener("click", async () => {
-            let sound = new Audio()
-            sound.src = "../sounds/emblem.wav";
-            document.body.appendChild(sound);
-            sound.volume = 0.5;
-            await sound.play();
-            await fetch('/users/register/submit', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    "email": document.getElementById("email").value,
-                    "emailVisibility": false,
-                    "password": document.getElementById("password").value,
-                    "passwordConfirm": document.getElementById("password_repeat").value
-                })
-            });
-        });
-    </script>
 </div>
 </body>
 </html>

@@ -1,29 +1,18 @@
-<link rel='stylesheet' href='/stylesheets/menu.css' />
+<link rel="stylesheet" href="/stylesheets/menu.css" />
 <nav id="menu">
     <div id="menu-left">
-        <a href="/" class="link-main">Home</a>
-        <a href="/challenge" class="link-main">Challenge Mode</a>
-        <a href="/time-trial" class="link-main">Time Trial</a>
-        <a href="/review" class="link-main">Review Mode</a>
+        <a href="/" id="home-link" data-mode="home">Home</a>
+        <a href="/challenge" id="challenge-link" data-mode="challenge">Challenge Mode</a>
+        <a href="/challenge" id="timeTrial-link" data-mode="timeTrial">Time Trial</a>
+        <a href="/review" id="review-link" data-mode="review">Review Mode</a>
     </div>
     <div id="menu-right">
         <a href="/users/register" class="link-profile">Register</a>
         <a href="/users/login" class="link-profile">Login</a>
     </div>
     <div id="trial-menu">
-        <a href="/">Give Up</a>
+        <a href="/" id="home-link" data-mode="home">Give Up</a>
     </div>
 </nav>
-<script>
-    let mode = localStorage.getItem("mode");
-    console.log(mode)
-    switch (mode) {
-        case "timeTrial":
-            document.getElementById("menu-left").remove();
-            document.getElementById("menu-right").remove();
-            break;
-        default:
-            document.getElementById("trial-menu").remove();
-            break;
-    }
-</script>
+
+<script src="/javascripts/utils/setMode.js"></script>

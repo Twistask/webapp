@@ -1,17 +1,5 @@
-var express = require('express');
-const pb = require("../db");
-var router = express.Router();
-
-async function createUser(body) {
-  await pb.collection('users').create(body);
-}
-
-async function loginUser(username, pass) {
-  return await pb.collection('users').authWithPassword(
-      username,
-      pass,
-  );
-}
+import express from "express";
+let router = express.Router();
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -46,4 +34,4 @@ router.post('/login/submit', async (req, res, next) => {
   }
 })
 
-module.exports = router;
+export default router;
