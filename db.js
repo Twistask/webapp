@@ -12,6 +12,10 @@ const Database = {
             return await Database.connection.collection(`${type}s`).create(body);
         },
 
+        createTask: async (body) => {
+            await Database.connection.collection('tasks').create(body);
+        },
+
         createUser: async (body) => {
             await Database.connection.collection('users').create(body);
         },
