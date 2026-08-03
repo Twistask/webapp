@@ -12,4 +12,5 @@ document.getElementById("submit").addEventListener("click", async () => {
             password: document.getElementById("password").value,
         })
     });
+    window.location.href = "/";
 });

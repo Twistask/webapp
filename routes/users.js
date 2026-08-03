@@ -52,11 +52,15 @@ router.post('/login/submit', async (req, res, next) => {
 
 router.get('/auth/status', async (req, res, next) => {
   try {
+    const token = req.cookies?.twistask_auth;
+    if (!token) {
+      return res.json({ authenticated: false });
+    }
+
     let user = null;
     try {
-      user = await Database.functions.getUserFromToken();
+      user = await Database.functions.getUserFromToken(token);
     } catch (err) {
-      // token invalid or expired
       return res.json({ authenticated: false });
     }
 
