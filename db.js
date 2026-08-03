@@ -25,6 +25,13 @@ const Database = {
                 username,
                 pass,
             );
+        },
+
+        logoutUser: async () => {
+            await Database.connection.authStore.clear();
+        },
+        async getUserFromToken() {
+           return await Database.connection.collection('users').authRefresh()
         }
     }
 }

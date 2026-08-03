@@ -16,8 +16,9 @@ let setupPage = () => {
             document.getElementById("trial-menu").remove();
             break;
         case "timeTrial":
-            document.getElementById("menu-left").remove();
-            document.getElementById("menu-right").remove();
+            document.getElementById("common").remove();
+            document.getElementById("logged-in").remove();
+            document.getElementById("logged-out").remove();
             break;
     }
 }

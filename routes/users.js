@@ -1,6 +1,7 @@
 import express from "express";
-let router = express.Router();
+import Database from "../db.js";
 
+let router = express.Router();
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   res.send('respond with a resource');
@@ -12,13 +13,13 @@ router.get('/register', function(req, res, next) {
 
 router.post('/register/submit', async (req, res, next) => {
   try {
-    let body = req.body;
-    const result = await createUser(body);
-    console.log(result);
+    const body = req.body;
+    const result = await Database.functions.createUser(body);
+    res.status(201).json({ ok: true, user: result.user ?? null });
   } catch (err) {
-    next(err); // lets Express error middleware handle/log and return a 500
+    next(err);
   }
-})
+});
 
 router.get('/login', function(req, res, next) {
   res.render('login', { title: 'Twistask' });
@@ -26,12 +27,69 @@ router.get('/login', function(req, res, next) {
 
 router.post('/login/submit', async (req, res, next) => {
   try {
-    let body = req.body;
-    const result = await loginUser(body.email, body.password);
-    console.log(result);
+    const body = req.body;
+    const result = await Database.functions.loginUser(body.email, body.password);
+    const token = result.token;
+    if (!token) {
+      return res.status(500).json({ ok: false, message: "No token returned from auth" });
+    }
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 24 * 60 * 60 * 1000 // 1 day
+    };
+
+    res.cookie("twistask_auth", token, cookieOptions);
+
+    res.json({ authenticated: true, user: result.user ?? null });
   } catch (err) {
-    next(err); // lets Express error middleware handle/log and return a 500
+    next(err);
   }
-})
+});
+
+router.get('/auth/status', async (req, res, next) => {
+  try {
+    let user = null;
+    try {
+      user = await Database.functions.getUserFromToken();
+    } catch (err) {
+      // token invalid or expired
+      return res.json({ authenticated: false });
+    }
+
+    if (!user) return res.json({ authenticated: false });
+    res.json({ authenticated: true, user });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/logout', async function (req, res, next) {
+  try {
+    const token = req.cookies?.twistask_auth;
+
+    if (token && Database.functions.logoutUser) {
+      try {
+        await Database.functions.logoutUser(token);
+      } catch (err) {
+        console.error("logoutUser failed:", err);
+      }
+    }
+
+    res.clearCookie("twistask_auth", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/"
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+});
 
 export default router;
