@@ -1,6 +1,8 @@
 import {checkAuthStatus} from "./handlers/users/authHelper.js";
 
-let quill = undefined;
+let editor = undefined;
+let viewer = undefined;
+let review_viewer = undefined;
 let mode = localStorage.getItem("mode");
 
 let setupPage = async () => {
@@ -28,23 +30,46 @@ let setupPage = async () => {
             break;
         case "timeTrial":
             document.getElementById("common").remove();
-            document.getElementById("logged-in").remove();
-            document.getElementById("logged-out").remove();
+            if (document.getElementById("logged-in")) document.getElementById("logged-in").remove();
+            if (document.getElementById("logged-out")) document.getElementById("logged-out").remove();
             break;
     }
 }
 
 let setupEditor = () => {
-    let editor = document.getElementById("editor");
-    if (editor) {
-        quill = new Quill('#editor', {
-            theme: 'snow'
+    const Editor = toastui.Editor;
+    let editor_el = document.getElementById("editor");
+    if (editor_el) {
+        editor = new Editor({
+            el: document.querySelector('#editor'),
+            height: '500px',
+            initialEditType: 'wysiwyg',
+            previewStyle: 'vertical'
         });
     }
+    let viewer_el = document.getElementById("viewer");
+    if (viewer_el) {
+        viewer = Editor.factory({
+            el: document.querySelector('#viewer'),
+            viewer: true,
+            height: '500px',
+            initialValue: '# hello'
+        });
+    }
+    let review_viewer_el = document.getElementById("answer-viewer");
+    if (review_viewer_el) {
+        review_viewer = Editor.factory({
+            el: document.querySelector('#answer-viewer'),
+            viewer: true,
+            height: '500px',
+            initialValue: '# hello'
+        });
+    }
+
 }
 
 let setupLogout = () => {
-    document.getElementById("logout").addEventListener('click', async (ev) => {
+    if (document.getElementById("logout")) document.getElementById("logout").addEventListener('click', async (ev) => {
         try {
             const res = await fetch('/users/logout', {
                 method: 'POST',               // use POST to match your route
@@ -70,4 +95,6 @@ await setupPage();
 setupEditor();
 setupLogout();
 
-export default quill;
+export default {
+    editor, viewer, review_viewer
+}

@@ -4,8 +4,7 @@
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel='stylesheet' href='/stylesheets/challenge.css' />
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+    <%- include('partials/editor') %>
 </head>
 <body>
     <%- include('menu') %>
@@ -15,10 +14,10 @@
             <select id="challenge-select"></select>
         </div>
         <div id="task-area" data-modes="review challenge timeTrial">
-            The task goes here.
+            <div id="viewer"></div>
         </div>
         <div id="review-answer-area" data-modes="review">
-            The random answer goes here.
+            <div id="answer-viewer"></div>
         </div>
         <div id="answer-area" data-modes="review challenge timeTrial">
             <label for="review-grade" data-modes="review">Select a grade (0-100): </label>

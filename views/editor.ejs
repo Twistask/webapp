@@ -4,8 +4,7 @@
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel='stylesheet' href='/stylesheets/challenge.css' />
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+    <%- include('partials/editor') %>
 </head>
 <body>
     <%- include('menu') %>
@@ -18,6 +17,7 @@
                 <p><br /></p>
             </div>
             <button type="submit" id="submit">Submit</button>
+            <audio src="/sounds/editor_music.mp3" loop="true" autoplay></audio>
         </div>
     </div>
     <script type="module" src="/javascripts/baseSetup.js"></script>

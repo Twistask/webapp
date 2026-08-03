@@ -33,14 +33,14 @@ export const TrialControls = {
             }
         });
     },
-    submitPuzzle: (id, value) => {
+    submitPuzzle: async (id, value) => {
         TrialControls.addSolution(id, value);
-        counter++;
-        if (counter === tasksNum) {
-            TrialControls.sendSolutions();
-            TrialControls.endTrial();
+        if (solutions.size >= tasksNum) {
+            TrialControls.sendSolutions().then(r => {
+                console.log("Trial over!!!!")
+            });
         }
-    },
+        },
     addSolution: (id, value) => {
         solutions.set(counter, {
             id: id,
@@ -51,20 +51,32 @@ export const TrialControls = {
     clearSolutions: () => {
         solutions.clear()
     },
-    sendSolutions: () => {
-        solutions.forEach(async (ans) => {
-            const res = await fetch(`/challenge/submit`, {
+    sendSolutions: async () => {
+        const promises = Array.from(solutions, ([, ans]) => {
+            return fetch('/challenge/submit', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    "target_id": ans.id,
-                    "value": ans.value
-                })
-            });
-        })
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ target_id: ans.id, value: ans.value })
+            })
+                .then(res => ({ id: ans.id, ok: res.ok, status: res.status }))
+                .catch(err => ({ id: ans.id, ok: false, error: String(err) }));
+        });
+
+        const results = await Promise.all(promises);
+
+        const anyFailed = results.some(r => !r.ok);
+        if (anyFailed) {
+            console.error('Some submissions failed', results);
+            // decide whether to throw or return results for caller to handle
+            throw new Error('One or more submissions failed');
+        }
+
+        solutions.clear();
+        return TrialControls.endTrial();
     },
     endTrial: () => {
-        window.location.href += "/result";
         localStorage.setItem("mode", "trialClear");
+        window.location.assign('/challenge/result');
     }
 }

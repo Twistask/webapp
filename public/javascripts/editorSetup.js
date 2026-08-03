@@ -1,5 +1,5 @@
-import quill from "./baseSetup.js";
 import {checkAuthStatus} from "./handlers/users/authHelper.js";
+import Controls from "./baseSetup.js";
 
 let setupSubmit = () => {
     let submitbtn = document.getElementById("submit");
@@ -19,7 +19,7 @@ let setupSubmit = () => {
                 body: JSON.stringify({
                     "author": author,
                     "title": document.getElementById("task-title").value,
-                    "description": quill.getSemanticHTML()
+                    "description": Controls.editor.getMarkdown()
                 })
             });
         })

@@ -13,11 +13,11 @@ const Database = {
         },
 
         createTask: async (body) => {
-            await Database.connection.collection('tasks').create(body);
+            return await Database.connection.collection('tasks').create(body);
         },
 
         createUser: async (body) => {
-            await Database.connection.collection('users').create(body);
+            return await Database.connection.collection('users').create(body);
         },
 
         loginUser: async (username, pass) => {
@@ -28,7 +28,7 @@ const Database = {
         },
 
         logoutUser: async () => {
-            await Database.connection.authStore.clear();
+            return Database.connection.authStore.clear();
         },
         async getUserFromToken(token) {
            return await Database.connection.collection('users').authRefresh(token)

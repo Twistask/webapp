@@ -1,5 +1,5 @@
 import {TrialControls} from "./utils/trialControls.js";
-import quill from "./baseSetup.js";
+import Controls from "./baseSetup.js";
 
 const { tasks = [], answers = [] } = window.APP || {};
 let mode = localStorage.getItem("mode");
@@ -45,7 +45,7 @@ let setupTask = () => {
             case "challenge": {
                 const value = document.getElementById("challenge-select").value;
                 const task = tasks.find(t => t.id === value);
-                document.getElementById("task-area").innerHTML = task.description;
+                Controls.viewer.setMarkdown(task.description);
                 localStorage.setItem("currentTargetID", task.id);
                 break;
             }
@@ -65,8 +65,8 @@ let setupTask = () => {
                     return;
                 }
 
-                document.getElementById('task-area').innerHTML = task.description;
-                document.getElementById('review-answer-area').innerHTML = chosenAnswer.value;
+                Controls.viewer.setMarkdown(task.description);
+                Controls.review_viewer.setMarkdown(chosenAnswer.value);
                 localStorage.setItem("currentTargetID", chosenAnswer.id);
                 break;
             }
@@ -74,7 +74,7 @@ let setupTask = () => {
                 const randIndex = Math.floor(Math.random() * tasks.length);
                 let chosenTask;
                 chosenTask = tasks[randIndex];
-                document.getElementById("task-area").innerHTML = chosenTask.description;
+                Controls.viewer.setMarkdown(chosenTask.description);
                 localStorage.setItem("currentTargetID", chosenTask.id);
             }
         }
@@ -103,14 +103,14 @@ let setupSubmit = () => {
                         body: JSON.stringify({
                             "target_id": target,
                             "grade": grade,
-                            "value": quill.getSemanticHTML()
+                            "value": Controls.editor.getMarkdown()
                         })
                     });
                     break;
                 }
                 case "timeTrial": {
                     setupTask();
-                    TrialControls.submitPuzzle(target, quill.getSemanticHTML());
+                    await TrialControls.submitPuzzle(target, Controls.editor.getMarkdown());
                 }
             }
         })
