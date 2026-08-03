@@ -10,6 +10,7 @@ document.getElementById("submit").addEventListener("click", async () => {
         body: JSON.stringify({
             "email": document.getElementById("email").value,
             "emailVisibility": false,
+            "name": document.getElementById("username").value,
             "password": document.getElementById("password").value,
             "passwordConfirm": document.getElementById("password_repeat").value
         })
