@@ -96,4 +96,36 @@ router.post('/logout', async function (req, res, next) {
   }
 });
 
+router.get('/profile', function(req, res, next) {
+  res.render('profile', { title: 'Twistask' });
+});
+
+router.delete('/delete', async function (req, res, next) {
+  try {
+    const token = req.cookies?.twistask_auth;
+    if (!token) {
+      return res.json({ authenticated: false });
+    }
+
+    let user = null;
+    try {
+      user = await Database.functions.getUserFromToken(token);
+    } catch (err) {
+      return res.json({ authenticated: false });
+    }
+
+    if (!user) return res.json({ authenticated: false });
+    res.clearCookie("twistask_auth", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/"
+    });
+    return await Database.functions.deleteUser(user.record.id);
+  } catch (err) {
+    next(err);
+  }
+});
+
+
 export default router;

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+<%- include('partials/menu') %>
+<div id="work-area">
+    <div id="user-settings">
+        <label for="password">New Password: </label><input type="password" id="password" required>
+        <label for="password_repeat">Confirm New Password: </label><input type="password" id="password_repeat" required>
+        <button type="submit" id="submit">Change Password</button>
+        <button id="delete_account">Delete Account</button>
+    </div>
+</div>
+<script type="module" src="/javascripts/handlers/users/settingsHandler.js"></script>
+</body>
+</html>
