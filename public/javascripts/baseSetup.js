@@ -38,6 +38,9 @@ let setupPage = async () => {
             break;
         case "timeTrial":
             document.getElementById("common").remove();
+            access_els.forEach(el => {
+                el.remove();
+            });
             break;
     }
 }
