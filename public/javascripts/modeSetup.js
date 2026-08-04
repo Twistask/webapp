@@ -69,7 +69,8 @@ let setupTask = async () => {
       const task = tasks.find((t) => t.id === chosenAnswer.target_id);
 
       if (!task) {
-        console.warn("no matching task for answer", chosenAnswer);
+        document.getElementById("work-area").innerHTML =
+            "There are currently no answers to review!";
         return;
       }
 

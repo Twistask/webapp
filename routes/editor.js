@@ -46,4 +46,14 @@ router.post("/update", async (req, res, next) => {
   }
 });
 
+router.delete("/delete", async (req, res, next) => {
+  try {
+    let body = req.body;
+    const result = await Database.functions.deleteTask(body.id);
+    console.log(result);
+  } catch (err) {
+    next(err); // lets Express error middleware handle/log and return a 500
+  }
+});
+
 export default router;

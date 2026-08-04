@@ -23,9 +23,11 @@ let setupTask = () => {
   const value = document.getElementById("challenge-select").value;
   if (value !== "new") {
     const task = tasks.find((t) => t.id === value);
+    document.getElementById("delete").style.display = "flex";
     document.getElementById("task-title").value = task.title;
     Controls.editor.setMarkdown(task.description);
   } else {
+    document.getElementById("delete").style.display = "none";
     document.getElementById("task-title").value = "";
     Controls.editor.reset();
   }
@@ -74,5 +76,26 @@ let setupSubmit = () => {
   }
 };
 
+let setupDelete = () => {
+  document
+      .getElementById("delete")
+      .addEventListener("click", async () => {
+        let answer = confirm(
+            "THIS ACTION IS IRREVERSIBLE!!! The task will be permanently deleted! Are you sure?",
+        );
+        if (answer === true) {
+          await fetch("/editor/delete", {
+            method: "DELETE",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: document.getElementById("challenge-select").value
+            })
+          });
+        }
+      });
+}
+
 setupEditor();
 setupSubmit();
+setupDelete();

@@ -28,6 +28,10 @@ const Database = {
       return await Database.connection.collection("tasks").update(id, body);
     },
 
+    deleteTask: async (id) => {
+      return await Database.connection.collection("tasks").delete(id);
+    },
+
     createUser: async (body) => {
       return await Database.connection.collection("users").create(body);
     },
