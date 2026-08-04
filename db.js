@@ -8,12 +8,24 @@ const Database = {
       return await Database.connection.collection(type).getFullList();
     },
 
+    loadContentbyUser: async (type, id) => {
+      return await Database.connection
+          .collection(type)
+          .getFullList({
+            filter: `author = '${id}'`,
+          });
+    },
+
     sendContent: async (type, body) => {
       return await Database.connection.collection(`${type}s`).create(body);
     },
 
     createTask: async (body) => {
       return await Database.connection.collection("tasks").create(body);
+    },
+
+    updateTask: async (id, body) => {
+      return await Database.connection.collection("tasks").update(id, body);
     },
 
     createUser: async (body) => {
