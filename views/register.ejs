@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-</head>
-<body>
-<%- include('partials/menu') %>
-<div id="work-area">
-    <label for="email">E-mail: </label><input type="text" id="email" required>
-    <label for="username">Username: </label><input type="text" id="username" required>
-    <label for="password">Password: </label><input type="password" id="password" required>
-    <label for="password_repeat">Confirm password: </label><input type="password" id="password_repeat" required>
-    <button type="submit" id="submit">Register</button>
-</div>
-<script type="module" src="/javascripts/handlers/users/registerHandler.js"></script>
-</body>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+  </head>
+  <body>
+    <%- include('partials/menu') %>
+    <div id="work-area">
+      <label for="email">E-mail: </label
+      ><input type="text" id="email" required />
+      <label for="username">Username: </label
+      ><input type="text" id="username" required />
+      <label for="password">Password: </label
+      ><input type="password" id="password" required />
+      <label for="password_repeat">Confirm password: </label
+      ><input type="password" id="password_repeat" required />
+      <button type="submit" id="submit">Register</button>
+    </div>
+    <script
+      type="module"
+      src="/javascripts/handlers/users/registerHandler.js"
+    ></script>
+  </body>
 </html>

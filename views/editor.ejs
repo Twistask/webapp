@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-    <link rel='stylesheet' href='/stylesheets/challenge.css' />
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <link rel="stylesheet" href="/stylesheets/challenge.css" />
     <%- include('partials/editor') %>
-</head>
-<body>
+  </head>
+  <body>
     <%- include('partials/menu') %>
     <div id="work-area">
-        <div id="editor-area">
-            <label for="task-title">Enter the name of the task: </label>
-            <input id="task-title" type="text">
-            <div id="editor">
-                <p>Type the contents of the task here. </p>
-                <p><br /></p>
-            </div>
-            <button type="submit" id="submit">Submit</button>
+      <div id="editor-area">
+        <label for="task-title">Enter the name of the task: </label>
+        <input id="task-title" type="text" />
+        <div id="editor">
+          <p>Type the contents of the task here.</p>
+          <p><br /></p>
         </div>
+        <button type="submit" id="submit">Submit</button>
+      </div>
     </div>
     <script type="module" src="/javascripts/baseSetup.js"></script>
     <script type="module" src="/javascripts/editorSetup.js"></script>
-</body>
+  </body>
 </html>

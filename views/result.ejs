@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-</head>
-<body>
-<%- include('partials/menu') %>
-<div id="work-area">
-    <h1><%= title %></h1>
-    <p>Trial Completed!</p>
-</div>
-<script>
-    let sound = new Audio()
-    sound.src = "../sounds/trial_clear.mp3";
-    document.body.appendChild(sound);
-    sound.volume = 0.5;
-    sound.play();
-</script>
-</body>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+  </head>
+  <body>
+    <%- include('partials/menu') %>
+    <div id="work-area">
+      <h1><%= title %></h1>
+      <p>Trial Completed!</p>
+    </div>
+    <script>
+      let sound = new Audio();
+      sound.src = "../sounds/trial_clear.mp3";
+      document.body.appendChild(sound);
+      sound.volume = 0.5;
+      sound.play();
+    </script>
+  </body>
 </html>

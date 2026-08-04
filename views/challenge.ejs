@@ -1,43 +1,65 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-    <link rel='stylesheet' href='/stylesheets/challenge.css' />
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <link rel="stylesheet" href="/stylesheets/challenge.css" />
     <%- include('partials/editor') %>
-</head>
-<body>
+  </head>
+  <body>
     <%- include('partials/menu') %>
     <div id="work-area">
-        <div id="controls" data-modes="challenge">
-            <label for="challenge-select">Select a challenge:</label>
-            <select id="challenge-select"></select>
+      <div id="controls" data-modes="challenge">
+        <label for="challenge-select">Select a challenge:</label>
+        <select id="challenge-select"></select>
+      </div>
+      <div id="task-area" data-modes="review challenge timeTrial">
+        <div id="viewer"></div>
+      </div>
+      <div id="review-answer-area" data-modes="review">
+        <div id="answer-viewer"></div>
+      </div>
+      <div id="answer-area" data-modes="review challenge timeTrial">
+        <label for="author-name" data-modes="challenge" data-access="guestOnly"
+          >Input your name:
+        </label>
+        <input
+          id="author-name"
+          type="text"
+          data-modes="challenge"
+          data-access="guestOnly"
+        />
+        <label for="review-grade" data-modes="review"
+          >Select a grade (0-100):
+        </label>
+        <input
+          id="review-grade"
+          type="number"
+          min="0"
+          max="100"
+          value="0"
+          data-modes="review"
+        />
+        <div id="editor" data-modes="review challenge timeTrial">
+          <p>Type here.</p>
+          <p><br /></p>
         </div>
-        <div id="task-area" data-modes="review challenge timeTrial">
-            <div id="viewer"></div>
-        </div>
-        <div id="review-answer-area" data-modes="review">
-            <div id="answer-viewer"></div>
-        </div>
-        <div id="answer-area" data-modes="review challenge timeTrial">
-            <label for="author-name" data-modes="challenge" data-access="guestOnly">Input your name: </label>
-            <input id="author-name" type="text" data-modes="challenge" data-access="guestOnly">
-            <label for="review-grade" data-modes="review">Select a grade (0-100): </label>
-            <input id="review-grade" type="number" min="0" max="100" value="0" data-modes="review">
-            <div id="editor" data-modes="review challenge timeTrial">
-                <p>Type here. </p>
-                <p><br /></p>
-            </div>
-            <button type="submit" id="submit" data-modes="review challenge timeTrial">Submit</button>
-        </div>
+        <button
+          type="submit"
+          id="submit"
+          data-modes="review challenge timeTrial"
+        >
+          Submit
+        </button>
+      </div>
     </div>
     <script>
-        window.APP = {
-            tasks: <%- JSON.stringify(tasks || []) %>,
-            answers: <%- JSON.stringify(answers || []) %>,
-        };
+      window.APP = {
+          tasks: <%- JSON.stringify(tasks || []) %>,
+          answers: <%- JSON.stringify(answers || []) %>,
+      };
     </script>
     <script type="module" src="/javascripts/baseSetup.js"></script>
     <script type="module" src="/javascripts/modeSetup.js"></script>
-</body>
+  </body>
 </html>
