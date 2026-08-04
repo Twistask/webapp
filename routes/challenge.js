@@ -19,7 +19,7 @@ router.post("/submit", async (req, res, next) => {
   try {
     let body = req.body;
     const result = await Database.functions.sendContent("answer", body);
-    if (result) res.json({ ok: true });
+    if (result) res.status(200).json({ ok: true });
   } catch (err) {
     next(err); // lets Express error middleware handle/log and return a 500
   }

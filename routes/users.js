@@ -70,7 +70,7 @@ router.get("/auth/status", async (req, res, next) => {
     }
 
     if (!user) return res.json({ authenticated: false });
-    res.json({ authenticated: true, user });
+    res.status(200).json({ authenticated: true, user });
   } catch (err) {
     next(err);
   }

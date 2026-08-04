@@ -30,7 +30,7 @@ router.post("/submit", async (req, res, next) => {
   try {
     let body = req.body;
     const result = await Database.functions.createTask(body);
-    console.log(result);
+    res.status(200).json({ok: true});
   } catch (err) {
     next(err); // lets Express error middleware handle/log and return a 500
   }
@@ -40,7 +40,7 @@ router.post("/update", async (req, res, next) => {
   try {
     let body = req.body;
     const result = await Database.functions.updateTask(body.id, body.task);
-    console.log(result);
+    res.status(200).json({ok: true});
   } catch (err) {
     next(err); // lets Express error middleware handle/log and return a 500
   }
@@ -50,7 +50,7 @@ router.delete("/delete", async (req, res, next) => {
   try {
     let body = req.body;
     const result = await Database.functions.deleteTask(body.id);
-    console.log(result);
+    res.status(200).json({ok: true});
   } catch (err) {
     next(err); // lets Express error middleware handle/log and return a 500
   }

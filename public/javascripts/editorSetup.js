@@ -71,7 +71,7 @@ let setupSubmit = () => {
           }),
         });
       }
-
+      window.location.reload();
     });
   }
 };
@@ -92,6 +92,7 @@ let setupDelete = () => {
               id: document.getElementById("challenge-select").value
             })
           });
+          window.location.reload();
         }
       });
 }
