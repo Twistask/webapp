@@ -20,6 +20,8 @@
             <div id="answer-viewer"></div>
         </div>
         <div id="answer-area" data-modes="review challenge timeTrial">
+            <label for="author-name" data-modes="challenge" data-access="guestOnly">Input your name: </label>
+            <input id="author-name" type="text" data-modes="challenge" data-access="guestOnly">
             <label for="review-grade" data-modes="review">Select a grade (0-100): </label>
             <input id="review-grade" type="number" min="0" max="100" value="0" data-modes="review">
             <div id="editor" data-modes="review challenge timeTrial">

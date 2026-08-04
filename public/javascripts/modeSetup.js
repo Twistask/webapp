@@ -1,5 +1,6 @@
 import {TrialControls} from "./utils/trialControls.js";
 import Controls from "./baseSetup.js";
+import {checkAuthStatus} from "./handlers/users/authHelper.js";
 
 const { tasks = [], answers = [] } = window.APP || {};
 let mode = localStorage.getItem("mode");
@@ -40,44 +41,48 @@ function createChallengeItems(items) {
     })
 }
 
-let setupTask = () => {
-        switch (mode) {
-            case "challenge": {
-                const value = document.getElementById("challenge-select").value;
-                const task = tasks.find(t => t.id === value);
-                Controls.viewer.setMarkdown(task.description);
-                localStorage.setItem("currentTargetID", task.id);
-                break;
-            }
-            case "review": {
-                const answersForTask = answers.filter(a => a.value && a.value.trim() !== '');
-                if (!answersForTask.length || !tasks.length) {
-                    console.warn('no answers or tasks available');
-                    return;
-                }
-
-                const randIndex = Math.floor(Math.random() * answersForTask.length);
-                let chosenAnswer = answersForTask[randIndex];
-                const task = tasks.find(t => t.id === chosenAnswer.target_id);
-
-                if (!task) {
-                    console.warn('no matching task for answer', chosenAnswer);
-                    return;
-                }
-
-                Controls.viewer.setMarkdown(task.description);
-                Controls.review_viewer.setMarkdown(chosenAnswer.value);
-                localStorage.setItem("currentTargetID", chosenAnswer.id);
-                break;
-            }
-            case "timeTrial": {
-                const randIndex = Math.floor(Math.random() * tasks.length);
-                let chosenTask;
-                chosenTask = tasks[randIndex];
-                Controls.viewer.setMarkdown(chosenTask.description);
-                localStorage.setItem("currentTargetID", chosenTask.id);
-            }
+let setupTask = async () => {
+    switch (mode) {
+        case "challenge": {
+            const value = document.getElementById("challenge-select").value;
+            const task = tasks.find(t => t.id === value);
+            Controls.viewer.setMarkdown(task.description);
+            localStorage.setItem("currentTargetID", task.id);
+            break;
         }
+        case "review": {
+            let auth = await checkAuthStatus();
+            let author;
+            if (auth.authenticated) author = auth.user.record.id;
+            else author = "guest";
+            const answersForTask = answers.filter(a => a.value && a.value.trim() !== '' && a.author !== author);
+            if (!answersForTask.length || !tasks.length) {
+                document.getElementById("work-area").innerHTML = "There are currently no answers to review!"
+                return;
+            }
+
+            const randIndex = Math.floor(Math.random() * answersForTask.length);
+            let chosenAnswer = answersForTask[randIndex];
+            const task = tasks.find(t => t.id === chosenAnswer.target_id);
+
+            if (!task) {
+                console.warn('no matching task for answer', chosenAnswer);
+                return;
+            }
+
+            Controls.viewer.setMarkdown(task.description);
+            Controls.review_viewer.setMarkdown(chosenAnswer.value);
+            localStorage.setItem("currentTargetID", chosenAnswer.id);
+            break;
+        }
+        case "timeTrial": {
+            const randIndex = Math.floor(Math.random() * tasks.length);
+            let chosenTask;
+            chosenTask = tasks[randIndex];
+            Controls.viewer.setMarkdown(chosenTask.description);
+            localStorage.setItem("currentTargetID", chosenTask.id);
+        }
+    }
 }
 
 let setupSubmit = () => {
@@ -86,8 +91,15 @@ let setupSubmit = () => {
         submitbtn.addEventListener("click", async () => {
             let target = localStorage.getItem("currentTargetID");
             let grade = undefined;
+            let author;
             if (document.getElementById("review-grade") !== null) {
                 grade = document.getElementById("review-grade").value;
+            }
+            if (document.getElementById("author-name") !== null) {
+                author = document.getElementById("author-name").value;
+            } else {
+                let auth = await checkAuthStatus();
+                author = auth.user.record.id;
             }
             let sound = new Audio()
             sound.src = "../sounds/emblem.wav";
@@ -101,6 +113,7 @@ let setupSubmit = () => {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({
+                            "author": author,
                             "target_id": target,
                             "grade": grade,
                             "value": Controls.editor.getMarkdown()

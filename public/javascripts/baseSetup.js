@@ -6,18 +6,26 @@ let review_viewer = undefined;
 let mode = localStorage.getItem("mode");
 
 let setupPage = async () => {
+    const access_els = Array.from(document.querySelectorAll('[data-access]'));
+
     let auth = await checkAuthStatus();
+    console.log(auth);
     switch (auth.authenticated) {
         case true:
-            document.getElementById("logged-out").remove();
+            access_els.forEach(el => {
+                const modes = el.dataset.access.split(/\s+/);
+                if (!modes.includes("authOnly")) el.remove();
+            });
             break;
         case false:
-            document.getElementById("logged-in").remove();
+            access_els.forEach(el => {
+                const modes = el.dataset.access.split(/\s+/);
+                if (!modes.includes("guestOnly")) el.remove();
+            });
             break;
     }
-    const els = Array.from(document.querySelectorAll('[data-modes]')); // snapshot
-
-    els.forEach(el => {
+    const mode_els = Array.from(document.querySelectorAll('[data-modes]'));
+    mode_els.forEach(el => {
         const modes = el.dataset.modes.split(/\s+/);
         if (!modes.includes(mode)) el.remove();
     });
@@ -30,16 +38,14 @@ let setupPage = async () => {
             break;
         case "timeTrial":
             document.getElementById("common").remove();
-            if (document.getElementById("logged-in")) document.getElementById("logged-in").remove();
-            if (document.getElementById("logged-out")) document.getElementById("logged-out").remove();
             break;
     }
 }
 
 let setupEditor = () => {
-    const Editor = toastui.Editor;
     let editor_el = document.getElementById("editor");
     if (editor_el) {
+        const Editor = toastui.Editor;
         editor = new Editor({
             el: document.querySelector('#editor'),
             height: '500px',
@@ -49,6 +55,7 @@ let setupEditor = () => {
     }
     let viewer_el = document.getElementById("viewer");
     if (viewer_el) {
+        const Editor = toastui.Editor;
         viewer = Editor.factory({
             el: document.querySelector('#viewer'),
             viewer: true,
@@ -58,6 +65,7 @@ let setupEditor = () => {
     }
     let review_viewer_el = document.getElementById("answer-viewer");
     if (review_viewer_el) {
+        const Editor = toastui.Editor;
         review_viewer = Editor.factory({
             el: document.querySelector('#answer-viewer'),
             viewer: true,
