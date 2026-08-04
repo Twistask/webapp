@@ -8,7 +8,7 @@
     <%- include('partials/menu') %>
     <div id="work-area">
       <label for="email">E-mail: </label
-      ><input type="text" id="email" required />
+      ><input type="email" id="email" required />
       <label for="username">Username: </label
       ><input type="text" id="username" required />
       <label for="password">Password: </label
@@ -16,6 +16,7 @@
       <label for="password_repeat">Confirm password: </label
       ><input type="password" id="password_repeat" minlength="8" required />
       <button type="submit" id="submit">Register</button>
+      <div id="error-box"></div>
     </div>
     <script
       type="module"
