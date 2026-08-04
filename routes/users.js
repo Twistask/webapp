@@ -95,7 +95,7 @@ router.post("/logout", async function (req, res, next) {
       path: "/",
     });
 
-    res.json({ ok: true });
+    return res.status(200).json({ ok: true });
   } catch (err) {
     next(err);
   }
@@ -126,7 +126,8 @@ router.delete("/delete", async function (req, res, next) {
       sameSite: "strict",
       path: "/",
     });
-    return await Database.functions.deleteUser(user.record.id);
+    await Database.functions.deleteUser(user.record.id);
+    return res.status(200).json({ ok: true });
   } catch (err) {
     next(err);
   }
