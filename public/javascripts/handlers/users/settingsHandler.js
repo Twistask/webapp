@@ -9,3 +9,12 @@ document.getElementById("delete_account").addEventListener("click", async () => 
         window.location.href = "/";
     }
 });
+
+document.getElementById("submit_pw").addEventListener("click", async () => {
+    const res = await fetch('/users/changePW', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {'Content-Type': 'application/json'},
+    });
+    window.location.href = "/";
+});

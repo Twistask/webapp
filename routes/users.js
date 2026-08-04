@@ -127,5 +127,10 @@ router.delete('/delete', async function (req, res, next) {
   }
 });
 
+router.post('/changePW', function(req, res, next) {
+  res.render('profile', { title: 'Twistask' });
+});
+
+
 
 export default router;
