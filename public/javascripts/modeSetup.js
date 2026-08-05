@@ -47,6 +47,7 @@ let setupTask = async () => {
       const value = document.getElementById("challenge-select").value;
       const task = tasks.find((t) => t.id === value);
       Controls.viewer.setMarkdown(task.description);
+      Controls.editor.reset();
       localStorage.setItem("currentTargetID", task.id);
       break;
     }
@@ -59,6 +60,7 @@ let setupTask = async () => {
         (a) => a.value && a.value.trim() !== "" && a.author !== author,
       );
       if (!answersForTask.length || !tasks.length) {
+        console.log("There are no suitable answers!");
         document.getElementById("work-area").innerHTML =
           "There are currently no answers to review!";
         return;
@@ -69,13 +71,14 @@ let setupTask = async () => {
       const task = tasks.find((t) => t.id === chosenAnswer.target_id);
 
       if (!task) {
-        document.getElementById("work-area").innerHTML =
-            "There are currently no answers to review!";
+        console.log("The task does not exist!");
+        setupTask();
         return;
       }
 
       Controls.viewer.setMarkdown(task.description);
       Controls.review_viewer.setMarkdown(chosenAnswer.value);
+      Controls.editor.reset();
       localStorage.setItem("currentTargetID", chosenAnswer.id);
       break;
     }
@@ -111,7 +114,20 @@ let setupSubmit = () => {
       sound.volume = 0.5;
       await sound.play();
       switch (mode) {
-        case "review":
+        case "review": {
+          const res = await fetch(`/${mode}/submit`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              author: author,
+              target_id: target,
+              grade: grade,
+              value: Controls.editor.getMarkdown(),
+            }),
+          });
+          setupTask();
+          break;
+        }
         case "challenge": {
           const res = await fetch(`/${mode}/submit`, {
             method: "POST",
@@ -123,6 +139,8 @@ let setupSubmit = () => {
               value: Controls.editor.getMarkdown(),
             }),
           });
+          document.getElementById("challenge-select").selectedIndex++;
+          setupTask();
           break;
         }
         case "timeTrial": {

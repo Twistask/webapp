@@ -29,7 +29,25 @@ const Database = {
     },
 
     deleteTask: async (id) => {
-      return await Database.connection.collection("tasks").delete(id);
+      const batch = Database.connection.createBatch();
+      const answerList = await Database.connection
+          .collection("answers")
+          .getFullList({
+            filter: `target_id = '${id}'`,
+          });
+      for (const ans of answerList) {
+        const commentList = await Database.connection
+            .collection("comments")
+            .getFullList({
+              filter: `target_id = '${ans.id}'`,
+            });
+        commentList.forEach((comm) => {
+          batch.collection("comments").delete(comm.id);
+        });
+        batch.collection("answers").delete(ans.id);
+      }
+      batch.collection("tasks").delete(id);
+      return await batch.send();
     },
 
     createUser: async (body) => {

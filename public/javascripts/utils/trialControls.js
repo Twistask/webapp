@@ -18,8 +18,8 @@ export const TrialControls = {
       timer_value.innerText = `Time left: ${convertToString(Math.max(0, trialTime - (Date.now() - start)))}`;
     }, 1);
     time_div.append(timer_value);
-    let work_area = document.getElementById("work-area");
-    work_area.append(time_div);
+    let menu = document.getElementById("trial-menu");
+    menu.append(time_div);
   },
   blockInput: () => {
     document.addEventListener("keydown", function (event) {
