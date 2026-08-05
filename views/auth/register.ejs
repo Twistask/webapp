@@ -3,20 +3,23 @@
   <head>
     <title><%= title %></title>
     <%- include('../partials/styling') %>
+    <link rel="stylesheet" href="/stylesheets/pages/auth.css" />
   </head>
   <body>
     <%- include('../partials/menu') %>
     <div id="work-area">
-      <label for="email">E-mail: </label
-      ><input type="email" id="email" required />
-      <label for="username">Username: </label
-      ><input type="text" id="username" required />
-      <label for="password">Password: </label
-      ><input type="password" id="password" minlength="8" required />
-      <label for="password_repeat">Confirm password: </label
-      ><input type="password" id="password_repeat" minlength="8" required />
-      <button type="submit" id="submit">Register</button>
-      <div id="error-box"></div>
+      <div id="form">
+        <label for="email">E-mail: </label
+        ><input type="email" id="email" required /><br>
+        <label for="username">Username: </label
+        ><input type="text" id="username" required /><br>
+        <label for="password">Password: </label
+        ><input type="password" id="password" minlength="8" required /><br>
+        <label for="password_repeat">Confirm password: </label
+        ><input type="password" id="password_repeat" minlength="8" required /><br>
+        <button type="submit" id="submit">Register</button><br><br>
+        <div id="error-box"></div>
+      </div>
     </div>
     <script
       type="module"

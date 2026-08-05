@@ -18,7 +18,10 @@ body {
 }
 
 #work-area {
-    padding: 1vmax;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    align-content: center;
 }
 
 #controls, #task-area, #answer-area, #review-answer-area {

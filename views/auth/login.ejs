@@ -3,15 +3,18 @@
   <head>
     <title><%= title %></title>
     <%- include('../partials/styling') %>
+    <link rel="stylesheet" href="/stylesheets/pages/auth.css" />
   </head>
   <body>
     <%- include('../partials/menu') %>
     <div id="work-area">
-      <label for="email">E-mail: </label
-      ><input type="text" id="email" required />
-      <label for="password">Password: </label
-      ><input type="password" id="password" required />
-      <button type="submit" id="submit">Login</button>
+      <div id="form">
+        <label for="email">E-mail: </label
+        ><input type="text" id="email" required /><br>
+        <label for="password">Password: </label
+        ><input type="password" id="password" required /><br>
+        <button type="submit" id="submit">Login</button>
+      </div>
     </div>
     <script
       type="module"
