@@ -8,7 +8,7 @@ router.get("/", function (req, res, next) {
 });
 
 router.get("/register", function (req, res, next) {
-  res.render("register", { title: "Twistask" });
+  res.render("auth/register", { title: "Twistask" });
 });
 
 router.post("/register/submit", async (req, res, next) => {
@@ -22,7 +22,7 @@ router.post("/register/submit", async (req, res, next) => {
 });
 
 router.get("/login", function (req, res, next) {
-  res.render("login", { title: "Twistask" });
+  res.render("auth/login", { title: "Twistask" });
 });
 
 router.post("/login/submit", async (req, res, next) => {

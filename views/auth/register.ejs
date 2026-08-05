@@ -2,10 +2,10 @@
 <html>
   <head>
     <title><%= title %></title>
-    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <%- include('../partials/styling') %>
   </head>
   <body>
-    <%- include('partials/menu') %>
+    <%- include('../partials/menu') %>
     <div id="work-area">
       <label for="email">E-mail: </label
       ><input type="email" id="email" required />

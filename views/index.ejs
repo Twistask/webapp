@@ -2,13 +2,15 @@
 <html>
   <head>
     <title><%= title %></title>
-    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <%- include('partials/styling') %>
+    <link rel="stylesheet" href="/stylesheets/pages/index.css" />
   </head>
   <body>
     <%- include('partials/menu') %>
     <div id="work-area">
       <h1><%= title %></h1>
-      <p>Welcome to <%= title %></p>
+      <p>Critical thinking isn’t a talent; it’s a skill. And like any skill, it requires practice. Whether you are making business decisions or navigating daily life, Twistask provides the tools to solve and create complex issues and build bulletproof logic.</p>
+      <p>Explore one of our main modes, or sign up to create your own tasks!</p>
     </div>
   </body>
 </html>

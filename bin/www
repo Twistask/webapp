@@ -5,7 +5,6 @@
  */
 
 import app from '../app.js';
-import Database from '../db.js';
 import createDebug from 'debug';
 import http from 'http';
 
