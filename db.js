@@ -16,6 +16,10 @@ const Database = {
           });
     },
 
+    getContent: async (type, id) => {
+      return await Database.connection.collection(`${type}s`).getOne(id);
+    },
+
     sendContent: async (type, body) => {
       return await Database.connection.collection(`${type}s`).create(body);
     },

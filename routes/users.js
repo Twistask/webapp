@@ -101,8 +101,30 @@ router.post("/logout", async function (req, res, next) {
   }
 });
 
-router.get("/profile", function (req, res, next) {
-  res.render("profile", { title: "Twistask" });
+router.get("/profile", async function (req, res, next) {
+  try {
+    const token = req.cookies?.twistask_auth;
+    if (!token) {
+      return res.json({authenticated: false});
+    }
+
+    let user = null;
+    try {
+      user = await Database.functions.getUserFromToken(token);
+    } catch (err) {
+      return res.json({authenticated: false});
+    }
+
+    if (!user) return res.json({authenticated: false});
+
+    let tasks = await Database.functions.loadContentbyUser("tasks", user.record.id);
+    let answers = await Database.functions.loadContentbyUser("answers", user.record.id);
+    let comments = await Database.functions.loadContentbyUser("comments", user.record.id);
+
+    res.render("profile", {title: "Twistask", tasks, answers, comments});
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.delete("/delete", async function (req, res, next) {

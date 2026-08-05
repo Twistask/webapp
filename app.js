@@ -9,6 +9,7 @@ import usersRouter from "./routes/users.js";
 import challengeRouter from "./routes/challenge.js";
 import reviewRouter from "./routes/review.js";
 import editorRouter from "./routes/editor.js";
+import viewerRouter from "./routes/viewer.js";
 
 let app = express();
 
@@ -33,6 +34,7 @@ app.use("/users", usersRouter);
 app.use("/challenge", challengeRouter);
 app.use("/review", reviewRouter);
 app.use("/editor", editorRouter);
+app.use("/viewer", viewerRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

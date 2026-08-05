@@ -7,15 +7,32 @@
   <body>
     <%- include('partials/menu') %>
     <div id="work-area">
+      <div id="my-tasks">
+        <h1>My Tasks</h1>
+      </div>
+      <div id="my-answers">
+        <h1>My Answers</h1>
+      </div>
+      <div id="my-reviews">
+        <h1>My Reviews</h1>
+      </div>
       <div id="user-settings">
+        <h1>Settings</h1>
         <label for="password">New Password: </label
-        ><input type="password" id="password" required />
+        ><input type="password" id="password" required /><br>
         <label for="password_repeat">Confirm New Password: </label
-        ><input type="password" id="password_repeat" required />
-        <button type="submit" id="submit_pw">Change Password</button>
+        ><input type="password" id="password_repeat" required /><br>
+        <button type="submit" id="submit_pw">Change Password</button><br>
         <button id="delete_account">Delete Account</button>
       </div>
     </div>
+    <script>
+      window.APP = {
+        tasks: <%- JSON.stringify(tasks || []) %>,
+        answers: <%- JSON.stringify(answers || []) %>,
+        comments: <%- JSON.stringify(comments || []) %>,
+      };
+    </script>
     <script
       type="module"
       src="/javascripts/handlers/users/settingsHandler.js"
