@@ -41,6 +41,7 @@ nav #common {
   display: flex;
   align-items: center;
   gap: 0.1vmax;
+  padding-right: 0.5vmax;
 }
 
 @media (max-width: 700px) {

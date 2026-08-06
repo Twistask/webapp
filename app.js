@@ -15,6 +15,7 @@ let app = express();
 
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import {checkAuthStatus} from "./middleware/checkAuthStatus.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -28,6 +29,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use(async (req, res, next) => {
+  try {
+    const token = req.cookies?.twistask_auth;
+    let status = await checkAuthStatus(token);
+    res.locals.auth = status.isAuthenticated;
+    res.locals.user = status.userData;
+  } catch (err) {
+    console.error("auth middleware unexpected error:", err);
+    res.locals.auth = false;
+    res.locals.user = null;
+  }
+  next();
+});
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
