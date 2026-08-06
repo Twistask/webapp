@@ -5,6 +5,7 @@ import Database from "../db.js";
 
 /* GET editor page. */
 router.get("/", async (req, res, next) => {
+  if (!res.locals.auth) res.redirect("../users/login");
   try {
     const token = req.cookies?.twistask_auth;
     if (!token) {
@@ -27,6 +28,7 @@ router.get("/", async (req, res, next) => {
 });
 
 router.post("/submit", async (req, res, next) => {
+  if (!res.locals.auth) res.status(403);
   try {
     let body = req.body;
     const result = await Database.functions.createTask(body);
@@ -37,6 +39,7 @@ router.post("/submit", async (req, res, next) => {
 });
 
 router.post("/update", async (req, res, next) => {
+  if (!res.locals.auth) res.status(403);
   try {
     let body = req.body;
     const result = await Database.functions.updateTask(body.id, body.task);
@@ -47,6 +50,7 @@ router.post("/update", async (req, res, next) => {
 });
 
 router.delete("/delete", async (req, res, next) => {
+  if (!res.locals.auth) res.status(403);
   try {
     let body = req.body;
     const result = await Database.functions.deleteTask(body.id);

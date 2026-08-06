@@ -5,6 +5,7 @@ import Database from "../db.js";
 
 /* GET review page. */
 router.get("/", async (req, res, next) => {
+  if (!res.locals.auth) res.redirect("../users/login");
   try {
     const tasks = await Database.functions.loadContent("tasks");
     const answers = await Database.functions.loadContent("answers");
@@ -15,6 +16,7 @@ router.get("/", async (req, res, next) => {
 });
 
 router.post("/submit", async (req, res, next) => {
+  if (!res.locals.auth) res.status(403);
   try {
     let body = req.body;
     const result = await Database.functions.sendContent("comment", body);

@@ -2,16 +2,14 @@ import express from "express";
 import Database from "../db.js";
 
 let router = express.Router();
-/* GET users listing. */
-router.get("/", function (req, res, next) {
-  res.send("respond with a resource");
-});
 
 router.get("/register", function (req, res, next) {
+  if (res.locals.auth) res.redirect("../");
   res.render("auth/register", { title: "Twistask" });
 });
 
 router.post("/register/submit", async (req, res, next) => {
+  if (res.locals.auth) res.status(409);
   try {
     const body = req.body;
     const result = await Database.functions.createUser(body);
@@ -22,10 +20,12 @@ router.post("/register/submit", async (req, res, next) => {
 });
 
 router.get("/login", function (req, res, next) {
+  if (res.locals.auth) res.redirect("../");
   res.render("auth/login", { title: "Twistask" });
 });
 
 router.post("/login/submit", async (req, res, next) => {
+  if (res.locals.auth) res.status(409);
   try {
     const body = req.body;
     const result = await Database.functions.loginUser(
@@ -77,6 +77,7 @@ router.get("/auth/status", async (req, res, next) => {
 });
 
 router.post("/logout", async function (req, res, next) {
+  if (!res.locals.auth) res.redirect("../");
   try {
     const token = req.cookies?.twistask_auth;
 
@@ -102,6 +103,7 @@ router.post("/logout", async function (req, res, next) {
 });
 
 router.get("/profile", async function (req, res, next) {
+  if (!res.locals.auth) res.redirect("login");
   try {
     const token = req.cookies?.twistask_auth;
     if (!token) {
@@ -128,6 +130,7 @@ router.get("/profile", async function (req, res, next) {
 });
 
 router.delete("/delete", async function (req, res, next) {
+  if (!res.locals.auth) res.status(403);
   try {
     const token = req.cookies?.twistask_auth;
     if (!token) {
