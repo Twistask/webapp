@@ -9,11 +9,9 @@ const Database = {
     },
 
     loadContentbyUser: async (type, id) => {
-      return await Database.connection
-          .collection(type)
-          .getFullList({
-            filter: `author = '${id}'`,
-          });
+      return await Database.connection.collection(type).getFullList({
+        filter: `author = '${id}'`,
+      });
     },
 
     getContent: async (type, id) => {
@@ -35,16 +33,16 @@ const Database = {
     deleteTask: async (id) => {
       const batch = Database.connection.createBatch();
       const answerList = await Database.connection
-          .collection("answers")
-          .getFullList({
-            filter: `target_id = '${id}'`,
-          });
+        .collection("answers")
+        .getFullList({
+          filter: `target_id = '${id}'`,
+        });
       for (const ans of answerList) {
         const commentList = await Database.connection
-            .collection("comments")
-            .getFullList({
-              filter: `target_id = '${ans.id}'`,
-            });
+          .collection("comments")
+          .getFullList({
+            filter: `target_id = '${ans.id}'`,
+          });
         commentList.forEach((comm) => {
           batch.collection("comments").delete(comm.id);
         });

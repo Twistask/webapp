@@ -1,34 +1,38 @@
 <!DOCTYPE html>
 
 <head>
-    <title>Welcome!</title>
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.getElementById('welcome').innerHTML = "Website unavailable";
-            document.getElementById('prompt').innerHTML = "The website is currently in maintenance mode.";
-        })
-    </script>
+  <title>Welcome!</title>
+  <meta
+    name="viewport"
+    content="width=device-width, height=device-height, initial-scale=1"
+  />
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      document.getElementById("welcome").innerHTML = "Website unavailable";
+      document.getElementById("prompt").innerHTML =
+        "The website is currently in maintenance mode.";
+    });
+  </script>
 </head>
 <body>
-<style>
+  <style>
     body {
-        display: grid;
+      display: grid;
     }
     p {
-        width: auto;
-        height: auto;
-        font-size: xx-large;
-        font-family: 'Segoe UI', system-ui;
-        text-align: center;
+      width: auto;
+      height: auto;
+      font-size: xx-large;
+      font-family: "Segoe UI", system-ui;
+      text-align: center;
     }
 
     h1 {
-        font-family: 'Segoe UI', system-ui;
-        font-size: xxx-large;
-        text-align: center;
+      font-family: "Segoe UI", system-ui;
+      font-size: xxx-large;
+      text-align: center;
     }
-</style>
-<h1 id="welcome"></h1>
-<p id="prompt"></p>
+  </style>
+  <h1 id="welcome"></h1>
+  <p id="prompt"></p>
 </body>

@@ -20,7 +20,10 @@ router.get("/", async (req, res, next) => {
     }
 
     if (!user) return res.json({ authenticated: false });
-    const tasks = await Database.functions.loadContentbyUser("tasks", user.record.id);
+    const tasks = await Database.functions.loadContentbyUser(
+      "tasks",
+      user.record.id,
+    );
     res.render("editor", { title: "Twistask", tasks });
   } catch (err) {
     next(err);
@@ -32,7 +35,7 @@ router.post("/submit", async (req, res, next) => {
   try {
     let body = req.body;
     const result = await Database.functions.createTask(body);
-    res.status(200).json({ok: true});
+    res.status(200).json({ ok: true });
   } catch (err) {
     next(err); // lets Express error middleware handle/log and return a 500
   }
@@ -43,7 +46,7 @@ router.post("/update", async (req, res, next) => {
   try {
     let body = req.body;
     const result = await Database.functions.updateTask(body.id, body.task);
-    res.status(200).json({ok: true});
+    res.status(200).json({ ok: true });
   } catch (err) {
     next(err); // lets Express error middleware handle/log and return a 500
   }
@@ -54,7 +57,7 @@ router.delete("/delete", async (req, res, next) => {
   try {
     let body = req.body;
     const result = await Database.functions.deleteTask(body.id);
-    res.status(200).json({ok: true});
+    res.status(200).json({ ok: true });
   } catch (err) {
     next(err); // lets Express error middleware handle/log and return a 500
   }

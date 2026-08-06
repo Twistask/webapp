@@ -13,9 +13,9 @@ nav {
   left: 0;
   height: 3vmax;
   background: linear-gradient(
-          180deg,
-          var(--nav-bg-top) 0%,
-          var(--nav-bg-bottom) 100%
+    180deg,
+    var(--nav-bg-top) 0%,
+    var(--nav-bg-bottom) 100%
   );
   align-items: center;
   padding: 0;

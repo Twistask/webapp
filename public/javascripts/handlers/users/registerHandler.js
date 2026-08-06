@@ -1,5 +1,10 @@
 document.getElementById("submit").addEventListener("click", async () => {
-  if (document.getElementById("password").value !== document.getElementById("password_repeat").value) return document.getElementById("error-box").innerText = "Passwords do not match!";
+  if (
+    document.getElementById("password").value !==
+    document.getElementById("password_repeat").value
+  )
+    return (document.getElementById("error-box").innerText =
+      "Passwords do not match!");
   else {
     let sound = new Audio();
     sound.src = "../sounds/emblem.wav";
