@@ -17,6 +17,6 @@ document.getElementById("submit").addEventListener("click", async () => {
         passwordConfirm: document.getElementById("password_repeat").value,
       }),
     });
-    window.location.href = "/";
+    window.location.replace("/");
   }
 });
