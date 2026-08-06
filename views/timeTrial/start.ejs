@@ -8,13 +8,17 @@
     <%- include('../partials/menu') %>
     <div id="work-area">
       <form action="/timeTrial/start" method="post">
-        <input type="number" min="1" max="<% tasks.length %>" name="tasksAmount"><br>
-        <select name="difficulty">
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-          <option value="superHard">Super Hard</option>
-        </select><br>
+        <label>How many tasks would you like to solve?
+          <input type="number" min="1" max="<%= tasks.length %>" value="3" name="tasksAmount">
+        </label><br>
+        <label>Select your difficulty:
+          <select name="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+            <option value="superHard">Super Hard</option>
+          </select>
+        </label><br>
         <button type="submit" id="startTrial">Start</button>
       </form>
     </div>

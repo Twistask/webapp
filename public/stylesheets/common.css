@@ -73,3 +73,17 @@ a:focus {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
   outline: none;
 }
+
+form {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: block;
+  margin: auto;
+  text-align: center;
+  align-content: center;
+  height: fit-content;
+  width: fit-content;
+}
