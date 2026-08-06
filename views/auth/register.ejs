@@ -8,27 +8,23 @@
   <body>
     <%- include('../partials/menu') %>
     <div id="work-area">
-      <div id="form">
+      <form action="/users/register/submit" method="post">
         <label for="email">E-mail: </label
-        ><input type="email" id="email" required /><br />
+        ><input type="email" id="email" name="email" required /><br />
         <label for="username">Username: </label
-        ><input type="text" id="username" required /><br />
+        ><input type="text" id="username" name="name" required /><br />
         <label for="password">Password: </label
-        ><input type="password" id="password" minlength="8" required /><br />
+        ><input type="password" id="password" name="password" minlength="8" required /><br />
         <label for="password_repeat">Confirm password: </label
         ><input
           type="password"
           id="password_repeat"
+          name="passwordConfirm"
           minlength="8"
           required
         /><br />
         <button type="submit" id="submit">Register</button><br /><br />
-        <div id="error-box"></div>
-      </div>
+      </form>
     </div>
-    <script
-      type="module"
-      src="/javascripts/handlers/users/registerHandler.js"
-    ></script>
   </body>
 </html>

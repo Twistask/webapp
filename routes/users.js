@@ -13,7 +13,7 @@ router.post("/register/submit", async (req, res, next) => {
   try {
     const body = req.body;
     const result = await Database.functions.createUser(body);
-    res.status(201).json({ ok: true, user: result.user ?? null });
+    res.redirect(303, "/");
   } catch (err) {
     next(err);
   }
@@ -49,7 +49,7 @@ router.post("/login/submit", async (req, res, next) => {
 
     res.cookie("twistask_auth", token, cookieOptions);
 
-    res.json({ authenticated: true, user: result.user ?? null });
+    res.redirect(303, "/");
   } catch (err) {
     next(err);
   }
