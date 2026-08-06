@@ -2,8 +2,9 @@ import { TrialControls } from "./utils/trialControls.js";
 import Controls from "./baseSetup.js";
 import { checkAuthStatus } from "./handlers/users/authHelper.js";
 
-const { tasks = [], answers = [] } = window.APP || {};
-let mode = localStorage.getItem("mode");
+const { tasks = [], answers = [], mode="" } = window.APP || {};
+
+const { difficulty = "", trialTime = "", tasksAmount = "" } = window.TRIAL || {};
 
 let setupMode = () => {
   switch (mode) {
@@ -25,7 +26,8 @@ let setupMode = () => {
       sound.loop = true;
       sound.play();
       setupTask();
-      TrialControls.setupTimer();
+      TrialControls.setup(tasksAmount);
+      TrialControls.setupTimer(trialTime);
       TrialControls.blockInput();
     }
   }

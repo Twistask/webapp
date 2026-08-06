@@ -8,56 +8,52 @@
   <body>
     <%- include('partials/menu') %>
     <div id="work-area">
-      <div id="controls" data-modes="challenge">
+      <% if (mode === "challenge") { %>
+      <div id="controls">
         <label for="challenge-select">Select a challenge:</label>
         <select id="challenge-select"></select>
       </div>
-      <div id="task-area" data-modes="review challenge timeTrial">
+      <% } %>
+      <div id="task-area">
         <div id="viewer"></div>
       </div>
-      <div id="review-answer-area" data-modes="review">
+      <% if (mode === "review") { %>
+      <div id="review-answer-area">
         <div id="answer-viewer"></div>
       </div>
-      <div id="answer-area" data-modes="review challenge timeTrial">
-        <label for="author-name" data-modes="challenge" data-access="guestOnly"
-          >Input your name:
-        </label>
-        <input
-          id="author-name"
-          type="text"
-          data-modes="challenge"
-          data-access="guestOnly"
-        />
-        <label for="review-grade" data-modes="review"
-          >Select a grade (0-100):
-        </label>
-        <input
-          id="review-grade"
-          type="number"
-          min="0"
-          max="100"
-          value="0"
-          data-modes="review"
-        />
-        <div id="editor" data-modes="review challenge timeTrial">
+      <% } %>
+      <div id="answer-area">
+        <% if (!auth && mode === "challenge") { %>
+        <label for="author-name">Input your name: </label>
+        <input id="author-name" type="text" />
+        <% } %>
+        <% if (mode === "review") { %>
+        <label for="review-grade">Select a grade (0-100): </label>
+        <input id="review-grade" type="number" min="0" max="100" value="0" />
+        <% } %>
+        <div id="editor">
           <p>Type here.</p>
           <p><br /></p>
         </div>
-        <button
-          type="submit"
-          id="submit"
-          data-modes="review challenge timeTrial"
-        >
-          Submit
-        </button>
+        <button type="submit" id="submit">Submit</button>
       </div>
     </div>
     <script>
       window.APP = {
           tasks: <%- JSON.stringify(tasks || []) %>,
           answers: <%- JSON.stringify(answers || []) %>,
+          mode: "<%- mode %>",
       };
     </script>
+    <% if (mode === "timeTrial") { %>
+    <script>
+      window.TRIAL = {
+        difficulty: "<%- difficulty || "" %>",
+        trialTime: "<%- trialTime || "" %>",
+        tasksAmount: "<%- tasksAmount || "" %>",
+      }
+    </script>
+    <% } %>
     <script type="module" src="/javascripts/baseSetup.js"></script>
     <script type="module" src="/javascripts/modeSetup.js"></script>
   </body>

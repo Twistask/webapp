@@ -1,32 +1,34 @@
 <link rel="stylesheet" href="/stylesheets/menu.css" />
 <nav id="menu" role="navigation" aria-label="Main">
-    <div id="common">
-        <a href="/" id="home-link">Home</a>
-        <a href="/challenge" id="challenge-link">Challenge Mode</a>
-        <a href="/challenge" id="timeTrial-link">Time Trial</a>
-    </div>
+  <% if (mode !== "timeTrial") { %>
+  <div id="common">
+    <a href="/" id="home-link">Home</a>
+    <a href="/challenge" id="challenge-link">Challenge Mode</a>
+    <a href="/timeTrial" id="timeTrial-link">Time Trial</a>
+  </div>
 
-    <div id="menu-right">
-        <% if (!auth) { %>
-            <div id="logged-out" data-access="guestOnly">
-                <a href="/users/register" id="register-link">Register</a>
-                <a href="/users/login" id="login-link">Login</a>
-            </div>
-        <% } else { %>
-            <div id="logged-in" data-access="authOnly">
-                <a href="/review" id="review-link">Review Mode</a>
-                <a href="/editor" id="editor-link">Task Editor</a>
-                <a href="/users/profile" id="profile-link">Profile</a>
-                <a id="logout-btn">Logout</a>
-                <div id="menu-user"><%= user?.name %></div>
-            </div>
-        <% } %>
+  <div id="menu-right">
+    <% if (!auth) { %>
+    <div id="logged-out" data-access="guestOnly">
+      <a href="/users/register" id="register-link">Register</a>
+      <a href="/users/login" id="login-link">Login</a>
     </div>
-
-    <div id="trial-menu">
-        <a href="/" id="home-link" data-mode="home">Give Up</a>
+    <% } else { %>
+    <div id="logged-in" data-access="authOnly">
+      <a href="/review" id="review-link">Review Mode</a>
+      <a href="/editor" id="editor-link">Task Editor</a>
+      <a href="/users/profile" id="profile-link">Profile</a>
+      <a id="logout-btn">Logout</a>
+      <div id="menu-user"><%= user?.name %></div>
     </div>
+    <% } %>
+  </div>
+    <% } %>
+  <% if (mode === "timeTrial") { %>
+  <div id="trial-menu">
+    <a href="/" id="home-link" data-mode="home">Give Up</a>
+  </div>
+  <% } %>
 </nav>
 
-<script src="/javascripts/utils/setMode.js"></script>
 <script type="module" src="/javascripts/baseSetup.js"></script>

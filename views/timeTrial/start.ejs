@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <%- include('../partials/styling') %>
+    <link rel="stylesheet" href="/stylesheets/pages/auth.css" />
+  </head>
+  <body>
+    <%- include('../partials/menu') %>
+    <div id="work-area">
+      <div id="form">
+        <input type="number" min="1" max="<% tasks.length %>" id="tasksAmount"><br>
+        <select id="difficulty">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+          <option value="superHard">Super Hard</option>
+        </select><br>
+        <a id="startTrial">Start</a>
+      </div>
+    </div>
+  <script src="/javascripts/utils/trialStart.js"></script>
+  </body>
+</html>

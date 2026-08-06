@@ -7,15 +7,15 @@ import logger from "morgan";
 import indexRouter from "./routes/index.js";
 import usersRouter from "./routes/users.js";
 import challengeRouter from "./routes/challenge.js";
+import timeTrialRouter from "./routes/timeTrial.js";
 import reviewRouter from "./routes/review.js";
 import editorRouter from "./routes/editor.js";
-import viewerRouter from "./routes/viewer.js";
 
 let app = express();
 
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import {checkAuthStatus} from "./middleware/checkAuthStatus.js";
+import { checkAuthStatus } from "./middleware/checkAuthStatus.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -31,13 +31,20 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(async (req, res, next) => {
+  res.locals.title = "Twistask";
+  res.locals.mode = "none";
+  res.locals.tasks = [];
+  res.locals.answers = [];
+  res.locals.comments = [];
+  res.locals.auth = false;
+  res.locals.user = null;
   try {
     const token = req.cookies?.twistask_auth;
     let status = await checkAuthStatus(token);
     res.locals.auth = status.isAuthenticated;
     res.locals.user = status.userData;
   } catch (err) {
-    console.error("auth middleware unexpected error:", err);
+    console.error("middleware unexpected error:", err);
     res.locals.auth = false;
     res.locals.user = null;
   }
@@ -47,9 +54,9 @@ app.use(async (req, res, next) => {
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/challenge", challengeRouter);
+app.use("/timeTrial", timeTrialRouter);
 app.use("/review", reviewRouter);
 app.use("/editor", editorRouter);
-app.use("/viewer", viewerRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

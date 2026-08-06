@@ -1,49 +1,6 @@
-import { checkAuthStatus } from "./handlers/users/authHelper.js";
-
 let editor = undefined;
 let viewer = undefined;
 let review_viewer = undefined;
-let mode = localStorage.getItem("mode");
-
-let setupPage = async () => {
-  const access_els = Array.from(document.querySelectorAll("[data-access]"));
-
-  let auth = await checkAuthStatus();
-  console.log(auth);
-  switch (auth.authenticated) {
-    case true:
-      access_els.forEach((el) => {
-        const modes = el.dataset.access.split(/\s+/);
-        if (!modes.includes("authOnly")) el.remove();
-      });
-      break;
-    case false:
-      access_els.forEach((el) => {
-        const modes = el.dataset.access.split(/\s+/);
-        if (!modes.includes("guestOnly")) el.remove();
-      });
-      break;
-  }
-  const mode_els = Array.from(document.querySelectorAll("[data-modes]"));
-  mode_els.forEach((el) => {
-    const modes = el.dataset.modes.split(/\s+/);
-    if (!modes.includes(mode)) el.remove();
-  });
-  switch (mode) {
-    default:
-    case "home":
-    case "challenge":
-    case "review":
-      document.getElementById("trial-menu").remove();
-      break;
-    case "timeTrial":
-      document.getElementById("common").remove();
-      access_els.forEach((el) => {
-        el.remove();
-      });
-      break;
-  }
-};
 
 let setupEditor = () => {
   let editor_el = document.getElementById("editor");
@@ -102,7 +59,6 @@ let setupLogout = () => {
     });
 };
 
-await setupPage();
 setupEditor();
 setupLogout();
 

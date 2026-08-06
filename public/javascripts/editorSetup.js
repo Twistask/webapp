@@ -7,7 +7,7 @@ let setupEditor = () => {
   createChallengeItems(tasks);
   document.getElementById("challenge-select").onchange = setupTask;
   setupTask();
-}
+};
 
 function createChallengeItems(items) {
   let select = document.getElementById("challenge-select");
@@ -31,7 +31,7 @@ let setupTask = () => {
     document.getElementById("task-title").value = "";
     Controls.editor.reset();
   }
-}
+};
 
 let setupSubmit = () => {
   let submitbtn = document.getElementById("submit");
@@ -56,7 +56,7 @@ let setupSubmit = () => {
               author: author,
               title: document.getElementById("task-title").value,
               description: Controls.editor.getMarkdown(),
-            }
+            },
           }),
         });
       } else {
@@ -77,25 +77,23 @@ let setupSubmit = () => {
 };
 
 let setupDelete = () => {
-  document
-      .getElementById("delete")
-      .addEventListener("click", async () => {
-        let answer = confirm(
-            "THIS ACTION IS IRREVERSIBLE!!! The task will be permanently deleted! Are you sure?",
-        );
-        if (answer === true) {
-          await fetch("/editor/delete", {
-            method: "DELETE",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              id: document.getElementById("challenge-select").value
-            })
-          });
-          window.location.reload();
-        }
+  document.getElementById("delete").addEventListener("click", async () => {
+    let answer = confirm(
+      "THIS ACTION IS IRREVERSIBLE!!! The task will be permanently deleted! Are you sure?",
+    );
+    if (answer === true) {
+      await fetch("/editor/delete", {
+        method: "DELETE",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: document.getElementById("challenge-select").value,
+        }),
       });
-}
+      window.location.reload();
+    }
+  });
+};
 
 setupEditor();
 setupSubmit();
