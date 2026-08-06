@@ -47,11 +47,7 @@
     </script>
     <% if (mode === "timeTrial") { %>
     <script>
-      window.TRIAL = {
-        difficulty: "<%- difficulty || "" %>",
-        trialTime: "<%- trialTime || "" %>",
-        tasksAmount: "<%- tasksAmount || "" %>",
-      }
+      window.TRIAL = <%- JSON.stringify(trial || {}) %>
     </script>
     <% } %>
     <script type="module" src="/javascripts/baseSetup.js"></script>

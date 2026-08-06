@@ -4,7 +4,7 @@ import { checkAuthStatus } from "./handlers/users/authHelper.js";
 
 const { tasks = [], answers = [], mode="" } = window.APP || {};
 
-const { difficulty = "", trialTime = "", tasksAmount = "" } = window.TRIAL || {};
+const trial = window.TRIAL || {};
 
 let setupMode = () => {
   switch (mode) {
@@ -26,8 +26,8 @@ let setupMode = () => {
       sound.loop = true;
       sound.play();
       setupTask();
-      TrialControls.setup(tasksAmount);
-      TrialControls.setupTimer(trialTime);
+      TrialControls.setup(trial.tasksAmount);
+      TrialControls.setupTimer(trial.trialTime);
       TrialControls.blockInput();
     }
   }

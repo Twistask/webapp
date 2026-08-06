@@ -11,11 +11,10 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.post("/challenge", async (req, res, next) => {
+router.post("/start", async (req, res, next) => {
   try {
     res.locals.tasks = await Database.functions.loadContent("tasks");
     res.locals.mode = "timeTrial";
-    res.locals.difficulty = req.body.difficulty;
     let trialTime;
     let tasksAmount;
     switch (req.body.difficulty) {
@@ -39,8 +38,12 @@ router.post("/challenge", async (req, res, next) => {
         tasksAmount = res.locals.tasks.length;
       }
     }
-    res.locals.trialTime = trialTime;
-    res.locals.tasksAmount = tasksAmount;
+    console.log(req.body)
+    res.locals.trial = {
+      difficulty: req.body.difficulty,
+      trialTime: trialTime,
+      tasksAmount: tasksAmount
+    }
     res.render("challenge");
   } catch (err) {
     next(err); // lets Express error middleware handle/log and return a 500
