@@ -138,6 +138,11 @@ router.get("/profile", async function (req, res, next) {
   }
 });
 
+router.get("/settings", function (req, res, next) {
+  if (!res.locals.auth) res.redirect("login");
+  res.render("settings");
+});
+
 router.delete("/delete", async function (req, res, next) {
   if (!res.locals.auth) res.status(403);
   try {
@@ -163,6 +168,7 @@ router.delete("/delete", async function (req, res, next) {
     await Database.functions.deleteUser(user.record.id);
     return res.status(200).json({ ok: true });
   } catch (err) {
+    console.log(err)
     next(err);
   }
 });

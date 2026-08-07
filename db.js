@@ -43,9 +43,9 @@ const Database = {
           .getFullList({
             filter: `target_id = '${ans.id}'`,
           });
-        commentList.forEach((comm) => {
+        for (const comm of commentList) {
           batch.collection("comments").delete(comm.id);
-        });
+        }
         batch.collection("answers").delete(ans.id);
       }
       batch.collection("tasks").delete(id);
@@ -73,15 +73,15 @@ const Database = {
         .getFullList({
           filter: `author = '${id}'`,
         });
-      answerList.forEach((ans) => {
+      for (const ans of answerList) {
         batch.collection("answers").delete(ans.id);
-      });
-      commentList.forEach((ans) => {
-        batch.collection("comments").delete(ans.id);
-      });
-      tasksList.forEach((ans) => {
-        batch.collection("tasks").delete(ans.id);
-      });
+      }
+      for (const comm of commentList) {
+        batch.collection("comments").delete(comm.id);
+      }
+      for (const task of tasksList) {
+        await Database.functions.deleteTask(task.id);
+      }
       batch.collection("users").delete(id);
       await batch.send();
     },
