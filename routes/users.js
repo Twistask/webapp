@@ -168,13 +168,8 @@ router.delete("/delete", async function (req, res, next) {
     await Database.functions.deleteUser(user.record.id);
     return res.status(200).json({ ok: true });
   } catch (err) {
-    console.log(err)
     next(err);
   }
-});
-
-router.post("/changePW", function (req, res, next) {
-  res.render("profile", { title: "Twistask" });
 });
 
 export default router;

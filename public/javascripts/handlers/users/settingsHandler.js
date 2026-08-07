@@ -13,12 +13,3 @@ document
       window.location.href = "/";
     }
   });
-
-document.getElementById("submit_pw").addEventListener("click", async () => {
-  await fetch("/users/changePW", {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-  });
-  window.location.href = "/";
-});

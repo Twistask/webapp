@@ -97,7 +97,7 @@ const Database = {
     },
     getUserFromToken: async (token) => {
       return await Database.connection.collection("users").authRefresh(token);
-    },
+    }
   },
 };
 
