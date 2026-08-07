@@ -1,7 +1,8 @@
-import Controls from "../../baseSetup.js";
-
 let solutions = new Map();
 let counter = 0;
+
+let editor;
+let viewer;
 
 import { convertToString } from "../../utils/timeConverter.js";
 
@@ -18,16 +19,32 @@ export const TrialControls = {
     sound.volume = 0.3;
     sound.loop = true;
     sound.play();
+    TrialControls.setupEditor();
     TrialControls.setupTask();
     TrialControls.setupTimer(trial.trialTime);
     TrialControls.setupSubmit();
     TrialControls.blockInput();
   },
+  setupEditor: () => {
+    const Editor = toastui.Editor;
+    editor = new Editor({
+      el: document.querySelector("#editor"),
+      height: "500px",
+      initialEditType: "wysiwyg",
+      previewStyle: "vertical",
+    });
+    viewer = Editor.factory({
+      el: document.querySelector("#viewer"),
+      viewer: true,
+      height: "500px",
+      initialValue: "# hello",
+    });
+  },
   setupTask: () => {
     const randIndex = Math.floor(Math.random() * tasks.length);
     let chosenTask;
     chosenTask = tasks[randIndex];
-    Controls.viewer.setMarkdown(chosenTask.description);
+    viewer.setMarkdown(chosenTask.description);
     localStorage.setItem("currentTargetID", chosenTask.id);
   },
   setupSubmit: () => {
@@ -37,7 +54,7 @@ export const TrialControls = {
       TrialControls.setupTask();
       await TrialControls.submitPuzzle(
           target,
-          Controls.editor.getMarkdown(),
+          editor.getMarkdown(),
       );
     })
   },

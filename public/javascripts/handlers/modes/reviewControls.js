@@ -1,12 +1,37 @@
-import Controls from "../../baseSetup.js";
 import {checkAuthStatus} from "../users/authHelper.js";
+
+let editor;
+let task_viewer;
+let answer_viewer;
 
 const { tasks = [], answers = [] } = window.APP || {};
 
 export const ReviewControls = {
     setup: () => {
+        ReviewControls.setupViewer();
         ReviewControls.setupTask();
         ReviewControls.setupSubmit();
+    },
+    setupViewer: () => {
+        const Editor = toastui.Editor;
+        editor = new Editor({
+            el: document.querySelector("#editor"),
+            height: "500px",
+            initialEditType: "wysiwyg",
+            previewStyle: "vertical",
+        });
+        task_viewer = Editor.factory({
+            el: document.querySelector("#viewer"),
+            viewer: true,
+            height: "500px",
+            initialValue: "# hello",
+        });
+        answer_viewer = Editor.factory({
+            el: document.querySelector("#answer-viewer"),
+            viewer: true,
+            height: "500px",
+            initialValue: "# hello",
+        });
     },
     setupTask: async () => {
         let auth = await checkAuthStatus();
@@ -32,9 +57,9 @@ export const ReviewControls = {
             return;
         }
 
-        Controls.viewer.setMarkdown(task.description);
-        Controls.review_viewer.setMarkdown(chosenAnswer.value);
-        Controls.editor.reset();
+        task_viewer.setMarkdown(task.description);
+        answer_viewer.setMarkdown(chosenAnswer.value);
+        editor.reset();
         localStorage.setItem("currentTargetID", chosenAnswer.id);
     },
     setupSubmit: () => {
@@ -52,7 +77,7 @@ export const ReviewControls = {
                         author: author,
                         target_id: target,
                         grade: grade,
-                        value: Controls.editor.getMarkdown(),
+                        value: editor.getMarkdown(),
                     }),
                 });
                 await ReviewControls.setupTask();

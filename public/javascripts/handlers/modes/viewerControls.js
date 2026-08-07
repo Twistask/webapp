@@ -1,11 +1,28 @@
-import Controls from "../../baseSetup.js";
+let viewer;
 
 const { task = "" } = window.APP || {};
 
-let setupTask = () => {
-  if (task.title) document.getElementById("task-title").innerText = task.title;
-  if (task.description) Controls.viewer.setMarkdown(task.description);
-  else Controls.viewer.setMarkdown(task.value);
-};
+export const ViewerControls = {
+  setup: () => {
+    ViewerControls.setupTaskViewer();
+    ViewerControls.setupTask();
+  },
+  setupTask: () => {
+    if (task.title) document.getElementById("task-title").innerText = task.title;
+    if (task.description) viewer.setMarkdown(task.description);
+    else viewer.setMarkdown(task.value);
+  },
+  setupTaskViewer: () => {
+    const Editor = toastui.Editor;
+    viewer = Editor.factory({
+      el: document.querySelector("#viewer"),
+      viewer: true,
+      height: "500px",
+      initialValue: "# hello",
+    });
+  }
+}
 
-setupTask();
+document.addEventListener('DOMContentLoaded', async () => {
+  await ViewerControls.setup();
+})

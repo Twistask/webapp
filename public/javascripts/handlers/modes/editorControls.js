@@ -1,14 +1,25 @@
-import Controls from "../../baseSetup.js";
 import {checkAuthStatus} from "../users/authHelper.js";
 
 const { tasks = [] } = window.APP || {};
+
+let editor;
 
 export const EditorControls = {
     setup: () => {
         EditorControls.createChallengeItems(tasks);
         document.getElementById("challenge-select").onchange = EditorControls.setupTask;
+        EditorControls.setupEditor();
         EditorControls.setupTask();
         EditorControls.setupSubmit();
+    },
+    setupEditor: () => {
+        const Editor = toastui.Editor;
+        editor = new Editor({
+            el: document.querySelector("#editor"),
+            height: "500px",
+            initialEditType: "wysiwyg",
+            previewStyle: "vertical",
+        });
     },
     createChallengeItems: () => {
         let select = document.getElementById("challenge-select");
@@ -25,11 +36,11 @@ export const EditorControls = {
             const task = tasks.find((t) => t.id === value);
             document.getElementById("delete").style.display = "flex";
             document.getElementById("task-title").value = task.title;
-            Controls.editor.setMarkdown(task.description);
+            editor.setMarkdown(task.description);
         } else {
             document.getElementById("delete").style.display = "none";
             document.getElementById("task-title").value = "";
-            Controls.editor.reset();
+            editor.reset();
         }
     },
     setupSubmit: async () => {
@@ -55,7 +66,7 @@ export const EditorControls = {
                             task: {
                                 author: author,
                                 title: title,
-                                description: Controls.editor.getMarkdown(),
+                                description: editor.getMarkdown(),
                             },
                         }),
                     });
@@ -67,7 +78,7 @@ export const EditorControls = {
                         body: JSON.stringify({
                             author: author,
                             title: title,
-                            description: Controls.editor.getMarkdown(),
+                            description: editor.getMarkdown(),
                         }),
                     });
                 }

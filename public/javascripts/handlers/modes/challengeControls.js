@@ -1,14 +1,32 @@
-import Controls from "../../baseSetup.js";
 import {checkAuthStatus} from "../users/authHelper.js";
 
 const { tasks = [] } = window.APP || {};
 
+let editor;
+let viewer;
+
 export const ChallengeControls = {
     setup: () => {
         ChallengeControls.createChallengeItems(tasks);
+        ChallengeControls.setupEditor();
         document.getElementById("challenge-select").onchange = ChallengeControls.setupTask;
         ChallengeControls.setupTask();
         ChallengeControls.setupSubmit();
+    },
+    setupEditor: () => {
+        const Editor = toastui.Editor;
+        editor = new Editor({
+            el: document.querySelector("#editor"),
+            height: "500px",
+            initialEditType: "wysiwyg",
+            previewStyle: "vertical",
+        });
+        viewer = Editor.factory({
+            el: document.querySelector("#viewer"),
+            viewer: true,
+            height: "500px",
+            initialValue: "# hello",
+        });
     },
     createChallengeItems: () => {
         let select = document.getElementById("challenge-select");
@@ -22,8 +40,8 @@ export const ChallengeControls = {
     setupTask: () => {
         const value = document.getElementById("challenge-select").value;
         const task = tasks.find((t) => t.id === value);
-        Controls.viewer.setMarkdown(task.description);
-        Controls.editor.reset();
+        viewer.setMarkdown(task.description);
+        editor.reset();
         localStorage.setItem("currentTargetID", task.id);
     },
     setupSubmit: async () => {
@@ -43,7 +61,7 @@ export const ChallengeControls = {
                 body: JSON.stringify({
                     author: author,
                     target_id: target,
-                    value: Controls.editor.getMarkdown(),
+                    value: editor.getMarkdown(),
                 }),
             });
             const select = document.getElementById("challenge-select");
