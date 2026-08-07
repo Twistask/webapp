@@ -7,6 +7,7 @@ router.get("/", async (req, res, next) => {
   try {
     res.locals.tasks = await Database.functions.loadContent("tasks");
     res.locals.mode = "challenge";
+    if (res.locals.user) res.locals.author = res.locals.user.id;
     res.render("challenge");
   } catch (err) {
     next(err); // lets Express error middleware handle/log and return a 500

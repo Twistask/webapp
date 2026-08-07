@@ -1,4 +1,4 @@
-import Controls from "./baseSetup.js";
+import Controls from "../../baseSetup.js";
 
 const { task = "" } = window.APP || {};
 

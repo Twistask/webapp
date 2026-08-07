@@ -1,24 +1,57 @@
+import Controls from "../../baseSetup.js";
+
 let solutions = new Map();
-let tasksAmount = 0;
 let counter = 0;
 
-import { convertToString } from "./timeConverter.js";
+import { convertToString } from "../../utils/timeConverter.js";
+
+const { tasks = [] } = window.APP || {};
+
+const trial = window.TRIAL || {};
+const author = window.AUTHOR || "";
 
 export const TrialControls = {
-  setup: (tasksA) => {
-    tasksAmount = Number(tasksA)
+  setup: () => {
+    let sound = new Audio();
+    sound.src = "../sounds/trial-theme.mp3";
+    document.body.appendChild(sound);
+    sound.volume = 0.3;
+    sound.loop = true;
+    sound.play();
+    TrialControls.setupTask();
+    TrialControls.setupTimer(trial.trialTime);
+    TrialControls.setupSubmit();
+    TrialControls.blockInput();
   },
-  setupTimer: (trialTime) => {
-    if (trialTime !== undefined && trialTime !== 0) {
+  setupTask: () => {
+    const randIndex = Math.floor(Math.random() * tasks.length);
+    let chosenTask;
+    chosenTask = tasks[randIndex];
+    Controls.viewer.setMarkdown(chosenTask.description);
+    localStorage.setItem("currentTargetID", chosenTask.id);
+  },
+  setupSubmit: () => {
+    let submitbtn = document.getElementById("submit");
+    let target = localStorage.getItem("currentTargetID");
+    submitbtn.addEventListener("click", async () => {
+      TrialControls.setupTask();
+      await TrialControls.submitPuzzle(
+          target,
+          Controls.editor.getMarkdown(),
+      );
+    })
+  },
+  setupTimer: () => {
+    if (trial.trialTime !== undefined && trial.trialTime !== 0) {
       let start = Date.now();
       setTimeout(() => {
         alert("Time's up!");
         window.location.href = "/";
-      }, Number(trialTime));
+      }, Number(trial.trialTime));
       let time_div = document.createElement("div");
       let timer_value = document.createElement("p");
       setInterval(() => {
-        timer_value.innerText = `Time left: ${convertToString(Math.max(0, trialTime - (Date.now() - start)))}`;
+        timer_value.innerText = `Time left: ${convertToString(Math.max(0, trial.trialTime - (Date.now() - start)))}`;
       }, 1);
       time_div.append(timer_value);
       let menu = document.getElementById("trial-menu");
@@ -39,7 +72,7 @@ export const TrialControls = {
   },
   submitPuzzle: async (id, value) => {
     TrialControls.addSolution(id, value);
-    if (solutions.size >= tasksAmount) {
+    if (solutions.size >= trial.tasksAmount) {
       TrialControls.sendSolutions().then((r) => {
         console.log("Trial over!!!!");
       });
@@ -52,16 +85,13 @@ export const TrialControls = {
     });
     console.log(solutions);
   },
-  clearSolutions: () => {
-    solutions.clear();
-  },
   sendSolutions: async () => {
     const promises = Array.from(solutions, ([, ans]) => {
       return fetch("/challenge/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ target_id: ans.id, value: ans.value }),
+        body: JSON.stringify({ author: author, target_id: ans.id, value: ans.value }),
       })
         .then((res) => ({ id: ans.id, ok: res.ok, status: res.status }))
         .catch((err) => ({ id: ans.id, ok: false, error: String(err) }));
@@ -72,7 +102,6 @@ export const TrialControls = {
     const anyFailed = results.some((r) => !r.ok);
     if (anyFailed) {
       console.error("Some submissions failed", results);
-      // decide whether to throw or return results for caller to handle
       throw new Error("One or more submissions failed");
     }
 
@@ -83,3 +112,7 @@ export const TrialControls = {
     window.location.replace("/timeTrial/result");
   },
 };
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await TrialControls.setup();
+})

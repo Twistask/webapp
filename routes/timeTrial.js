@@ -45,6 +45,8 @@ router.post("/start", async (req, res, next) => {
       trialTime: trialTime,
       tasksAmount: tasksAmount
     }
+    if (req.body.author) res.locals.author = req.body.author;
+    else res.locals.author = res.locals.user.id;
     res.render("challenge");
   } catch (err) {
     next(err); // lets Express error middleware handle/log and return a 500

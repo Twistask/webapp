@@ -19,6 +19,9 @@
             <option value="superHard">Super Hard</option>
           </select>
         </label><br>
+        <% if (!auth) { %>
+          <label for="username">Enter your name: </label><input type="text" id="username" name="author" required><br>
+        <% } %>
         <button type="submit" id="startTrial">Start</button>
       </form>
     </div>

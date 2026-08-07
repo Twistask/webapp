@@ -48,9 +48,16 @@
     <% if (mode === "timeTrial") { %>
     <script>
       window.TRIAL = <%- JSON.stringify(trial || {}) %>
+              window.AUTHOR = "<%- author %>"
     </script>
+    <script type="module" src="/javascripts/handlers/modes/trialControls.js"></script>
+    <% } %>
+    <% if (mode === "challenge") { %>
+      <script type="module" src="/javascripts/handlers/modes/challengeControls.js"></script>
+    <% } %>
+    <% if (mode === "review") { %>
+      <script type="module" src="/javascripts/handlers/modes/reviewControls.js"></script>
     <% } %>
     <script type="module" src="/javascripts/baseSetup.js"></script>
-    <script type="module" src="/javascripts/modeSetup.js"></script>
   </body>
 </html>
