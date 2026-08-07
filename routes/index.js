@@ -7,6 +7,7 @@ router.get("/", function (req, res, next) {
 });
 
 router.get("/tasks/:id", async function (req, res, next) {
+  if (!res.locals.auth) res.redirect("../users/login");
   try {
     const id = req.params.id;
     res.locals.main = await Database.functions.getContent("task", id);
@@ -18,6 +19,7 @@ router.get("/tasks/:id", async function (req, res, next) {
 });
 
 router.get("/answers/:id", async function (req, res, next) {
+  if (!res.locals.auth) res.redirect("../users/login");
   try {
     const id = req.params.id;
     res.locals.main = await Database.functions.getContent("answer", id);
