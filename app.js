@@ -16,6 +16,7 @@ let app = express();
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { checkAuthStatus } from "./middleware/checkAuthStatus.js";
+import {pingDatabase} from "./middleware/pingDatabase.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -29,6 +30,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use(async (req, res, next) => {
+  try {
+    let result = await pingDatabase();
+    if (result.status === 200) return next();
+  } catch (err) {
+    console.log("Database is offline!!!");
+    res.render("service/maintenance");
+  }
+})
 
 app.use(async (req, res, next) => {
   res.locals.title = "Twistask";
