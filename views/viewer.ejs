@@ -12,10 +12,15 @@
         <div id="task-title"></div>
         <div id="viewer"></div>
       </div>
+      <div id="answer-area">
+        <h1>Answers</h1>
+      </div>
     </div>
     <script>
       window.APP = {
           task: <%- JSON.stringify(task || []) %>,
+          answers: <%- JSON.stringify(answers || []) %>,
+          comments: <%- JSON.stringify(answers || []) %>,
       };
     </script>
 

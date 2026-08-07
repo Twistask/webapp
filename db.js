@@ -30,6 +30,22 @@ const Database = {
       return await Database.connection.collection("tasks").update(id, body);
     },
 
+    getAnswersForTask: async (id) => {
+      return await Database.connection
+          .collection("answers")
+          .getFullList({
+            filter: `target_id = '${id}'`,
+          });
+    },
+
+    getCommentsForAnswer: async (id) => {
+      return await Database.connection
+          .collection("comments")
+          .getFullList({
+            filter: `target_id = '${id}'`,
+          });
+    },
+
     deleteTask: async (id) => {
       const batch = Database.connection.createBatch();
       const answerList = await Database.connection
