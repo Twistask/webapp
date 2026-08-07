@@ -24,7 +24,7 @@ let loader = () => {
         const task = tasks.find((t) => t.id === answer.target_id);
         let commHref = document.createElement("a");
         commHref.id = "comment-link";
-        commHref.href = `/comments/${comm.id}`;
+        commHref.href = `/answers/${comm.target_id}`;
         commHref.innerText = `${task.title} (${comm.created})`;
         commentsDiv.appendChild(commHref);
     });

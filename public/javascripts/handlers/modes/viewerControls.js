@@ -1,19 +1,19 @@
 let viewer;
 
-const { task = "", answers = [] } = window.APP || {};
+const { main = "", children = [] } = window.APP || {};
 
 export const ViewerControls = {
   setup: () => {
-    ViewerControls.setupTaskViewer();
-    ViewerControls.setupTask();
-    ViewerControls.setupAnswers();
+    ViewerControls.setupMainViewer();
+    ViewerControls.setupMain();
+    ViewerControls.setupChildren();
   },
-  setupTask: () => {
-    if (task.title) document.getElementById("task-title").innerText = task.title;
-    if (task.description) viewer.setMarkdown(task.description);
-    else viewer.setMarkdown(task.value);
+  setupMain: () => {
+    if (main.title) document.getElementById("task-title").innerText = main.title;
+    if (main.description) viewer.setMarkdown(main.description);
+    else viewer.setMarkdown(main.value);
   },
-  setupTaskViewer: () => {
+  setupMainViewer: () => {
     const Editor = toastui.Editor;
     viewer = Editor.factory({
       el: document.querySelector("#viewer"),
@@ -22,20 +22,20 @@ export const ViewerControls = {
       initialValue: "# hello",
     });
   },
-  setupAnswers: () => {
-    for (const ans of answers) {
-      let ans_el = document.createElement("div");
-      ans_el.id = `ans_${ans.id}`;
-      let ans_area = document.getElementById("answer-area");
-      ans_area.appendChild(ans_el);
+  setupChildren: () => {
+    for (const ch of children) {
+      let ch_el = document.createElement("div");
+      ch_el.id = `ch_${ch.id}`;
+      let ch_area = document.getElementById("ch-area");
+      ch_area.appendChild(ch_el);
       const Editor = toastui.Editor;
-      let ans_view = Editor.factory({
-        el: ans_el,
+      let ch_view = Editor.factory({
+        el: ch_el,
         viewer: true,
         height: "500px",
         initialValue: "# hello",
       });
-      ans_view.setMarkdown(ans.value)
+      ch_view.setMarkdown(ch.value)
     }
   }
 }

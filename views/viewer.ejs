@@ -8,19 +8,17 @@
   <body>
     <%- include('partials/menu') %>
     <div id="work-area">
-      <div id="task-area">
+      <div id="main-area">
         <div id="task-title"></div>
         <div id="viewer"></div>
       </div>
-      <div id="answer-area">
-        <h1>Answers</h1>
+      <div id="ch-area">
       </div>
     </div>
     <script>
       window.APP = {
-          task: <%- JSON.stringify(task || []) %>,
-          answers: <%- JSON.stringify(answers || []) %>,
-          comments: <%- JSON.stringify(answers || []) %>,
+          main: <%- JSON.stringify(main || []) %>,
+          children: <%- JSON.stringify(children || []) %>,
       };
     </script>
 

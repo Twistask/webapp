@@ -9,8 +9,8 @@ router.get("/", function (req, res, next) {
 router.get("/tasks/:id", async function (req, res, next) {
   try {
     const id = req.params.id;
-    res.locals.task = await Database.functions.getContent("task", id);
-    res.locals.answers = await Database.functions.getAnswersForTask(id);
+    res.locals.main = await Database.functions.getContent("task", id);
+    res.locals.children = await Database.functions.getAnswersForTask(id);
     res.render("viewer");
   } catch (err) {
     next(err);
@@ -20,18 +20,9 @@ router.get("/tasks/:id", async function (req, res, next) {
 router.get("/answers/:id", async function (req, res, next) {
   try {
     const id = req.params.id;
-    const result = await Database.functions.getContent("answer", id);
-    res.render("viewer", { title: "Twistask", task: result });
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.get("/comments/:id", async function (req, res, next) {
-  try {
-    const id = req.params.id;
-    const result = await Database.functions.getContent("comment", id);
-    res.render("viewer", { title: "Twistask", task: result });
+    res.locals.main = await Database.functions.getContent("answer", id);
+    res.locals.children = await Database.functions.getCommentsForAnswer(id);
+    res.render("viewer");
   } catch (err) {
     next(err);
   }
