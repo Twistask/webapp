@@ -7,7 +7,7 @@ let loader = () => {
   tasks.forEach((task) => {
     let taskHref = document.createElement("a");
     taskHref.id = "task-link";
-    taskHref.href = `/viewer/tasks/${task.id}`;
+    taskHref.href = `/tasks/${task.id}`;
     taskHref.innerText = task.title;
     tasksDiv.appendChild(taskHref);
   });
@@ -15,7 +15,7 @@ let loader = () => {
     const task = tasks.find((t) => t.id === ans.target_id);
     let ansHref = document.createElement("a");
     ansHref.id = "answer-link";
-    ansHref.href = `/viewer/answers/${ans.id}`;
+    ansHref.href = `/answers/${ans.id}`;
     ansHref.innerText = `${task.title} (${ans.created})`;
     answersDiv.appendChild(ansHref);
   });
@@ -24,7 +24,7 @@ let loader = () => {
     const task = tasks.find((t) => t.id === answer.target_id);
     let commHref = document.createElement("a");
     commHref.id = "comment-link";
-    commHref.href = `/viewer/comments/${comm.id}`;
+    commHref.href = `/comments/${comm.id}`;
     commHref.innerText = `${task.title} (${comm.created})`;
     commentsDiv.appendChild(commHref);
   });

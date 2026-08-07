@@ -2,7 +2,9 @@ import { TrialControls } from "./utils/trialControls.js";
 import Controls from "./baseSetup.js";
 import { checkAuthStatus } from "./handlers/users/authHelper.js";
 
-const { tasks = [], answers = [], mode="" } = window.APP || {};
+const { tasks = [], answers = [], mode = "" } = window.APP || {};
+
+console.log(mode)
 
 const trial = window.TRIAL || {};
 

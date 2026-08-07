@@ -80,7 +80,6 @@ export const TrialControls = {
     return TrialControls.endTrial();
   },
   endTrial: () => {
-    localStorage.setItem("mode", "trialClear");
-    window.location.assign("/challenge/result");
+    window.location.replace("/timeTrial/result");
   },
 };

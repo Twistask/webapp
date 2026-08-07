@@ -18,11 +18,13 @@
       </div>
       <div id="user-settings">
         <h1>Settings</h1>
-        <label for="password">New Password: </label
-        ><input type="password" id="password" required /><br />
-        <label for="password_repeat">Confirm New Password: </label
-        ><input type="password" id="password_repeat" required /><br />
-        <button type="submit" id="submit_pw">Change Password</button><br />
+          <form id="user-settings">
+            <label for="password">New Password: </label
+            ><input type="password" id="password" name="password" required /><br />
+            <label for="password_repeat">Confirm New Password: </label
+            ><input type="password" id="password_repeat" name="passwordConfirm" required /><br />
+            <button type="submit" id="submit_pw">Change Password</button><br />
+          </form>
         <button id="delete_account">Delete Account</button>
       </div>
     </div>
