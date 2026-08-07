@@ -7,9 +7,10 @@ import Database from "../db.js";
 router.get("/", async (req, res, next) => {
   if (!res.locals.auth) res.redirect("../users/login");
   try {
-    const tasks = await Database.functions.loadContent("tasks");
-    const answers = await Database.functions.loadContent("answers");
-    res.render("challenge", { title: "Twistask", tasks, answers });
+    res.locals.mode = "review";
+    res.locals.tasks = await Database.functions.loadContent("tasks");
+    res.locals.answers = await Database.functions.loadContent("answers");
+    res.render("challenge");
   } catch (err) {
     next(err); // lets Express error middleware handle/log and return a 500
   }
