@@ -113,6 +113,9 @@ const Database = {
     },
     getUserFromToken: async (token) => {
       return await Database.connection.collection("users").authRefresh(token);
+    },
+    changePassword: async (id, body) => {
+      return await Database.connection.collection("users").update(id, body);
     }
   },
 };

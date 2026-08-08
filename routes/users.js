@@ -163,4 +163,34 @@ router.delete("/delete", async function (req, res, next) {
   }
 });
 
+router.post("/change-password", async function (req, res, next) {
+  if (!res.locals.auth) res.status(403);
+  const body = req.body;
+  try {
+    const token = req.cookies?.twistask_auth;
+    if (!token) {
+      return res.json({ authenticated: false });
+    }
+
+    let user = null;
+    try {
+      user = await Database.functions.getUserFromToken(token);
+    } catch (err) {
+      return res.json({ authenticated: false });
+    }
+
+    if (!user) return res.json({ authenticated: false });
+    res.clearCookie("twistask_auth", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+    });
+    await Database.functions.changePassword(user.record.id, body);
+    return res.redirect(303, "/");
+  } catch (err) {
+    next(err);
+  }
+})
+
 export default router;
