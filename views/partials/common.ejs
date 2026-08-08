@@ -1,0 +1,11 @@
+<link rel="stylesheet" href="/stylesheets/common.css" />
+<script>
+    window.APP = {
+        auth: <%- JSON.stringify(auth || false) %>,
+        user: <%- JSON.stringify(user || {}) %>,
+        tasks: <%- JSON.stringify(tasks || []) %>,
+        answers: <%- JSON.stringify(answers || []) %>,
+        comments: <%- JSON.stringify(comments || []) %>,
+        mode: "<%- mode %>",
+    }
+</script>

@@ -2,7 +2,6 @@
 <html>
   <head>
     <title><%= title %></title>
-    <%- include('../partials/styling') %>
   </head>
   <body>
     <%- include('../partials/menu') %>
@@ -22,8 +21,11 @@
           minlength="8"
           required
         /><br />
+        <label for="student_type">I'm a student</label><input type="radio" id="student_type" name="role" value="student"><br>
+        <label for="teacher_type">I'm a teacher</label><input type="radio" id="teacher_type" name="role" value="teacher"><br>
         <button type="submit" id="submit">Register</button><br /><br />
       </form>
     </div>
   </body>
+  <%- include('../partials/common') %>
 </html>

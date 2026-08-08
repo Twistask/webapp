@@ -1,10 +1,8 @@
-import {checkAuthStatus} from "../users/authHelper.js";
-
 let editor;
 let task_viewer;
 let answer_viewer;
 
-const { tasks = [], answers = [] } = window.APP || {};
+const { tasks = [], answers = [], user = {} } = window.APP || {};
 
 export const ReviewControls = {
     setup: () => {
@@ -34,9 +32,7 @@ export const ReviewControls = {
         });
     },
     setupTask: async () => {
-        let auth = await checkAuthStatus();
-        let author;
-        if (auth.authenticated) author = auth.user.record.id;
+        let author = user.id;
         const answersForTask = answers.filter(
             (a) => a.value && a.value.trim() !== "" && a.author !== author,
         );
@@ -68,8 +64,7 @@ export const ReviewControls = {
             submitbtn.addEventListener("click", async () => {
                 let target = localStorage.getItem("currentTargetID");
                 let grade = document.getElementById("review-grade").value;
-                let auth = await checkAuthStatus();
-                let author = auth.user.record.id;
+                let author = user.id;
                 const res = await fetch(`/review/submit`, {
                     method: "POST",
                     headers: {"Content-Type": "application/json"},

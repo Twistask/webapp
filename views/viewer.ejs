@@ -2,7 +2,6 @@
 <html>
   <head>
     <title><%= title %></title>
-    <%- include('partials/styling') %>
     <%- include('partials/editor') %>
   </head>
   <body>
@@ -16,12 +15,12 @@
       </div>
     </div>
     <script>
-      window.APP = {
+      window.VIEWER = {
           main: <%- JSON.stringify(main || []) %>,
           children: <%- JSON.stringify(children || []) %>,
       };
     </script>
-
     <script type="module" src="/javascripts/handlers/modes/viewerControls.js"></script>
   </body>
+  <%- include('partials/common') %>
 </html>

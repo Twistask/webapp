@@ -2,7 +2,6 @@
 <html>
   <head>
     <title><%= title %></title>
-    <%- include('partials/styling') %>
     <%- include('partials/editor') %>
   </head>
   <body>
@@ -26,11 +25,7 @@
         <button id="delete">Delete</button>
       </div>
     </div>
-    <script>
-      window.APP = {
-        tasks: <%- JSON.stringify(tasks || []) %>,
-      };
-    </script>
     <script type="module" src="/javascripts/handlers/modes/editorControls.js"></script>
   </body>
+  <%- include('partials/common') %>
 </html>

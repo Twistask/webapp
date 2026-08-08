@@ -2,7 +2,6 @@
 <html>
   <head>
     <title><%= title %></title>
-    <%- include('partials/styling') %>
     <%- include('partials/editor') %>
   </head>
   <body>
@@ -38,13 +37,6 @@
         <button type="submit" id="submit">Submit</button>
       </div>
     </div>
-    <script>
-      window.APP = {
-          tasks: <%- JSON.stringify(tasks || []) %>,
-          answers: <%- JSON.stringify(answers || []) %>,
-          mode: "<%- mode %>",
-      };
-    </script>
     <% if (mode === "timeTrial") { %>
     <script>
       window.TRIAL = <%- JSON.stringify(trial || {}) %>
@@ -58,6 +50,6 @@
     <% if (mode === "review") { %>
       <script type="module" src="/javascripts/handlers/modes/reviewControls.js"></script>
     <% } %>
-
   </body>
+  <%- include('partials/common') %>
 </html>

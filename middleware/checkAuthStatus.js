@@ -11,6 +11,7 @@ export const checkAuthStatus = async (token) => {
         let userData = {
           id: user.record.id,
           name: user.record.name ?? user.record.email ?? "",
+          role: user.record.role,
         };
         return { isAuthenticated, userData };
       } else {

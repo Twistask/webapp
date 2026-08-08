@@ -1,6 +1,6 @@
-import {checkAuthStatus} from "../users/authHelper.js";
+const { tasks = [], user = {} } = window.APP || {};
 
-const { tasks = [] } = window.APP || {};
+console.log(window.APP);
 
 let editor;
 
@@ -52,8 +52,7 @@ export const EditorControls = {
                 document.body.appendChild(sound);
                 sound.volume = 0.5;
                 await sound.play();
-                let auth = await checkAuthStatus();
-                let author = auth.user.record.id;
+                let author = user.id;
                 let title = document.getElementById("task-title").value;
                 const value = document.getElementById("challenge-select").value;
                 if (value !== "new") {

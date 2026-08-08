@@ -1,6 +1,8 @@
 let viewer;
 
-const { main = "", children = [] } = window.APP || {};
+const { main = "", children = [] } = window.VIEWER || {};
+
+const { user = {} } = window.APP || {};
 
 export const ViewerControls = {
   setup: () => {

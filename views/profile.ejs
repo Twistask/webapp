@@ -2,14 +2,15 @@
 <html>
   <head>
     <title><%= title %></title>
-    <%- include('partials/styling') %>
   </head>
   <body>
     <%- include('partials/menu') %>
     <div id="work-area">
-      <div id="my-tasks">
-        <h1>My Tasks</h1>
-      </div>
+      <% if (user.role !== "student") { %>
+        <div id="my-tasks">
+          <h1>My Tasks</h1>
+        </div>
+      <% } %>
       <div id="my-answers">
         <h1>My Answers</h1>
       </div>
@@ -17,17 +18,10 @@
         <h1>My Reviews</h1>
       </div>
     </div>
-    <script>
-      window.APP = {
-        tasks: <%- JSON.stringify(tasks || []) %>,
-        answers: <%- JSON.stringify(answers || []) %>,
-        comments: <%- JSON.stringify(comments || []) %>,
-        user: <%- JSON.stringify(user || {}) %>,
-      };
-    </script>
     <script
       type="module"
       src="/javascripts/handlers/users/profileHandler.js"
     ></script>
   </body>
+  <%- include('partials/common') %>
 </html>

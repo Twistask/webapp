@@ -1,6 +1,4 @@
-import {checkAuthStatus} from "../users/authHelper.js";
-
-const { tasks = [] } = window.APP || {};
+const { tasks = [], user = {} } = window.APP || {};
 
 let editor;
 let viewer;
@@ -52,8 +50,7 @@ export const ChallengeControls = {
             if (document.getElementById("author-name") !== null) {
                 author = document.getElementById("author-name").value;
             } else {
-                let auth = await checkAuthStatus();
-                author = auth.user.record.id;
+                author = user.id;
             }
             const res = await fetch(`/challenge/submit`, {
                 method: "POST",
