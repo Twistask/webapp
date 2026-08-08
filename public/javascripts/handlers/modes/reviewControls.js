@@ -63,7 +63,6 @@ export const ReviewControls = {
         if (submitbtn) {
             submitbtn.addEventListener("click", async () => {
                 let target = localStorage.getItem("currentTargetID");
-                let grade = document.getElementById("review-grade").value;
                 let author = user.id;
                 const res = await fetch(`/review/submit`, {
                     method: "POST",
@@ -71,7 +70,6 @@ export const ReviewControls = {
                     body: JSON.stringify({
                         author: author,
                         target_id: target,
-                        grade: grade,
                         value: editor.getMarkdown(),
                     }),
                 });
