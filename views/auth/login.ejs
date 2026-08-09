@@ -6,12 +6,13 @@
   <body>
     <%- include('../partials/menu') %>
     <div id="work-area">
-      <form action="/users/login/submit" method="post">
+      <form action="/users/login" method="post">
         <label for="email">E-mail: </label
         ><input type="text" id="email" name="email" required /><br />
         <label for="password">Password: </label
         ><input type="password" id="password" name="password" required /><br />
         <button type="submit" id="submit">Login</button>
+        <div id="error-box"><%= err %></div>
       </form>
     </div>
   </body>

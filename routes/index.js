@@ -7,7 +7,8 @@ router.get("/", function (req, res, next) {
 });
 
 router.get("/tasks/:id", async function (req, res, next) {
-  if (!res.locals.auth) res.redirect("../users/login");
+  if (!res.locals.auth) return res.redirect("../users/login");
+  if (res.locals.auth && res.locals.user.role === "student") return res.redirect("../");
   try {
     const id = req.params.id;
     res.locals.main = await Database.functions.getContent("task", id);

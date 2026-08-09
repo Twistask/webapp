@@ -6,7 +6,7 @@
   <body>
     <%- include('../partials/menu') %>
     <div id="work-area">
-      <form action="/users/register/submit" method="post">
+      <form action="/users/register" method="post">
         <label for="email">E-mail: </label
         ><input type="email" id="email" name="email" required /><br />
         <label for="username">Username: </label
@@ -24,6 +24,7 @@
         <label for="student_type">I'm a student</label><input type="radio" id="student_type" name="role" value="student"><br>
         <label for="teacher_type">I'm a teacher</label><input type="radio" id="teacher_type" name="role" value="teacher"><br>
         <button type="submit" id="submit">Register</button><br /><br />
+        <div id="error-box"><%= err %></div>
       </form>
     </div>
   </body>

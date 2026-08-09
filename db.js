@@ -112,7 +112,11 @@ const Database = {
       return Database.connection.authStore.clear();
     },
     getUserFromToken: async (token) => {
-      return await Database.connection.collection("users").authRefresh(token);
+      try {
+        return await Database.connection.collection("users").authRefresh(token);
+      } catch (err) {
+        if (err.status === 401) return false;
+      }
     },
     changePassword: async (id, body) => {
       return await Database.connection.collection("users").update(id, body);
