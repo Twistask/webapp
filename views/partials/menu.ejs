@@ -5,6 +5,12 @@
     <a href="/" id="home-link">Home</a>
     <a href="/challenge" id="challenge-link">Challenge Mode</a>
     <a href="/timeTrial" id="timeTrial-link">Time Trial</a>
+    <% if (auth) { %>
+    <a href="/review" id="review-link">Review Mode</a>
+    <% if (user.role !== "student") { %>
+      <a href="/editor" id="editor-link">Task Editor</a>
+    <% } %>
+    <% } %>
   </div>
 
   <div id="menu-right">
@@ -15,10 +21,6 @@
     </div>
     <% } else { %>
     <div id="logged-in" data-access="authOnly">
-      <a href="/review" id="review-link">Review Mode</a>
-      <% if (user.role !== "student") { %>
-        <a href="/editor" id="editor-link">Task Editor</a>
-      <% } %>
       <a href="/users/profile" id="profile-link">Profile</a>
       <a href="/users/settings" id="settings-link">Settings</a>
       <a id="logout">Logout</a>

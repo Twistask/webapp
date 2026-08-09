@@ -10,6 +10,7 @@ export const EditorControls = {
         document.getElementById("challenge-select").onchange = EditorControls.setupTask;
         EditorControls.setupEditor();
         EditorControls.setupTask();
+        EditorControls.setupImporter();
         EditorControls.setupSubmit();
     },
     setupEditor: () => {
@@ -20,6 +21,22 @@ export const EditorControls = {
             initialEditType: "wysiwyg",
             previewStyle: "vertical",
         });
+    },
+    setupImporter: () => {
+        document.getElementById("markdown-import").addEventListener('change', (ev) => {
+            const file = ev.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                editor.setMarkdown(e.target.result);
+                document.getElementById("markdown-import").value = null;
+            };
+            reader.onerror = (e) => {
+                console.error('Error reading file:', e.target.error);
+            };
+            reader.readAsText(file);
+
+        })
     },
     createChallengeItems: () => {
         let select = document.getElementById("challenge-select");
