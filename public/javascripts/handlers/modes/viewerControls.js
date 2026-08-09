@@ -25,19 +25,24 @@ export const ViewerControls = {
     });
   },
   setupChildren: () => {
-    for (const ch of children) {
-      let ch_el = document.createElement("div");
-      ch_el.id = `ch_${ch.id}`;
-      let ch_area = document.getElementById("ch-area");
-      ch_area.appendChild(ch_el);
-      const Editor = toastui.Editor;
-      let ch_view = Editor.factory({
-        el: ch_el,
-        viewer: true,
-        height: "500px",
-        initialValue: "# hello",
-      });
-      ch_view.setMarkdown(ch.value)
+    let ch_area = document.getElementById("ch-area");
+    if (children.length === 0) {
+      console.log("Nothing to display!!!")
+      ch_area.innerText = "There's currently nothing to display here!";
+    } else {
+      for (const ch of children) {
+        let ch_el = document.createElement("div");
+        ch_el.id = `ch_${ch.id}`;
+        ch_area.appendChild(ch_el);
+        const Editor = toastui.Editor;
+        let ch_view = Editor.factory({
+          el: ch_el,
+          viewer: true,
+          height: "500px",
+          initialValue: "# hello",
+        });
+        ch_view.setMarkdown(ch.value)
+      }
     }
   }
 }
