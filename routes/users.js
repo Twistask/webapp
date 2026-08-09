@@ -211,6 +211,49 @@ router.get("/verify", async (req, res, next) => {
     res.locals.msg = "Invalid or expired verification token."
     return res.render("auth/verify");
   }
-})
+});
+
+router.get("/forgot-password", function (req, res, next) {
+  if (res.locals.auth) res.redirect("../");
+  res.locals.err = "";
+  res.render("auth/request-password-reset", { title: "Twistask" });
+});
+
+router.post("/forgot-password", async function (req, res, next) {
+  if (res.locals.auth) res.status(409);
+  let email = req.body.email;
+  try {
+    let result = await Database.functions.requestPasswordReset(email);
+    console.log(result);
+    if (result === true) {
+      res.locals.msg = "Check your email for instructions."
+      return res.render("auth/verify");
+    }
+  } catch (err) {
+    res.locals.msg = "Invalid account."
+    return res.render("auth/verify");
+  }
+});
+
+router.get("/reset-password", function (req, res, next) {
+  const token = String(req.query.token || "").trim();
+  if (res.locals.auth || !token) res.redirect("../");
+  res.locals.token = token;
+  res.render("auth/reset-password", { title: "Twistask" });
+});
+
+router.post("/reset-password", async (req, res, next) => {
+  const { token, password } = req.body;
+  try {
+    let result = await Database.functions.resetPassword(token, password);
+    if (result === true) {
+      res.locals.msg = "Successfully reset your password."
+      return res.render("auth/verify");
+    }
+  } catch (err) {
+    res.locals.msg = "Invalid or expired token."
+    return res.render("auth/verify");
+  }
+});
 
 export default router;

@@ -116,6 +116,19 @@ const Database = {
     logoutUser: async () => {
       return Database.connection.authStore.clear();
     },
+
+    requestPasswordReset: async (email) => {
+      return await Database.connection.collection('users').requestPasswordReset(email);
+    },
+
+    resetPassword: async (token, pw) => {
+      return await Database.connection.collection('users').confirmPasswordReset(
+          token,
+          pw,
+          pw,
+      );
+    },
+
     getUserFromToken: async (token) => {
       try {
         return await Database.connection.collection("users").authRefresh(token);
