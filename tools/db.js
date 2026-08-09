@@ -123,6 +123,15 @@ const Database = {
         if (err.status === 401) return false;
       }
     },
+
+    getUserbyId: async (id) => {
+      try {
+        return await Database.connection.collection("users").getOne(id);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
     changePassword: async (id, body) => {
       return await Database.connection.collection("users").update(id, body);
     }

@@ -1,13 +1,9 @@
 import nodemailer from "nodemailer";
-import Mail from "./mail";
 
 const MailService = {
     transporter: nodemailer.createTransport({
-        service: process.env.MAIL_SERVICE,
-        auth: {
-            user: process.env.MAIL_USERNAME,
-            pass: process.env.MAIL_PASS,
-        }
+        host: 'localhost',
+        port: 1025,
     }),
     sendEmail: async (to, subject, text, html = null) => {
         try {
