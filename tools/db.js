@@ -69,7 +69,12 @@ const Database = {
     },
 
     createUser: async (body) => {
-      return await Database.connection.collection("users").create(body);
+      let user = await Database.connection.collection("users").create(body);
+      if (user && body.email) await Database.connection.collection('users').requestVerification(body.email);
+    },
+
+    verifyUser: async (token) => {
+      return await Database.connection.collection('users').confirmVerification(token)
     },
 
     deleteUser: async (id) => {

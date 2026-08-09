@@ -1,5 +1,5 @@
 import express from "express";
-import Database from "../db.js";
+import Database from "../tools/db.js";
 let router = express.Router();
 
 router.get("/", function (req, res, next) {

@@ -1,5 +1,5 @@
 import express from "express";
-import Database from "../db.js";
+import Database from "../tools/db.js";
 
 let router = express.Router();
 
@@ -196,6 +196,20 @@ router.post("/settings", async function (req, res, next) {
   } catch (err) {
     res.locals.err = "Failed to change password. Please check if you've entered the information correctly."
     return res.render("settings");
+  }
+});
+
+router.get("/verify", async (req, res, next) => {
+  const token = String(req.query.token || "").trim();
+  try {
+    let result = await Database.functions.verifyUser(token);
+    if (result === true) {
+      res.locals.msg = "Successfully verified your account."
+      return res.render("auth/verify");
+    }
+  } catch (err) {
+    res.locals.msg = "Invalid or expired verification token."
+    return res.render("auth/verify");
   }
 })
 

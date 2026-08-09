@@ -1,4 +1,4 @@
-import Database from "../db.js";
+import Database from "../tools/db.js";
 
 export const checkAuthStatus = async (token) => {
   try {

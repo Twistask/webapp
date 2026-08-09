@@ -1,7 +1,7 @@
 import express from "express";
 let router = express.Router();
 
-import Database from "../db.js";
+import Database from "../tools/db.js";
 
 /* GET editor page. */
 router.get("/", async (req, res, next) => {
