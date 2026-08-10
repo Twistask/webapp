@@ -32,16 +32,37 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use(async (req, res, next) => {
-  try {
-    let result = await pingDatabase();
-    if (result.status === 200) return next();
-  } catch (err) {
-    console.log("Database is offline!!!");
-    res.render("service/maintenance");
-  }
-})
+// In-memory cache for DB health checks to avoid hitting the DB on every request
+const DB_PING_CACHE_MS = Number(process.env.DB_PING_CACHE_MS) || 5000;
+let _lastDbPing = { timestamp: 0, result: null };
 
+app.use(async (req, res, next) => {
+  // skip health checks for favicon and health endpoints
+  if (req.path === "/favicon.ico" || req.path.startsWith("/public/")) return next();
+
+  try {
+    const now = Date.now();
+    if (_lastDbPing.result && now - _lastDbPing.timestamp < DB_PING_CACHE_MS) {
+      // use cached result
+      if (_lastDbPing.result.ok && _lastDbPing.result.status === 200) return next();
+      console.warn("DB health (cached) not OK:", _lastDbPing.result.error ?? _lastDbPing.result.status);
+      return res.status(503).render("service/maintenance");
+    }
+
+    const result = await pingDatabase();
+    _lastDbPing = { timestamp: now, result };
+
+    if (result && result.ok && result.status === 200) return next();
+
+    console.warn("DB health check failed:", result?.error ?? `status ${result?.status}`);
+    return res.status(503).render("service/maintenance");
+  } catch (err) {
+    console.error("Unexpected error in DB health middleware:", err?.message ?? err);
+    return res.status(503).render("service/maintenance");
+  }
+});
+
+// Attach auth status to res.locals for downstream handlers
 app.use(async (req, res, next) => {
   res.locals.title = "Twistask";
   res.locals.mode = "none";
@@ -60,7 +81,7 @@ app.use(async (req, res, next) => {
     res.locals.auth = false;
     res.locals.user = null;
   }
-  next();
+  return next();
 });
 
 app.use("/", indexRouter);
