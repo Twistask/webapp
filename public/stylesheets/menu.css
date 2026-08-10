@@ -79,6 +79,11 @@ nav #common {
 }
 
 #user-menu a {
+  /* border-box, not the site-wide default content-box: otherwise the
+     0.5vmax padding inherited from the global `button, a` rule gets added
+     on top of width:100%, overflowing the panel and pushing the whole
+     page into horizontal scroll. */
+  box-sizing: border-box;
   margin: 0.15vmax 0;
   width: 100%;
 }
