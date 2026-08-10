@@ -1,11 +1,17 @@
 <link rel="stylesheet" href="/stylesheets/common.css" />
 <script>
-    window.APP = {
-        auth: <%- JSON.stringify(auth || false) %>,
-        user: <%- JSON.stringify(user || {}) %>,
-        tasks: <%- JSON.stringify(tasks || []) %>,
-        answers: <%- JSON.stringify(answers || []) %>,
-        comments: <%- JSON.stringify(comments || []) %>,
-        mode: "<%- mode %>",
-    }
+    // Expose a minimal, safely serialized global so client scripts can use it.
+    // We stringify and replace '<' to avoid breaking out of the script context.
+    (function(){
+      const safe = (v) => JSON.stringify(v || []).replace(/</g, "\\u003c");
+      const safeObj = (v) => JSON.stringify(v || {}).replace(/</g, "\\u003c");
+      window.APP = {
+        auth: <%- JSON.stringify(Boolean(auth || false)) %>,
+        user: <%- JSON.stringify({ id: (user && user.id) ? user.id : null, name: (user && user.name) ? user.name : '', role: (user && user.role) ? user.role : null }).replace(/</g, "\\u003c") %>,
+        tasks: <%- safe(tasks) %>,
+        answers: <%- safe(answers) %>,
+        comments: <%- safe(comments) %>,
+        mode: "<%- (mode || '') %>",
+      };
+    })();
 </script>

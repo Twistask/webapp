@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= title %></title>
+    <title><%= title || 'Twistask' %></title>
     <%- include('partials/editor') %>
   </head>
   <body>
     <%- include('partials/menu') %>
     <div id="work-area">
       <div id="main-area">
-        <div id="task-title"></div>
-        <div id="viewer"></div>
+        <h1 id="task-title"><%= (main && main.title) ? main.title : '' %></h1>
+        <div id="viewer" aria-live="polite"></div>
       </div>
-      <div id="ch-area">
+      <div id="ch-area" aria-label="related-answers">
       </div>
     </div>
     <script>
+      // Safely serialize server-side data for client JS. Escape '<' to avoid script-break.
       window.VIEWER = {
-          main: <%- JSON.stringify(main || []) %>,
-          children: <%- JSON.stringify(children || []) %>,
+          main: <%- JSON.stringify(main || {}).replace(/</g, "\\u003c") %>,
+          children: <%- JSON.stringify(children || []).replace(/</g, "\\u003c") %>,
       };
     </script>
     <script type="module" src="/javascripts/handlers/modes/viewerControls.js"></script>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= title %></title>
+    <title><%= title || 'Twistask' %></title>
     <%- include('partials/editor') %>
   </head>
   <body>
@@ -9,21 +9,21 @@
     <div id="work-area">
       <div id="controls">
         <label for="challenge-select">Select a challenge:</label>
-        <select id="challenge-select">
+        <select id="challenge-select" name="challenge-select">
           <option value="new">New Task</option>
         </select>
         <br />
         <label for="task-title">Enter the name of the task: </label>
-        <input id="task-title" type="text" />
+        <input id="task-title" name="title" type="text" />
       </div>
       <div id="editor-area">
-        <div id="editor">
+        <div id="editor" role="textbox" contenteditable="true" aria-label="Task editor">
           <p>Type the contents of the task here.</p>
           <p><br /></p>
         </div>
-        <input type="file" id="markdown-import" accept=".md,.txt"><br>
-        <button type="submit" id="submit">Submit</button>
-        <button id="delete">Delete</button>
+        <input type="file" id="markdown-import" accept=".md,.txt,text/markdown" aria-label="Import markdown file"><br>
+        <button type="button" id="submit">Submit</button>
+        <button type="button" id="delete">Delete</button>
       </div>
     </div>
     <script type="module" src="/javascripts/handlers/modes/editorControls.js"></script>

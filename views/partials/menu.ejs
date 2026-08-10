@@ -7,7 +7,7 @@
     <a href="/timeTrial" id="timeTrial-link">Time Trial</a>
     <% if (auth) { %>
     <a href="/review" id="review-link">Review Mode</a>
-    <% if (user.role !== "student") { %>
+    <% if (user && user.role !== "student") { %>
       <a href="/editor" id="editor-link">Task Editor</a>
     <% } %>
     <% } %>
@@ -24,7 +24,7 @@
       <a href="/users/profile" id="profile-link">Profile</a>
       <a href="/users/settings" id="settings-link">Settings</a>
       <a id="logout">Logout</a>
-      <div id="menu-user"><%= user?.name %></div>
+      <div id="menu-user"><%= (user && user.name) ? user.name : '' %></div>
     </div>
       <script type="module" src="/javascripts/handlers/menu/logoutSetup.js"></script>
     <% } %>
@@ -36,5 +36,3 @@
   </div>
   <% } %>
 </nav>
-
-

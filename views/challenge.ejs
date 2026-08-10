@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= title %></title>
+    <title><%= title || 'Twistask' %></title>
     <%- include('partials/editor') %>
   </head>
   <body>
@@ -10,33 +10,34 @@
       <% if (mode === "challenge") { %>
       <div id="controls">
         <label for="challenge-select">Select a challenge:</label>
-        <select id="challenge-select"></select>
+        <select id="challenge-select" name="challenge-select" aria-label="Select a challenge"></select>
       </div>
       <% } %>
       <div id="task-area">
-        <div id="viewer"></div>
+        <div id="viewer" aria-live="polite"></div>
       </div>
       <% if (mode === "review") { %>
       <div id="review-answer-area">
-        <div id="answer-viewer"></div>
+        <div id="answer-viewer" aria-live="polite"></div>
       </div>
       <% } %>
       <div id="answer-area">
         <% if (!auth && mode === "challenge") { %>
         <label for="author-name">Input your name: </label>
-        <input id="author-name" type="text" />
+        <input id="author-name" name="author" type="text" autocomplete="name" />
         <% } %>
-        <div id="editor">
+        <div id="editor" role="textbox" contenteditable="true" aria-label="Answer editor">
           <p>Type here.</p>
           <p><br /></p>
         </div>
-        <button type="submit" id="submit">Submit</button>
+        <button type="button" id="submit">Submit</button>
       </div>
     </div>
     <% if (mode === "timeTrial") { %>
     <script>
-      window.TRIAL = <%- JSON.stringify(trial || {}) %>
-              window.AUTHOR = "<%- author %>"
+      // Safely embed trial data and author into JS context. Escape '<' to avoid breaking <script>.
+      window.TRIAL = <%- JSON.stringify(trial || {}).replace(/</g, "\\u003c") %>;
+      window.AUTHOR = <%- JSON.stringify(String(author || "")).replace(/</g, "\\u003c") %>;
     </script>
     <script type="module" src="/javascripts/handlers/modes/trialControls.js"></script>
     <% } %>

@@ -1,30 +1,30 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= title %></title>
+    <title><%= title || 'Twistask' %></title>
   </head>
   <body>
     <%- include('../partials/menu') %>
     <div id="work-area">
       <form action="/users/register" method="post">
-        <label for="email">E-mail: </label
-        ><input type="email" id="email" name="email" required /><br />
-        <label for="username">Username: </label
-        ><input type="text" id="username" name="name" required /><br />
-        <label for="password">Password: </label
-        ><input type="password" id="password" name="password" minlength="8" required /><br />
-        <label for="password_repeat">Confirm password: </label
-        ><input
-          type="password"
-          id="password_repeat"
-          name="passwordConfirm"
-          minlength="8"
-          required
-        /><br />
-        <label for="student_type">I'm a student</label><input type="radio" id="student_type" name="role" value="student"><br>
-        <label for="teacher_type">I'm a teacher</label><input type="radio" id="teacher_type" name="role" value="teacher"><br>
+        <label for="email">E-mail: </label>
+        <input type="email" id="email" name="email" required autocomplete="email" /><br />
+        <label for="username">Username: </label>
+        <input type="text" id="username" name="name" required autocomplete="name" /><br />
+        <label for="password">Password: </label>
+        <input type="password" id="password" name="password" minlength="8" required autocomplete="new-password" /><br />
+        <label for="password_repeat">Confirm password: </label>
+        <input type="password" id="password_repeat" name="passwordConfirm" minlength="8" required autocomplete="new-password" /><br />
+        <div>
+          <input type="radio" id="student_type" name="role" value="student">
+          <label for="student_type">I'm a student</label>
+        </div>
+        <div>
+          <input type="radio" id="teacher_type" name="role" value="teacher">
+          <label for="teacher_type">I'm a teacher</label>
+        </div>
         <button type="submit" id="submit">Register</button><br /><br />
-        <div id="error-box"><%= err %></div>
+        <div id="error-box"><%= err || '' %></div>
       </form>
     </div>
   </body>

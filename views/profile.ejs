@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= title %></title>
+    <title><%= title || 'Twistask' %></title>
   </head>
   <body>
     <%- include('partials/menu') %>
     <div id="work-area">
-      <% if (user.role !== "student") { %>
+      <% if (user && user.role !== "student") { %>
         <div id="my-tasks">
           <h1>My Tasks</h1>
         </div>

@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= title %></title>
+    <title><%= title || 'Twistask' %></title>
   </head>
   <body>
     <%- include('../partials/menu') %>
     <div id="work-area">
       <form action="/users/login" method="post">
-        <label for="email">E-mail: </label
-        ><input type="text" id="email" name="email" required /><br />
-        <label for="password">Password: </label
-        ><input type="password" id="password" name="password" required /><br />
+        <label for="email">E-mail: </label>
+        <input type="email" id="email" name="email" required autocomplete="email" /><br />
+        <label for="password">Password: </label>
+        <input type="password" id="password" name="password" required autocomplete="current-password" /><br />
         <a href="/users/forgot-password">Forgot password?</a>
         <button type="submit" id="submit">Login</button>
-        <div id="error-box"><%= err %></div>
+        <div id="error-box"><%= err || '' %></div>
       </form>
     </div>
   </body>

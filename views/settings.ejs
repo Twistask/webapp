@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title><%= title %></title>
+    <title><%= title || 'Twistask' %></title>
 </head>
 <body>
 <%- include('partials/menu') %>
@@ -9,15 +9,18 @@
     <div id="user-settings">
         <form id="password-change" action="/users/settings" method="post">
             <h1>Settings</h1>
-            <label for="old_password">Current Password: </label
-            ><input type="password" id="password" name="oldPassword" required /><br />
-            <label for="password">New Password: </label
-            ><input type="password" id="password" name="password" required /><br />
-            <label for="password_repeat">Confirm New Password: </label
-            ><input type="password" id="password_repeat" name="passwordConfirm" required /><br />
+            <label for="oldPassword">Current Password: </label>
+            <input type="password" id="oldPassword" name="oldPassword" required /><br />
+
+            <label for="password">New Password: </label>
+            <input type="password" id="password" name="password" required /><br />
+
+            <label for="passwordConfirm">Confirm New Password: </label>
+            <input type="password" id="passwordConfirm" name="passwordConfirm" required /><br />
+
             <button type="submit" id="submit_pw">Change Password</button><br />
-            <div id="error-box"><%= err %></div>
-            <button id="delete_account">Delete Account</button>
+            <div id="error-box"><%= err || '' %></div>
+            <button type="button" id="delete_account">Delete Account</button>
         </form>
     </div>
 </div>
