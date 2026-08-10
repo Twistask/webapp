@@ -36,11 +36,9 @@ const DB_PING_CACHE_MS = Number(process.env.DB_PING_CACHE_MS) || 5000;
 let _lastDbPing = { timestamp: 0, result: null };
 
 app.use(async (req, res, next) => {
-  // short-circuit common static-ish paths (safety; static middleware is already mounted above)
   if (
     req.path === "/favicon.ico" ||
-    req.path.startsWith("/public/") ||
-    req.path.startsWith("/assets/")
+    req.path.startsWith("/public/")
   ) {
     return next();
   }
@@ -54,7 +52,6 @@ app.use(async (req, res, next) => {
       return res.status(503).render("service/maintenance");
     }
 
-    // perform a new ping and cache it
     const result = await pingDatabase();
     _lastDbPing = { timestamp: now, result };
 
@@ -64,7 +61,6 @@ app.use(async (req, res, next) => {
     return res.status(503).render("service/maintenance");
   } catch (err) {
     console.error("Unexpected error in DB health middleware:", err?.message ?? err);
-    // on unexpected errors, render maintenance to be safe
     return res.status(503).render("service/maintenance");
   }
 });
