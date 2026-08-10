@@ -33,10 +33,6 @@ export const ReviewControls = {
     },
     setupTask: async () => {
         let author = user.id;
-        // Only consider answers whose task still exists - filtering this up
-        // front (rather than retrying with a fresh random pick on a miss)
-        // avoids unbounded recursion when the pool contains nothing but
-        // orphaned answers.
         const answersForTask = answers.filter(
             (a) =>
                 a.value &&
@@ -52,7 +48,7 @@ export const ReviewControls = {
         }
 
         const randIndex = Math.floor(Math.random() * answersForTask.length);
-        const chosenAnswer = answersForTask[randIndex];
+        const chosenAnswer = answersForTask.at(randIndex);
         const task = tasks.find((t) => t.id === chosenAnswer.target_id);
 
         task_viewer.setMarkdown(task.description || "");

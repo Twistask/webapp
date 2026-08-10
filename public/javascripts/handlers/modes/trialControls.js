@@ -40,7 +40,7 @@ export const TrialControls = {
       return;
     }
     const randIndex = Math.floor(Math.random() * tasks.length);
-    const chosenTask = tasks[randIndex];
+    const chosenTask = tasks.at(randIndex);
     viewer.setMarkdown(chosenTask.description || "");
     localStorage.setItem("currentTargetID", chosenTask.id);
   },
@@ -63,7 +63,7 @@ export const TrialControls = {
       let start = Date.now();
       setTimeout(() => {
         alert("Time's up!");
-        window.location.href = "/";
+        window.location.replace("/");
       }, Number(trial.trialTime));
       let time_div = document.createElement("div");
       let timer_value = document.createElement("p");

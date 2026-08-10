@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            window.location.href = "/";
+            window.location.replace("/");
         } catch (err) {
             console.error("Account deletion error", err);
             alert("Network error while deleting your account. Your account was NOT deleted.");

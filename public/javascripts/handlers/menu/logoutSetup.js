@@ -16,7 +16,7 @@ let setupLogout = () => {
         alert("Logout failed. Please try again.");
         return;
       }
-      window.location.href = "/";
+      window.location.replace("/");
     } catch (err) {
       console.error("Logout error", err);
       alert("Network error while logging out.");
