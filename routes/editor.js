@@ -1,66 +1,84 @@
 import express from "express";
-let router = express.Router();
-
 import Database from "../tools/db.js";
+import { isNonEmptyString } from "../utils/validate.js";
 
-/* GET editor page. */
+const router = express.Router();
+
+// GET /editor
 router.get("/", async (req, res, next) => {
-  if (!res.locals.auth) return res.redirect("../users/login");
-  if (res.locals.auth && res.locals.user.role === "student") return res.redirect("../");
+  if (!res.locals.auth) return res.redirect("/users/login");
+
+  if (res.locals.user?.role === "student") return res.redirect("/");
+
   try {
-    const token = req.cookies?.twistask_auth;
-    if (!token) {
-      return res.json({ authenticated: false });
-    }
+    const userId = res.locals.user?.id;
+    if (!userId) return res.status(401).json({ authenticated: false });
 
-    let user = null;
-    try {
-      user = await Database.functions.getUserFromToken(token);
-    } catch (err) {
-      return res.json({ authenticated: false });
-    }
-
-    if (!user) return res.json({ authenticated: false });
-    const tasks = await Database.functions.loadContentbyUser(
-      "tasks",
-      user.record.id,
-    );
-    res.render("editor", { title: "Twistask", tasks });
+    const tasks = await Database.functions.loadContentbyUser("tasks", userId);
+    return res.render("editor", { title: "Twistask", tasks });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
+// POST /editor/submit
 router.post("/submit", async (req, res, next) => {
-  if (!res.locals.auth || res.locals.user.role === "student") return res.status(403);
+  if (!res.locals.auth || res.locals.user?.role === "student") {
+    return res.status(403).json({ ok: false, error: "forbidden" });
+  }
   try {
-    let body = req.body;
-    const result = await Database.functions.createTask(body);
-    res.status(200).json({ ok: true });
+    const body = req.body || {};
+    if (!body || typeof body !== "object") {
+      return res.status(400).json({ ok: false, error: "invalid body" });
+    }
+    if (!isNonEmptyString(body.title) || !isNonEmptyString(body.content)) {
+      return res.status(400).json({ ok: false, error: "missing title or content" });
+    }
+
+    const created = await Database.functions.createTask({
+      title: String(body.title).slice(0, 300),
+      content: String(body.content).slice(0, 20000),
+      author: res.locals.user.id,
+    });
+
+    return res.status(201).json({ ok: true, id: created?.id ?? null });
   } catch (err) {
-    next(err); // lets Express error middleware handle/log and return a 500
+    return next(err);
   }
 });
 
+// POST /editor/update
 router.post("/update", async (req, res, next) => {
-  if (!res.locals.auth || res.locals.user.role === "student") return res.status(403);
+  if (!res.locals.auth || res.locals.user?.role === "student") {
+    return res.status(403).json({ ok: false, error: "forbidden" });
+  }
   try {
-    let body = req.body;
-    const result = await Database.functions.updateTask(body.id, body.task);
-    res.status(200).json({ ok: true });
+    const body = req.body || {};
+    const id = String(body.id || "").trim();
+    const task = body.task;
+    if (!isNonEmptyString(id) || !task) {
+      return res.status(400).json({ ok: false, error: "missing id or task" });
+    }
+    await Database.functions.updateTask(id, task);
+    return res.status(200).json({ ok: true });
   } catch (err) {
-    next(err); // lets Express error middleware handle/log and return a 500
+    return next(err);
   }
 });
 
+// DELETE /editor/delete
 router.delete("/delete", async (req, res, next) => {
-  if (!res.locals.auth || res.locals.user.role === "student") return res.status(403);
+  if (!res.locals.auth || res.locals.user?.role === "student") {
+    return res.status(403).json({ ok: false, error: "forbidden" });
+  }
   try {
-    let body = req.body;
-    const result = await Database.functions.deleteTask(body.id);
-    res.status(200).json({ ok: true });
+    const body = req.body || {};
+    const id = String(body.id || "").trim();
+    if (!isNonEmptyString(id)) return res.status(400).json({ ok: false, error: "missing id" });
+    await Database.functions.deleteTask(id);
+    return res.status(200).json({ ok: true });
   } catch (err) {
-    next(err); // lets Express error middleware handle/log and return a 500
+    return next(err);
   }
 });
 
