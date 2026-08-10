@@ -71,19 +71,6 @@ export const EditorControls = {
         let submitbtn = document.getElementById("submit");
         if (submitbtn) {
             submitbtn.addEventListener("click", async () => {
-                // Decorative sound effect - must never block or fail the
-                // actual save below (autoplay restrictions, a missing file,
-                // etc. would otherwise silently prevent submission).
-                try {
-                    let sound = new Audio();
-                    sound.src = "../sounds/emblem.wav";
-                    document.body.appendChild(sound);
-                    sound.volume = 0.5;
-                    await sound.play();
-                } catch (err) {
-                    console.warn("Sound playback failed:", err);
-                }
-
                 const title = document.getElementById("task-title").value.trim();
                 if (!title) {
                     alert("Please enter a task title.");

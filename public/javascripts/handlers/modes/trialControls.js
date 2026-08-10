@@ -13,12 +13,6 @@ const author = window.AUTHOR || "";
 
 export const TrialControls = {
   setup: () => {
-    let sound = new Audio();
-    sound.src = "../sounds/trial-theme.mp3";
-    document.body.appendChild(sound);
-    sound.volume = 0.3;
-    sound.loop = true;
-    sound.play().catch((err) => console.warn("Background music failed to play:", err));
     TrialControls.setupEditor();
     TrialControls.setupTask();
     TrialControls.setupTimer(trial.trialTime);
