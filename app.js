@@ -16,7 +16,7 @@ let app = express();
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { checkAuthStatus } from "./middleware/checkAuthStatus.js";
-import {pingDatabase} from "./middleware/pingDatabase.js";
+import { pingDatabase } from "./middleware/pingDatabase.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -31,15 +31,43 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+// In-memory cache for DB health checks to avoid hitting the DB on every request
+const DB_PING_CACHE_MS = Number(process.env.DB_PING_CACHE_MS) || 5000;
+let _lastDbPing = { timestamp: 0, result: null };
+
 app.use(async (req, res, next) => {
-  try {
-    let result = await pingDatabase();
-    if (result.status === 200) return next();
-  } catch (err) {
-    console.log("Database is offline!!!");
-    res.render("service/maintenance");
+  // short-circuit common static-ish paths (safety; static middleware is already mounted above)
+  if (
+    req.path === "/favicon.ico" ||
+    req.path.startsWith("/public/") ||
+    req.path.startsWith("/assets/")
+  ) {
+    return next();
   }
-})
+
+  try {
+    const now = Date.now();
+    if (_lastDbPing.result && now - _lastDbPing.timestamp < DB_PING_CACHE_MS) {
+      // use cached result
+      if (_lastDbPing.result.ok && _lastDbPing.result.status === 200) return next();
+      console.warn("DB health (cached) not OK:", _lastDbPing.result.error ?? _lastDbPing.result.status);
+      return res.status(503).render("service/maintenance");
+    }
+
+    // perform a new ping and cache it
+    const result = await pingDatabase();
+    _lastDbPing = { timestamp: now, result };
+
+    if (result && result.ok && result.status === 200) return next();
+
+    console.warn("DB health check failed:", result?.error ?? `status ${result?.status}`);
+    return res.status(503).render("service/maintenance");
+  } catch (err) {
+    console.error("Unexpected error in DB health middleware:", err?.message ?? err);
+    // on unexpected errors, render maintenance to be safe
+    return res.status(503).render("service/maintenance");
+  }
+});
 
 app.use(async (req, res, next) => {
   res.locals.title = "Twistask";
