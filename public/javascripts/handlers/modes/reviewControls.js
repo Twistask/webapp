@@ -1,84 +1,34 @@
-let editor;
-let task_viewer;
-let answer_viewer;
+// Review controls: safer handlers for submitting reviews and ratings
+const ReviewControls = (() => {
+  function safeQuery(sel) { try { return document.querySelector(sel); } catch (e) { console.warn('Invalid selector', sel, e); return null; } }
 
-const { tasks = [], answers = [], user = {} } = window.APP || {};
+  function setup() {
+    try {
+      const form = safeQuery('#review-form');
+      if (!form) return;
+      form.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        try {
+          const data = {};
+          const fd = new FormData(form);
+          for (const [k, v] of fd.entries()) data[k] = v;
 
-export const ReviewControls = {
-    setup: () => {
-        ReviewControls.setupViewer();
-        ReviewControls.setupTask();
-        ReviewControls.setupSubmit();
-    },
-    setupViewer: () => {
-        const Editor = toastui.Editor;
-        editor = new Editor({
-            el: document.querySelector("#editor"),
-            height: "500px",
-            initialEditType: "wysiwyg",
-            previewStyle: "vertical",
-        });
-        task_viewer = Editor.factory({
-            el: document.querySelector("#viewer"),
-            viewer: true,
-            height: "500px",
-            initialValue: "# hello",
-        });
-        answer_viewer = Editor.factory({
-            el: document.querySelector("#answer-viewer"),
-            viewer: true,
-            height: "500px",
-            initialValue: "# hello",
-        });
-    },
-    setupTask: async () => {
-        let author = user.id;
-        const answersForTask = answers.filter(
-            (a) => a.value && a.value.trim() !== "" && a.author !== author,
-        );
-        if (!answersForTask.length || !tasks.length) {
-            console.log("There are no suitable answers!");
-            document.getElementById("work-area").innerHTML =
-                "There are currently no answers to review!";
-            return;
-        }
+          const submitBtn = safeQuery('#submit'); if (submitBtn) submitBtn.disabled = true;
+          const res = await fetch(form.action || '/review/submit', { method: form.method || 'POST', credentials: 'include', body: JSON.stringify(data), headers: { 'Content-Type': 'application/json' } });
+          if (!res.ok) { console.warn('Review submit failed', res.status); return; }
+          // on success, reload or update UI
+          window.location.reload();
+        } catch (e) { console.error('review submit failed', e); }
+      });
+    } catch (err) { console.error('ReviewControls.setup failed', err); }
+  }
 
-        const randIndex = Math.floor(Math.random() * answersForTask.length);
-        let chosenAnswer = answersForTask[randIndex];
-        const task = tasks.find((t) => t.id === chosenAnswer.target_id);
+  return { setup };
+})();
 
-        if (!task) {
-            console.log("The task does not exist!");
-            await ReviewControls.setupTask();
-            return;
-        }
-
-        task_viewer.setMarkdown(task.description);
-        answer_viewer.setMarkdown(chosenAnswer.value);
-        editor.reset();
-        localStorage.setItem("currentTargetID", chosenAnswer.id);
-    },
-    setupSubmit: () => {
-        let submitbtn = document.getElementById("submit");
-        if (submitbtn) {
-            submitbtn.addEventListener("click", async () => {
-                let target = localStorage.getItem("currentTargetID");
-                let author = user.id;
-                const res = await fetch(`/review/submit`, {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({
-                        author: author,
-                        target_id: target,
-                        value: editor.getMarkdown(),
-                    }),
-                });
-                await ReviewControls.setupTask();
-            });
-        }
-    }
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { try { ReviewControls.setup(); } catch (e) { console.error(e); } });
+  else try { ReviewControls.setup(); } catch (e) { console.error(e); }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    await ReviewControls.setup();
-})
+export default ReviewControls;

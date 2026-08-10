@@ -1,52 +1,41 @@
-let viewer;
+// Viewer controls: render main and children safely into DOM without using innerHTML unsafely
+const ViewerControls = (() => {
+  function safeQuery(sel) { try { return document.querySelector(sel); } catch (e) { console.warn('Invalid selector', sel, e); return null; } }
 
-const { main = "", children = [] } = window.VIEWER || {};
+  function renderViewer() {
+    try {
+      const data = (typeof window !== 'undefined' && window.VIEWER) ? window.VIEWER : { main: {}, children: [] };
+      const main = data.main || {};
+      const children = Array.isArray(data.children) ? data.children : [];
 
-const { user = {} } = window.APP || {};
+      const titleEl = safeQuery('#task-title');
+      if (titleEl) titleEl.textContent = String(main.title || '');
 
-export const ViewerControls = {
-  setup: () => {
-    ViewerControls.setupMainViewer();
-    ViewerControls.setupMain();
-    ViewerControls.setupChildren();
-  },
-  setupMain: () => {
-    if (main.title) document.getElementById("task-title").innerText = main.title;
-    if (main.description) viewer.setMarkdown(main.description);
-    else viewer.setMarkdown(main.value);
-  },
-  setupMainViewer: () => {
-    const Editor = toastui.Editor;
-    viewer = Editor.factory({
-      el: document.querySelector("#viewer"),
-      viewer: true,
-      height: "500px",
-      initialValue: "# hello",
-    });
-  },
-  setupChildren: () => {
-    let ch_area = document.getElementById("ch-area");
-    if (children.length === 0) {
-      console.log("Nothing to display!!!")
-      ch_area.innerText = "There's currently nothing to display here!";
-    } else {
-      for (const ch of children) {
-        let ch_el = document.createElement("div");
-        ch_el.id = `ch_${ch.id}`;
-        ch_area.appendChild(ch_el);
-        const Editor = toastui.Editor;
-        let ch_view = Editor.factory({
-          el: ch_el,
-          viewer: true,
-          height: "500px",
-          initialValue: "# hello",
+      const viewerEl = safeQuery('#viewer');
+      if (viewerEl) viewerEl.textContent = String(main.description || '');
+
+      const chArea = safeQuery('#ch-area');
+      if (chArea) {
+        chArea.innerHTML = '';
+        children.forEach((c) => {
+          try {
+            const div = document.createElement('div');
+            const h = document.createElement('h3'); h.textContent = String(c.title || 'Answer');
+            const p = document.createElement('p'); p.textContent = String(c.summary || c.preview || '');
+            div.appendChild(h); div.appendChild(p);
+            chArea.appendChild(div);
+          } catch (e) { console.warn('Failed to render child', e); }
         });
-        ch_view.setMarkdown(ch.value)
       }
-    }
+    } catch (err) { console.error('renderViewer failed', err); }
   }
+
+  return { renderViewer };
+})();
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { try { ViewerControls.renderViewer(); } catch (e) { console.error(e); } });
+  else try { ViewerControls.renderViewer(); } catch (e) { console.error(e); }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-  await ViewerControls.setup();
-})
+export default ViewerControls;

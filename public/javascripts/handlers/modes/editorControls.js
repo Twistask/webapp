@@ -1,109 +1,86 @@
-const { tasks = [], user = {} } = window.APP || {};
+// Editor page controls (create/update/delete) with safer guards
+const EditorControls = (() => {
+  function safeQuery(sel) { try { return document.querySelector(sel); } catch (e) { console.warn('Invalid selector', sel, e); return null; } }
 
-console.log(window.APP);
+  function setup() {
+    try {
+      setupFileImport();
+      setupSubmit();
+      setupDelete();
+    } catch (err) { console.error('EditorControls.setup failed', err); }
+  }
 
-let editor;
+  function setupFileImport() {
+    try {
+      const fileInput = safeQuery('#markdown-import');
+      const editorEl = safeQuery('#editor');
+      if (!fileInput || !editorEl) return;
 
-export const EditorControls = {
-    setup: () => {
-        EditorControls.createChallengeItems(tasks);
-        document.getElementById("challenge-select").onchange = EditorControls.setupTask;
-        EditorControls.setupEditor();
-        EditorControls.setupTask();
-        EditorControls.setupImporter();
-        EditorControls.setupSubmit();
-    },
-    setupEditor: () => {
-        const Editor = toastui.Editor;
-        editor = new Editor({
-            el: document.querySelector("#editor"),
-            height: "500px",
-            initialEditType: "wysiwyg",
-            previewStyle: "vertical",
-        });
-    },
-    setupImporter: () => {
-        document.getElementById("markdown-import").addEventListener('change', (ev) => {
-            const file = ev.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                editor.setMarkdown(e.target.result);
-                document.getElementById("markdown-import").value = null;
-            };
-            reader.onerror = (e) => {
-                console.error('Error reading file:', e.target.error);
-            };
-            reader.readAsText(file);
+      fileInput.addEventListener('change', async (ev) => {
+        const f = ev.target.files && ev.target.files[0];
+        if (!f) return;
+        try {
+          const text = await f.text();
+          // If toastui is present, setMarkdown, otherwise set content
+          if (window.toastui && window.toastui.Editor && editorEl) {
+            try { const ed = window.toastui.Editor.getInstance ? window.toastui.Editor.getInstance(editorEl) : null; if (ed && typeof ed.setMarkdown === 'function') ed.setMarkdown(text); else editorEl.textContent = text; } catch (e) { editorEl.textContent = text; }
+          } else {
+            editorEl.textContent = text;
+          }
+        } catch (e) { console.error('File read failed', e); }
+      });
+    } catch (err) { console.error('setupFileImport error', err); }
+  }
 
-        })
-    },
-    createChallengeItems: () => {
-        let select = document.getElementById("challenge-select");
-        tasks.forEach((item) => {
-            let opt = document.createElement("option");
-            opt.value = item.id;
-            opt.innerHTML = item.title;
-            select.appendChild(opt);
-        });
-    },
-    setupTask: () => {
-        const value = document.getElementById("challenge-select").value;
-        if (value !== "new") {
-            const task = tasks.find((t) => t.id === value);
-            document.getElementById("delete").style.display = "flex";
-            document.getElementById("task-title").value = task.title;
-            editor.setMarkdown(task.description);
-        } else {
-            document.getElementById("delete").style.display = "none";
-            document.getElementById("task-title").value = "";
-            editor.reset();
-        }
-    },
-    setupSubmit: async () => {
-        let submitbtn = document.getElementById("submit");
-        if (submitbtn) {
-            submitbtn.addEventListener("click", async () => {
-                let sound = new Audio();
-                sound.src = "../sounds/emblem.wav";
-                document.body.appendChild(sound);
-                sound.volume = 0.5;
-                await sound.play();
-                let author = user.id;
-                let title = document.getElementById("task-title").value;
-                const value = document.getElementById("challenge-select").value;
-                if (value !== "new") {
-                    const res = await fetch(`/editor/update`, {
-                        method: "POST",
-                        credentials: "include",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            id: value,
-                            task: {
-                                author: author,
-                                title: title,
-                                description: editor.getMarkdown(),
-                            },
-                        }),
-                    });
-                } else {
-                    const res = await fetch(`/editor/submit`, {
-                        method: "POST",
-                        credentials: "include",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            author: author,
-                            title: title,
-                            description: editor.getMarkdown(),
-                        }),
-                    });
-                }
-                window.location.reload();
-            });
-        }
-    },
+  function setupSubmit() {
+    try {
+      const submitBtn = safeQuery('#submit'); if (!submitBtn) return;
+      submitBtn.addEventListener('click', async (ev) => {
+        ev.preventDefault();
+        submitBtn.disabled = true;
+        try {
+          const titleEl = safeQuery('#task-title'); const title = titleEl ? String(titleEl.value || titleEl.textContent || '') : '';
+          const editorEl = safeQuery('#editor');
+          let value = editorEl ? String(editorEl.innerText || editorEl.textContent || '') : '';
+
+          const payload = { title: title, value: value };
+          const res = await fetch('/editor/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(payload) });
+          if (!res.ok) {
+            console.warn('Editor submit failed', res.status);
+            return;
+          }
+          // Optionally navigate or show success
+          window.location.href = '/editor';
+        } catch (e) { console.error('submit failed', e); }
+        finally { try { submitBtn.disabled = false; } catch (_) {} }
+      });
+    } catch (err) { console.error('setupSubmit error', err); }
+  }
+
+  function setupDelete() {
+    try {
+      const delBtn = safeQuery('#delete'); if (!delBtn) return;
+      delBtn.addEventListener('click', async (ev) => {
+        ev.preventDefault();
+        if (!confirm('Delete this task? This action cannot be undone.')) return;
+        delBtn.disabled = true;
+        try {
+          const id = safeQuery('#challenge-select')?.value || null;
+          if (!id) { console.warn('No id found to delete'); return; }
+          const res = await fetch(`/editor/delete/${encodeURIComponent(id)}`, { method: 'DELETE', credentials: 'include' });
+          if (!res.ok) { console.warn('Delete failed', res.status); return; }
+          window.location.href = '/editor';
+        } catch (e) { console.error('delete failed', e); } finally { try { delBtn.disabled = false; } catch (_) {} }
+      });
+    } catch (err) { console.error('setupDelete error', err); }
+  }
+
+  return { setup };
+})();
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { try { EditorControls.setup(); } catch (e) { console.error(e); } });
+  else try { EditorControls.setup(); } catch (e) { console.error(e); }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    await EditorControls.setup();
-})
+export default EditorControls;

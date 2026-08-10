@@ -1,80 +1,147 @@
-const { tasks = [], user = {} } = window.APP || {};
+// Safer ChallengeControls: guards, fallbacks, and robust network handling
+const ChallengeControls = (() => {
+  const app = (typeof window !== 'undefined' && window.APP) ? window.APP : {};
+  const { tasks = [], user = {} } = app;
+  let editor = null;
+  let viewer = null;
 
-let editor;
-let viewer;
+  function safeQuery(sel) {
+    try { return document.querySelector(sel); } catch (e) { console.warn('Invalid selector', sel, e); return null; }
+  }
 
-export const ChallengeControls = {
-    setup: () => {
-        ChallengeControls.createChallengeItems(tasks);
-        ChallengeControls.setupEditor();
-        document.getElementById("challenge-select").onchange = ChallengeControls.setupTask;
-        ChallengeControls.setupTask();
-        ChallengeControls.setupSubmit();
-    },
-    setupEditor: () => {
-        const Editor = toastui.Editor;
-        editor = new Editor({
-            el: document.querySelector("#editor"),
-            height: "500px",
-            initialEditType: "wysiwyg",
-            previewStyle: "vertical",
-        });
-        viewer = Editor.factory({
-            el: document.querySelector("#viewer"),
-            viewer: true,
-            height: "500px",
-            initialValue: "# hello",
-        });
-    },
-    createChallengeItems: () => {
-        let select = document.getElementById("challenge-select");
-        tasks.forEach((item) => {
-            let opt = document.createElement("option");
-            opt.value = item.id;
-            opt.innerHTML = item.title;
-            select.appendChild(opt);
-        });
-    },
-    setupTask: () => {
-        const value = document.getElementById("challenge-select").value;
-        const task = tasks.find((t) => t.id === value);
-        viewer.setMarkdown(task.description);
-        editor.reset();
-        localStorage.setItem("currentTargetID", task.id);
-    },
-    setupSubmit: async () => {
-        let submitbtn = document.getElementById("submit");
-        submitbtn.addEventListener("click", async () => {
-            let target = localStorage.getItem("currentTargetID");
-            let author;
-            if (document.getElementById("author-name") !== null) {
-                author = document.getElementById("author-name").value;
-            } else {
-                author = user.id;
-            }
-            const res = await fetch(`/challenge/submit`, {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    author: author,
-                    target_id: target,
-                    value: editor.getMarkdown(),
-                }),
-            });
-            const select = document.getElementById("challenge-select");
-            const current = select.selectedIndex;
-            const lastIndex = select.options.length - 1;
+  function setup() {
+    try {
+      createChallengeItems();
+      setupEditor();
+      const select = safeQuery('#challenge-select');
+      if (select) select.addEventListener('change', setupTask);
+      setupTask();
+      setupSubmit();
+    } catch (err) {
+      console.error('ChallengeControls.setup failed', err);
+    }
+  }
 
-            if (current < lastIndex) {
-                select.selectedIndex = current + 1;
-            } else {
-                select.selectedIndex = 0;
-            }
-            ChallengeControls.setupTask();
-        })
-    },
+  function setupEditor() {
+    try {
+      const editorEl = safeQuery('#editor');
+      const viewerEl = safeQuery('#viewer');
+      if (!editorEl) { console.warn('Editor element not found'); return; }
+
+      if (window.toastui && window.toastui.Editor) {
+        try {
+          const Editor = window.toastui.Editor;
+          editor = new Editor({ el: editorEl, height: '500px', initialEditType: 'wysiwyg', previewStyle: 'vertical' });
+          if (viewerEl) viewer = Editor.factory({ el: viewerEl, viewer: true, height: '500px', initialValue: '# hello' });
+        } catch (e) {
+          console.warn('toastui init failed', e);
+          editor = null;
+        }
+      } else {
+        // fallback: make editable
+        editorEl.setAttribute('contenteditable', 'true');
+        editor = null;
+        if (viewerEl) viewer = viewerEl;
+      }
+    } catch (err) { console.error('setupEditor error', err); }
+  }
+
+  function createChallengeItems() {
+    try {
+      const select = safeQuery('#challenge-select');
+      if (!select || !Array.isArray(tasks)) return;
+      // clear existing
+      select.innerHTML = '';
+      tasks.forEach((item) => {
+        try {
+          const opt = document.createElement('option');
+          opt.value = String(item.id);
+          opt.textContent = String(item.title || 'Untitled');
+          select.appendChild(opt);
+        } catch (e) { console.warn('Failed to add option', e); }
+      });
+    } catch (err) { console.error('createChallengeItems error', err); }
+  }
+
+  function setupTask() {
+    try {
+      const select = safeQuery('#challenge-select');
+      if (!select || !Array.isArray(tasks) || tasks.length === 0) return;
+      const value = String(select.value || select.options[0]?.value || '');
+      const task = tasks.find((t) => String(t.id) === value) || tasks[0];
+      if (!task) return;
+
+      if (viewer && typeof viewer.setMarkdown === 'function') {
+        try { viewer.setMarkdown(String(task.description || '')); } catch (e) { console.warn('viewer.setMarkdown failed', e); }
+      } else {
+        const v = safeQuery('#viewer'); if (v) v.textContent = String(task.description || '');
+      }
+
+      if (editor && typeof editor.reset === 'function') {
+        try { editor.reset(); } catch (e) { console.warn('editor.reset failed', e); }
+      } else {
+        const ed = safeQuery('#editor'); if (ed) ed.innerHTML = '<p><br></p>';
+      }
+
+      try { localStorage.setItem('currentTargetID', String(task.id)); } catch (e) { console.warn('localStorage set failed', e); }
+    } catch (err) { console.error('setupTask error', err); }
+  }
+
+  async function setupSubmit() {
+    try {
+      const submitBtn = safeQuery('#submit'); if (!submitBtn) return;
+      submitBtn.addEventListener('click', async (ev) => {
+        ev.preventDefault();
+        try {
+          const target = localStorage.getItem('currentTargetID');
+          let authorVal = null;
+          const aInp = safeQuery('#author-name');
+          if (aInp) authorVal = (aInp.value || '').trim();
+          else authorVal = user && user.id ? user.id : '';
+
+          let value = '';
+          if (editor && typeof editor.getMarkdown === 'function') value = String(await editor.getMarkdown());
+          else {
+            const ed = safeQuery('#editor'); value = ed ? String(ed.innerText || ed.textContent || '') : '';
+          }
+
+          // Disable to prevent duplicates
+          submitBtn.disabled = true;
+          const res = await fetch('/challenge/submit', {
+            method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ author: authorVal, target_id: target, value: value })
+          });
+
+          if (!res.ok) {
+            console.warn('Submit failed', res.status);
+            // re-enable for retry
+            submitBtn.disabled = false;
+            return;
+          }
+
+          // Move to next item if available
+          const select = safeQuery('#challenge-select');
+          if (select) {
+            const current = select.selectedIndex || 0;
+            const lastIndex = Math.max(0, select.options.length - 1);
+            select.selectedIndex = (current < lastIndex) ? current + 1 : 0;
+            setupTask();
+          }
+        } catch (e) {
+          console.error('submit handler failed', e);
+        } finally {
+          try { submitBtn.disabled = false; } catch (_) {}
+        }
+      });
+    } catch (err) { console.error('setupSubmit error', err); }
+  }
+
+  return { setup };
+})();
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { try { ChallengeControls.setup(); } catch (e) { console.error(e); } });
+  else try { ChallengeControls.setup(); } catch (e) { console.error(e); }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    await ChallengeControls.setup();
-})
+export default ChallengeControls;
