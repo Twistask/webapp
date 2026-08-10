@@ -1,257 +1,229 @@
 import express from "express";
 import Database from "../tools/db.js";
+import { isNonEmptyString } from "../utils/validate.js";
 
-let router = express.Router();
+const router = express.Router();
 
-router.get("/register", function (req, res, next) {
-  if (res.locals.auth) res.redirect("../");
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "strict",
+  path: "/",
+  maxAge: 24 * 60 * 60 * 1000, // 1 day
+};
+
+// Registration page
+router.get("/register", (req, res) => {
+  if (res.locals.auth) return res.redirect("/");
   res.locals.err = "";
-  res.render("auth/register", { title: "Twistask" });
+  return res.render("auth/register", { title: "Twistask" });
 });
 
 router.post("/register", async (req, res, next) => {
-  if (res.locals.auth) res.status(409);
+  if (res.locals.auth) return res.status(409).render("service/error", { message: "Already authenticated" });
+
+  const body = req.body || {};
+  if (!isNonEmptyString(body.email) || !isNonEmptyString(body.password)) {
+    res.locals.err = "Email and password are required";
+    return res.status(400).render("auth/register");
+  }
+
   try {
-    const body = req.body;
-    const result = await Database.functions.createUser(body);
-    res.redirect(303, "/");
+    await Database.functions.createUser(body);
+    return res.redirect(303, "/");
   } catch (err) {
-    res.locals.err = "Failed to register. Please check if you've entered the information correctly."
-    return res.render("auth/register");
+    console.error("users.register error:", err?.message ?? err);
+    res.locals.err = "Failed to register. Please check your details.";
+    return res.status(500).render("auth/register");
   }
 });
 
-router.get("/login", function (req, res, next) {
-  if (res.locals.auth) res.redirect("../");
+// Login page
+router.get("/login", (req, res) => {
+  if (res.locals.auth) return res.redirect("/");
   res.locals.err = "";
-  res.render("auth/login", { title: "Twistask" });
+  return res.render("auth/login", { title: "Twistask" });
 });
 
 router.post("/login", async (req, res, next) => {
-  if (res.locals.auth) res.status(409);
-  try {
-    const body = req.body;
-    const result = await Database.functions.loginUser(
-      body.email,
-      body.password,
-    );
-    const token = result.token;
-    if (!token) {
-      return res
-        .status(500)
-        .json({ ok: false, message: "No token returned from auth" });
-    }
+  if (res.locals.auth) return res.status(409).render("service/error", { message: "Already authenticated" });
 
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-    };
+  const { email, password } = req.body || {};
+  if (!isNonEmptyString(email) || !isNonEmptyString(password)) {
+    res.locals.err = "Email and password are required";
+    return res.status(400).render("auth/login");
+  }
+
+  try {
+    const result = await Database.functions.loginUser(email, password);
+    const token = result?.token;
+    if (!isNonEmptyString(token)) {
+      res.locals.err = "Authentication failed";
+      return res.status(401).render("auth/login");
+    }
 
     res.cookie("twistask_auth", token, cookieOptions);
-
-    res.redirect(303, "/");
-  } catch (err) {
-    res.locals.err = "Failed to authenticate. Please check your username and password."
-    return res.render("auth/login");
-  }
-});
-
-router.get("/auth/status", async (req, res, next) => {
-  try {
-    const token = req.cookies?.twistask_auth;
-    if (!token) {
-      return res.json({ authenticated: false });
-    }
-
-    let user = null;
-    try {
-      user = await Database.functions.getUserFromToken(token);
-    } catch (err) {
-      return res.json({ authenticated: false });
-    }
-
-    if (!user) return res.json({ authenticated: false });
-    res.status(200).json({ authenticated: true, user });
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.post("/logout", async function (req, res, next) {
-  if (!res.locals.auth) res.redirect("../");
-  try {
-    const token = req.cookies?.twistask_auth;
-
-    if (token && Database.functions.logoutUser) {
-      try {
-        await Database.functions.logoutUser(token);
-      } catch (err) {
-        console.error("logoutUser failed:", err);
-      }
-    }
-
-    res.clearCookie("twistask_auth", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-    });
-
-    return res.status(200).json({ ok: true });
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.get("/profile", async function (req, res, next) {
-  if (!res.locals.auth) res.redirect("login");
-  try {
-    const token = req.cookies?.twistask_auth;
-    if (!token) {
-      return res.json({ authenticated: false });
-    }
-
-    let user = null;
-    try {
-      user = await Database.functions.getUserFromToken(token);
-    } catch (err) {
-      return res.json({ authenticated: false });
-    }
-
-    if (!user) return res.json({ authenticated: false });
-
-    let tasks = await Database.functions.loadContent("tasks");
-    let answers = await Database.functions.loadContent("answers");
-    let comments = await Database.functions.loadContent("comments");
-
-    res.render("profile", { title: "Twistask", tasks, answers, comments });
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.get("/settings", function (req, res, next) {
-  if (!res.locals.auth) res.redirect("login");
-  res.locals.err = "";
-  res.render("settings");
-});
-
-router.delete("/delete", async function (req, res, next) {
-  if (!res.locals.auth) res.status(403);
-  try {
-    const token = req.cookies?.twistask_auth;
-    if (!token) {
-      return res.json({ authenticated: false });
-    }
-
-    let user = null;
-    try {
-      user = await Database.functions.getUserFromToken(token);
-    } catch (err) {
-      return res.json({ authenticated: false });
-    }
-
-    if (!user) return res.json({ authenticated: false });
-    let result = await Database.functions.deleteUser(user.record.id);
-    if (result.status === 200) res.clearCookie("twistask_auth", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-    });
-    return res.status(200).json({ ok: true });
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.post("/settings", async function (req, res, next) {
-  if (!res.locals.auth) res.status(403);
-  const body = req.body;
-  try {
-    const token = req.cookies?.twistask_auth;
-    if (!token) {
-      return res.json({ authenticated: false });
-    }
-
-    let user = null;
-    try {
-      user = await Database.functions.getUserFromToken(token);
-    } catch (err) {
-      return res.json({ authenticated: false });
-    }
-
-    if (!user) return res.json({ authenticated: false });
-    let result = await Database.functions.changePassword(user.record.id, body);
-    if (result.status === 200) res.clearCookie("twistask_auth", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-    });
     return res.redirect(303, "/");
   } catch (err) {
-    res.locals.err = "Failed to change password. Please check if you've entered the information correctly."
-    return res.render("settings");
+    console.error("users.login error:", err?.message ?? err);
+    res.locals.err = "Failed to authenticate. Please check your username and password.";
+    return res.status(401).render("auth/login");
   }
 });
 
-router.get("/verify", async (req, res, next) => {
-  const token = String(req.query.token || "").trim();
+// Auth status (API)
+router.get("/auth/status", async (req, res) => {
   try {
-    let result = await Database.functions.verifyUser(token);
-    if (result === true) {
-      res.locals.msg = "Successfully verified your account."
-      return res.render("auth/verify");
-    }
+    const token = req.cookies?.twistask_auth;
+    if (!token) return res.json({ authenticated: false });
+    const user = await Database.functions.getUserFromToken(token).catch(() => false);
+    if (!user) return res.json({ authenticated: false });
+
+    return res.status(200).json({ authenticated: true, user: { id: user.record?.id, email: user.record?.email, role: user.record?.role } });
   } catch (err) {
-    res.locals.msg = "Invalid or expired verification token."
-    return res.render("auth/verify");
+    return res.status(500).json({ authenticated: false });
   }
 });
 
-router.get("/forgot-password", function (req, res, next) {
-  if (res.locals.auth) res.redirect("../");
+// Logout
+router.post("/logout", async (req, res) => {
+  if (!res.locals.auth) return res.status(401).json({ ok: false, error: "not authenticated" });
+
+  try {
+    await Database.functions.logoutUser().catch((e) => console.warn("logoutUser failed:", e));
+  } finally {
+    res.clearCookie("twistask_auth", cookieOptions);
+    return res.status(200).json({ ok: true });
+  }
+});
+
+// Profile view
+router.get("/profile", async (req, res, next) => {
+  if (!res.locals.auth) return res.redirect("/users/login");
+
+  try {
+    const tasks = await Database.functions.loadContent("tasks");
+    const answers = await Database.functions.loadContent("answers");
+    const comments = await Database.functions.loadContent("comments");
+    return res.render("profile", { title: "Twistask", tasks, answers, comments });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+// Settings page
+router.get("/settings", (req, res) => {
+  if (!res.locals.auth) return res.redirect("/users/login");
   res.locals.err = "";
-  res.render("auth/request-password-reset", { title: "Twistask" });
+  return res.render("settings");
 });
 
-router.post("/forgot-password", async function (req, res, next) {
-  if (res.locals.auth) res.status(409);
-  let email = req.body.email;
+// Change password (settings)
+router.post("/settings", async (req, res, next) => {
+  if (!res.locals.auth) return res.status(401).render("settings");
+  const body = req.body || {};
   try {
-    let result = await Database.functions.requestPasswordReset(email);
-    console.log(result);
+    const userId = res.locals.user?.id;
+    if (!userId) return res.status(401).json({ authenticated: false });
+
+    await Database.functions.changePassword(userId, body);
+    res.clearCookie("twistask_auth", cookieOptions);
+    return res.redirect(303, "/");
+  } catch (err) {
+    console.error("users.changePassword error:", err?.message ?? err);
+    res.locals.err = "Failed to change password. Please check input.";
+    return res.status(500).render("settings");
+  }
+});
+
+// Delete account
+router.delete("/delete", async (req, res, next) => {
+  if (!res.locals.auth) return res.status(401).json({ authenticated: false });
+
+  try {
+    const userId = res.locals.user?.id;
+    if (!userId) return res.status(400).json({ ok: false, error: "no user id" });
+
+    await Database.functions.deleteUser(userId);
+    res.clearCookie("twistask_auth", cookieOptions);
+    return res.status(200).json({ ok: true });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+// Verification and password reset flows
+router.get("/verify", async (req, res) => {
+  const token = String(req.query.token || "").trim();
+  if (!token) {
+    res.locals.msg = "Missing verification token.";
+    return res.render("auth/verify");
+  }
+
+  try {
+    const result = await Database.functions.verifyUser(token);
     if (result === true) {
-      res.locals.msg = "Check your email for instructions."
+      res.locals.msg = "Successfully verified your account.";
       return res.render("auth/verify");
     }
+    res.locals.msg = "Verification failed.";
+    return res.render("auth/verify");
   } catch (err) {
-    res.locals.msg = "Invalid account."
+    res.locals.msg = "Invalid or expired verification token.";
     return res.render("auth/verify");
   }
 });
 
-router.get("/reset-password", function (req, res, next) {
-  const token = String(req.query.token || "").trim();
-  if (res.locals.auth || !token) res.redirect("../");
-  res.locals.token = token;
-  res.render("auth/reset-password", { title: "Twistask" });
+router.get("/forgot-password", (req, res) => {
+  if (res.locals.auth) return res.redirect("/");
+  res.locals.err = "";
+  return res.render("auth/request-password-reset", { title: "Twistask" });
 });
 
-router.post("/reset-password", async (req, res, next) => {
-  const { token, password } = req.body;
+router.post("/forgot-password", async (req, res) => {
+  if (res.locals.auth) return res.status(409).render("service/error", { message: "Already authenticated" });
+  const email = String(req.body?.email || "").trim();
+  if (!isNonEmptyString(email)) {
+    res.locals.msg = "Email is required.";
+    return res.render("auth/verify");
+  }
   try {
-    let result = await Database.functions.resetPassword(token, password);
+    const result = await Database.functions.requestPasswordReset(email);
     if (result === true) {
-      res.locals.msg = "Successfully reset your password."
+      res.locals.msg = "Check your email for instructions.";
       return res.render("auth/verify");
     }
+    res.locals.msg = "Unable to send reset email.";
+    return res.render("auth/verify");
   } catch (err) {
-    res.locals.msg = "Invalid or expired token."
+    res.locals.msg = "Invalid account.";
+    return res.render("auth/verify");
+  }
+});
+
+router.get("/reset-password", (req, res) => {
+  const token = String(req.query.token || "").trim();
+  if (res.locals.auth || !token) return res.redirect("/");
+  res.locals.token = token;
+  return res.render("auth/reset-password", { title: "Twistask" });
+});
+
+router.post("/reset-password", async (req, res) => {
+  const { token, password } = req.body || {};
+  if (!isNonEmptyString(token) || !isNonEmptyString(password)) {
+    res.locals.msg = "Token and password are required.";
+    return res.render("auth/verify");
+  }
+  try {
+    const result = await Database.functions.resetPassword(token, password);
+    if (result === true) {
+      res.locals.msg = "Successfully reset your password.";
+      return res.render("auth/verify");
+    }
+    res.locals.msg = "Invalid or expired token.";
+    return res.render("auth/verify");
+  } catch (err) {
+    res.locals.msg = "Invalid or expired token.";
     return res.render("auth/verify");
   }
 });
