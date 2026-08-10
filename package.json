@@ -13,6 +13,7 @@
     "dotenv": "^17.4.2",
     "ejs": "~2.6.1",
     "express": "~4.16.1",
+    "express-rate-limit": "^8.6.2",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
     "nodemailer": "^9.0.5",
