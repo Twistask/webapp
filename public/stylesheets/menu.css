@@ -41,7 +41,7 @@ nav #common {
   display: flex;
   align-items: center;
   gap: 0.1vmax;
-  padding-right: 0.5vmax;
+  padding-right: 1vmax;
 }
 
 #logged-in {
