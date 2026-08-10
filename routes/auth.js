@@ -10,7 +10,10 @@ router.get("/register", function (req, res, next) {
 });
 
 router.post("/register", async (req, res, next) => {
-    if (res.locals.auth) return res.status(409).render("auth/register");
+    if (res.locals.auth) {
+        res.locals.err = "You are already logged in.";
+        return res.status(409).render("auth/register");
+    }
     try {
         const body = req.body;
         await Database.functions.createUser(body);
@@ -28,7 +31,10 @@ router.get("/login", function (req, res, next) {
 });
 
 router.post("/login", async (req, res, next) => {
-    if (res.locals.auth) return res.status(409).render("auth/login");
+    if (res.locals.auth) {
+        res.locals.err = "You are already logged in.";
+        return res.status(409).render("auth/login");
+    }
     try {
         const body = req.body;
         const result = await Database.functions.loginUser(
