@@ -2,7 +2,9 @@
   --muted: #6b7280;
   --light-blue: #cfeeff;
   --primary: #1e88e5;
+  --primary-dark: #0d47a1;
   --accent-green: #7ed957;
+  --danger: #e53935;
 }
 
 body {
@@ -18,6 +20,11 @@ body {
   margin: 0;
 }
 
+h1,
+h2 {
+  color: var(--primary-dark);
+}
+
 #work-area {
   padding: 1vmax;
 }
@@ -26,16 +33,17 @@ body {
   padding-bottom: 1vmax;
 }
 
-/* Content panels: task/answer viewers and the task editor all get the same
-   card treatment so the page reads as structured zones instead of a blank
-   white canvas. #answer-area (the user's own input) is visually distinct
-   in green, with a floating divider bar separating it from whatever
-   read-only content sits above it. */
+/* Content panels: task/answer viewers, the task editor, and any other page
+   section marked with .panel all get the same card treatment so pages read
+   as structured zones instead of a blank white canvas. #answer-area (the
+   user's own input) is visually distinct in green, with a floating divider
+   bar separating it from whatever read-only content sits above it. */
 #task-area,
 #review-answer-area,
 #main-area,
 #ch-area,
-#editor-area {
+#editor-area,
+.panel {
   background: var(--light-blue);
   border-radius: 0.6vmax;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
@@ -123,4 +131,46 @@ form {
   align-content: center;
   height: fit-content;
   width: fit-content;
+  background: var(--light-blue);
+  border-radius: 0.8vmax;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  padding: 2vmax 2.6vmax;
+}
+
+form label {
+  display: inline-block;
+  color: var(--primary-dark);
+  font-weight: 600;
+  margin-top: 0.6vmax;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select {
+  font-family: inherit;
+  font-size: 1vmax;
+  padding: 0.5vmax 0.7vmax;
+  margin: 0.3vmax 0 0.8vmax;
+  border: 1px solid var(--primary);
+  border-radius: 0.4vmax;
+  background: #ffffff;
+  color: #1a1a1a;
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+#error-box {
+  color: var(--danger);
+  font-weight: 600;
+  margin-top: 0.8vmax;
+}
+
+#error-box:empty {
+  display: none;
 }
