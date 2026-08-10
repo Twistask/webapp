@@ -16,8 +16,8 @@
   <div id="menu-right">
     <% if (!auth) { %>
     <div id="logged-out" data-access="guestOnly">
-      <a href="/users/register" id="register-link">Register</a>
-      <a href="/users/login" id="login-link">Login</a>
+      <a href="/auth/register" id="register-link">Register</a>
+      <a href="/auth/login" id="login-link">Login</a>
     </div>
     <% } else { %>
     <div id="logged-in" data-access="authOnly">

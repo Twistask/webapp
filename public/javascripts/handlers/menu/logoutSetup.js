@@ -2,7 +2,7 @@ let setupLogout = () => {
   if (document.getElementById("logout"))
     document.getElementById("logout").addEventListener("click", async (ev) => {
       try {
-        const res = await fetch("/users/logout", {
+        const res = await fetch("/auth/logout", {
           method: "POST", // use POST to match your route
           credentials: "include", // send HttpOnly cookie
           headers: {

@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import logger from "morgan";
 
 import indexRouter from "./routes/index.js";
+import authRouter from "./routes/auth.js";
 import usersRouter from "./routes/users.js";
 import challengeRouter from "./routes/challenge.js";
 import timeTrialRouter from "./routes/timeTrial.js";
@@ -16,7 +17,7 @@ let app = express();
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { checkAuthStatus } from "./middleware/checkAuthStatus.js";
-import {pingDatabase} from "./middleware/pingDatabase.js";
+import { pingDatabase } from "./middleware/pingDatabase.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -63,6 +64,7 @@ app.use(async (req, res, next) => {
 });
 
 app.use("/", indexRouter);
+app.use("/auth", authRouter);
 app.use("/users", usersRouter);
 app.use("/challenge", challengeRouter);
 app.use("/timeTrial", timeTrialRouter);
