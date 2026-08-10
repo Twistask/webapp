@@ -1,0 +1,20 @@
+chore: squash automation/cleanup changes
+
+Consolidated hardening and safety updates:
+
+- Routes: validation, sanitization, role/auth checks, consistent JSON and view responses
+  - routes/index.js, routes/users.js, routes/challenge.js, routes/editor.js, routes/review.js, routes/timeTrial.js
+- Middleware & helpers
+  - middleware/requireAuth.js, middleware/requireRole.js, middleware/checkAuthStatus.js, middleware/pingDatabase.js
+- Tools
+  - tools/db.js, tools/mail.js (safer initialization and error shapes)
+- Views (safer templates and JSON embedding)
+  - views/* (challenge.ejs, viewer.ejs, editor.ejs, index.ejs, profile.ejs, settings.ejs, auth/* adjustments)
+- App wiring
+  - app.js (DB health cache, auth attach, JSON-aware error handler)
+- Utilities
+  - utils/validate.js
+
+Notes:
+- Non-destructive: original automation/cleanup branch preserved; this branch contains a single consolidated commit.
+- Recommended follow-ups: add .env.example, unit tests for auth & challenge submit, add CSRF protections, add express-validator.
