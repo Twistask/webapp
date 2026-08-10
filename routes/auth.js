@@ -13,7 +13,7 @@ let router = express.Router();
 router.get("/register", function (req, res, next) {
     if (res.locals.auth) return res.redirect("../");
     res.locals.err = "";
-    res.render("auth/register", { title: "Twistask" });
+    res.render("auth/register");
 });
 
 router.post("/register", registerLimiter, async (req, res, next) => {
@@ -34,7 +34,7 @@ router.post("/register", registerLimiter, async (req, res, next) => {
 router.get("/login", function (req, res, next) {
     if (res.locals.auth) return res.redirect("../");
     res.locals.err = "";
-    res.render("auth/login", { title: "Twistask" });
+    res.render("auth/login");
 });
 
 router.post("/login", loginLimiter, async (req, res, next) => {
@@ -140,7 +140,7 @@ router.get("/verify", verifyLimiter, async (req, res, next) => {
 router.get("/forgot-password", function (req, res, next) {
     if (res.locals.auth) return res.redirect("../");
     res.locals.err = "";
-    res.render("auth/request-password-reset", { title: "Twistask" });
+    res.render("auth/request-password-reset");
 });
 
 router.post("/forgot-password", forgotPasswordLimiter, async function (req, res, next) {
@@ -160,7 +160,7 @@ router.get("/reset-password", function (req, res, next) {
     const token = String(req.query.token || "").trim();
     if (res.locals.auth || !token) return res.redirect("../");
     res.locals.token = token;
-    res.render("auth/reset-password", { title: "Twistask" });
+    res.render("auth/reset-password");
 });
 
 router.post("/reset-password", resetPasswordLimiter, async (req, res, next) => {

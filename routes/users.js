@@ -6,11 +6,11 @@ let router = express.Router();
 router.get("/profile", async function (req, res, next) {
   if (!res.locals.auth) return res.redirect("login");
   try {
-    let tasks = await Database.functions.loadContent("tasks");
-    let answers = await Database.functions.loadContent("answers");
-    let comments = await Database.functions.loadContent("comments");
+    res.locals.tasks = await Database.functions.loadContent("tasks");
+    res.locals.answers = await Database.functions.loadContent("answers");
+    res.locals.comments = await Database.functions.loadContent("comments");
 
-    res.render("profile", { title: "Twistask", tasks, answers, comments });
+    res.render("profile");
   } catch (err) {
     next(err);
   }

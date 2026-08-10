@@ -9,11 +9,11 @@ router.get("/", async (req, res, next) => {
   if (!res.locals.auth) return res.redirect("../users/login");
   if (res.locals.user.role === "student") return res.redirect("../");
   try {
-    const tasks = await Database.functions.loadContentbyUser(
+    res.locals.tasks = await Database.functions.loadContentbyUser(
       "tasks",
       res.locals.user.id,
     );
-    res.render("editor", { title: "Twistask", tasks });
+    res.render("editor");
   } catch (err) {
     next(err);
   }
