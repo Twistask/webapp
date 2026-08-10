@@ -26,7 +26,7 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
 app.use(logger("dev"));
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
@@ -36,12 +36,8 @@ const DB_PING_CACHE_MS = Number(process.env.DB_PING_CACHE_MS) || 5000;
 let _lastDbPing = { timestamp: 0, result: null };
 
 app.use(async (req, res, next) => {
-  if (
-    req.path === "/favicon.ico" ||
-    req.path.startsWith("/public/")
-  ) {
-    return next();
-  }
+  // skip health checks for favicon and health endpoints
+  if (req.path === "/favicon.ico" || req.path.startsWith("/public/")) return next();
 
   try {
     const now = Date.now();
@@ -65,6 +61,7 @@ app.use(async (req, res, next) => {
   }
 });
 
+// Attach auth status to res.locals for downstream handlers
 app.use(async (req, res, next) => {
   res.locals.title = "Twistask";
   res.locals.mode = "none";
@@ -83,7 +80,7 @@ app.use(async (req, res, next) => {
     res.locals.auth = false;
     res.locals.user = null;
   }
-  next();
+  return next();
 });
 
 app.use("/", indexRouter);
@@ -104,9 +101,17 @@ app.use(function (err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render("service/error");
+  // respond with JSON for API clients
+  const wantsJson = req.headers.accept && req.headers.accept.includes("application/json");
+  const status = err.status || 500;
+
+  if (wantsJson || req.xhr) {
+    return res.status(status).json({ error: res.locals.message || "Internal Server Error", status });
+  }
+
+  // render the error page for browsers
+  res.status(status);
+  return res.render("service/error");
 });
 
 export default app;
