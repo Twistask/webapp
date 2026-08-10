@@ -1,30 +1,65 @@
 import express from "express";
-let router = express.Router();
-
 import Database from "../tools/db.js";
 import MailService from "../tools/mail.js";
+import { isNonEmptyString } from "../utils/validate.js";
 
+const router = express.Router();
+
+// GET /challenge
 router.get("/", async (req, res, next) => {
   try {
     res.locals.tasks = await Database.functions.loadContent("tasks");
     res.locals.mode = "challenge";
     if (res.locals.user) res.locals.author = res.locals.user.id;
-    res.render("challenge");
+    return res.render("challenge");
   } catch (err) {
-    next(err); // lets Express error middleware handle/log and return a 500
+    return next(err);
   }
 });
 
+// POST /challenge/submit - anonymous submissions allowed
 router.post("/submit", async (req, res, next) => {
   try {
-    let body = req.body;
-    const result = await Database.functions.sendContent("answer", body);
-    const task = await Database.functions.getContent("task", body.target_id);
-    const user = await Database.functions.getUserbyId(task.author);
-    const mail = MailService.sendEmail(user.email, "Your task has been solved!", "Your task has been solved!");
-    if (result) res.status(200).json({ ok: true });
+    const body = req.body || {};
+    const targetId = String(body.target_id || "").trim();
+    const content = String(body.content || body.answer || body.text || "").trim();
+
+    if (!isNonEmptyString(targetId)) {
+      return res.status(400).json({ ok: false, error: "missing target_id" });
+    }
+    if (!isNonEmptyString(content)) {
+      return res.status(400).json({ ok: false, error: "missing content" });
+    }
+
+    const answer = await Database.functions.sendContent("answer", {
+      target_id: targetId,
+      content: content.slice(0, 20000),
+      author: res.locals.user?.id ?? null,
+    });
+
+    // best-effort notify
+    (async () => {
+      try {
+        const task = await Database.functions.getContent("task", targetId);
+        if (task && task.author) {
+          const user = await Database.functions.getUserbyId(task.author);
+          if (user && user.email) {
+            const mailResult = await MailService.sendEmail(
+              user.email,
+              "Your task has been solved!",
+              "Your task has been solved!",
+            );
+            if (!mailResult.success) console.warn("challenge.submit: mail failed", mailResult.error);
+          }
+        }
+      } catch (notifyErr) {
+        console.warn("challenge.submit: notification failed:", notifyErr?.message ?? notifyErr);
+      }
+    })();
+
+    return res.status(200).json({ ok: true, id: answer?.id ?? null });
   } catch (err) {
-    next(err); // lets Express error middleware handle/log and return a 500
+    return next(err);
   }
 });
 
