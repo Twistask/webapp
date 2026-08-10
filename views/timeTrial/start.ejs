@@ -1,29 +1,34 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= title %></title>
+    <title><%= title || 'Twistask' %></title>
   </head>
   <body>
     <%- include('../partials/menu') %>
     <div id="work-area">
       <form action="/timeTrial/start" method="post">
-        <label>How many tasks would you like to solve?
-          <input type="number" min="1" max="<%= tasks.length %>" value="1" name="tasksAmount">
-        </label><br>
-        <label>Select your difficulty:
-          <select name="difficulty">
+        <label>
+          How many tasks would you like to solve?
+          <input type="number" min="1" max="<%= (tasks && tasks.length) ? tasks.length : 1 %>" value="<%= (tasks && tasks.length) ? 1 : 1 %>" name="tasksAmount" aria-label="Number of tasks to attempt">
+        </label>
+        <br>
+        <label>
+          Select your difficulty:
+          <select name="difficulty" aria-label="Select difficulty">
             <option value="easy">Easy</option>
             <option value="medium">Medium</option>
             <option value="hard">Hard</option>
             <option value="superHard">Super Hard</option>
           </select>
-        </label><br>
+        </label>
+        <br>
         <% if (!auth) { %>
-          <label for="username">Enter your name: </label><input type="text" id="username" name="author" required><br>
+          <label for="username">Enter your name: </label>
+          <input type="text" id="username" name="author" required autocomplete="name" aria-label="Your name"><br>
         <% } %>
         <button type="submit" id="startTrial">Start</button>
       </form>
     </div>
+    <%- include('../partials/common') %>
   </body>
-  <%- include('../partials/common') %>
 </html>
