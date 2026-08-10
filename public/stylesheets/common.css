@@ -2,6 +2,7 @@
   --muted: #6b7280;
   --light-blue: #cfeeff;
   --primary: #1e88e5;
+  --accent-green: #7ed957;
 }
 
 body {
@@ -21,17 +22,53 @@ body {
   padding: 1vmax;
 }
 
-#controls,
-#task-area,
-#answer-area,
-#review-answer-area {
+#controls {
   padding-bottom: 1vmax;
+}
+
+/* Content panels: task/answer viewers and the task editor all get the same
+   card treatment so the page reads as structured zones instead of a blank
+   white canvas. #answer-area (the user's own input) is visually distinct
+   in green, with a floating divider bar separating it from whatever
+   read-only content sits above it. */
+#task-area,
+#review-answer-area,
+#main-area,
+#ch-area,
+#editor-area {
+  background: var(--light-blue);
+  border-radius: 0.6vmax;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  padding: 1.2vmax;
+  margin-bottom: 1.5vmax;
+}
+
+#answer-area {
+  position: relative;
+  background: var(--accent-green);
+  border-radius: 0.6vmax;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  padding: 1.2vmax;
+  margin-top: 2.2vmax;
+}
+
+#answer-area::before {
+  content: "";
+  position: absolute;
+  top: -1.35vmax;
+  left: 0;
+  right: 0;
+  height: 0.45vmax;
+  background: var(--primary);
+  border-radius: 0.25vmax;
 }
 
 #editor,
 #viewer,
 #answer-viewer {
   padding: 0.2vmax;
+  border-radius: 0.3vmax;
+  overflow: hidden;
 }
 
 button,
