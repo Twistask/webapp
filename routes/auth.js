@@ -1,5 +1,12 @@
 import express from "express";
 import Database from "../tools/db.js";
+import {
+    loginLimiter,
+    registerLimiter,
+    forgotPasswordLimiter,
+    resetPasswordLimiter,
+    verifyLimiter,
+} from "../middleware/authRateLimit.js";
 
 let router = express.Router();
 
@@ -9,8 +16,11 @@ router.get("/register", function (req, res, next) {
     res.render("auth/register", { title: "Twistask" });
 });
 
-router.post("/register", async (req, res, next) => {
-    if (res.locals.auth) return res.status(409).render("auth/register");
+router.post("/register", registerLimiter, async (req, res, next) => {
+    if (res.locals.auth) {
+        res.locals.err = "You are already logged in.";
+        return res.status(409).render("auth/register");
+    }
     try {
         const body = req.body;
         await Database.functions.createUser(body);
@@ -27,8 +37,11 @@ router.get("/login", function (req, res, next) {
     res.render("auth/login", { title: "Twistask" });
 });
 
-router.post("/login", async (req, res, next) => {
-    if (res.locals.auth) return res.status(409).render("auth/login");
+router.post("/login", loginLimiter, async (req, res, next) => {
+    if (res.locals.auth) {
+        res.locals.err = "You are already logged in.";
+        return res.status(409).render("auth/login");
+    }
     try {
         const body = req.body;
         const result = await Database.functions.loginUser(
@@ -106,7 +119,7 @@ router.post("/logout", async function (req, res, next) {
     }
 });
 
-router.get("/verify", async (req, res, next) => {
+router.get("/verify", verifyLimiter, async (req, res, next) => {
     const token = String(req.query.token || "").trim();
     if (!token) {
         res.locals.msg = "Invalid or expired verification token.";
@@ -130,7 +143,7 @@ router.get("/forgot-password", function (req, res, next) {
     res.render("auth/request-password-reset", { title: "Twistask" });
 });
 
-router.post("/forgot-password", async function (req, res, next) {
+router.post("/forgot-password", forgotPasswordLimiter, async function (req, res, next) {
     if (res.locals.auth) return res.status(409).render("auth/request-password-reset");
     let email = req.body.email;
     try {
@@ -150,7 +163,7 @@ router.get("/reset-password", function (req, res, next) {
     res.render("auth/reset-password", { title: "Twistask" });
 });
 
-router.post("/reset-password", async (req, res, next) => {
+router.post("/reset-password", resetPasswordLimiter, async (req, res, next) => {
     const { token, password } = req.body;
     try {
         const result = await Database.functions.resetPassword(token, password);
