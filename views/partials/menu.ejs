@@ -21,11 +21,23 @@
     </div>
     <% } else { %>
     <div id="logged-in" data-access="authOnly">
-      <a href="/users/profile" id="profile-link">Profile</a>
-      <a href="/users/settings" id="settings-link">Settings</a>
-      <a id="logout">Logout</a>
-      <div id="menu-user"><%= user?.name %></div>
+      <button
+        type="button"
+        id="user-menu-toggle"
+        aria-haspopup="menu"
+        aria-expanded="false"
+        aria-controls="user-menu"
+      >
+        <%= user?.name %>
+        <span aria-hidden="true">&#9662;</span>
+      </button>
+      <div id="user-menu" role="menu" aria-labelledby="user-menu-toggle" hidden>
+        <a href="/users/profile" id="profile-link" role="menuitem">Profile</a>
+        <a href="/users/settings" id="settings-link" role="menuitem">Settings</a>
+        <a id="logout" role="menuitem" tabindex="0">Logout</a>
+      </div>
     </div>
+      <script type="module" src="/javascripts/handlers/menu/userMenuDropdown.js"></script>
       <script type="module" src="/javascripts/handlers/menu/logoutSetup.js"></script>
     <% } %>
   </div>
