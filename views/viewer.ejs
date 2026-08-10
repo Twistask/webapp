@@ -15,10 +15,10 @@
       </div>
     </div>
     <script>
-      window.VIEWER = {
-          main: <%- JSON.stringify(main || []) %>,
-          children: <%- JSON.stringify(children || []) %>,
-      };
+      window.VIEWER = <%- JSON.stringify({
+          main: main || [],
+          children: children || [],
+      }).replace(/</g, "\\u003c") %>;
     </script>
     <script type="module" src="/javascripts/handlers/modes/viewerControls.js"></script>
   </body>

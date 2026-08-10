@@ -18,7 +18,7 @@ export const TrialControls = {
     document.body.appendChild(sound);
     sound.volume = 0.3;
     sound.loop = true;
-    sound.play();
+    sound.play().catch((err) => console.warn("Background music failed to play:", err));
     TrialControls.setupEditor();
     TrialControls.setupTask();
     TrialControls.setupTimer(trial.trialTime);
@@ -41,21 +41,27 @@ export const TrialControls = {
     });
   },
   setupTask: () => {
+    if (tasks.length === 0) {
+      viewer.setMarkdown("There are currently no tasks available for a time trial.");
+      return;
+    }
     const randIndex = Math.floor(Math.random() * tasks.length);
-    let chosenTask;
-    chosenTask = tasks[randIndex];
-    viewer.setMarkdown(chosenTask.description);
+    const chosenTask = tasks[randIndex];
+    viewer.setMarkdown(chosenTask.description || "");
     localStorage.setItem("currentTargetID", chosenTask.id);
   },
   setupSubmit: () => {
     let submitbtn = document.getElementById("submit");
-    let target = localStorage.getItem("currentTargetID");
     submitbtn.addEventListener("click", async () => {
+      const target = localStorage.getItem("currentTargetID");
+      if (!target) return;
       TrialControls.setupTask();
-      await TrialControls.submitPuzzle(
-          target,
-          editor.getMarkdown(),
-      );
+      try {
+        await TrialControls.submitPuzzle(target, editor.getMarkdown());
+      } catch (err) {
+        console.error("Failed to submit trial solutions:", err);
+        alert("Some of your answers failed to submit. Please check your connection and try again.");
+      }
     })
   },
   setupTimer: () => {
@@ -69,7 +75,7 @@ export const TrialControls = {
       let timer_value = document.createElement("p");
       setInterval(() => {
         timer_value.innerText = `Time left: ${convertToString(Math.max(0, trial.trialTime - (Date.now() - start)))}`;
-      }, 1);
+      }, 250);
       time_div.append(timer_value);
       let menu = document.getElementById("trial-menu");
       menu.append(time_div);
@@ -90,17 +96,17 @@ export const TrialControls = {
   submitPuzzle: async (id, value) => {
     TrialControls.addSolution(id, value);
     if (solutions.size >= trial.tasksAmount) {
-      TrialControls.sendSolutions().then((r) => {
-        console.log("Trial over!!!!");
-      });
+      return TrialControls.sendSolutions();
     }
   },
   addSolution: (id, value) => {
-    solutions.set(counter, {
+    // `counter` must advance on every call, otherwise every solution
+    // overwrites the same Map entry and the trial never collects more
+    // than one answer.
+    solutions.set(counter++, {
       id: id,
       value: value,
     });
-    console.log(solutions);
   },
   sendSolutions: async () => {
     const promises = Array.from(solutions, ([, ans]) => {
@@ -131,5 +137,11 @@ export const TrialControls = {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
-  await TrialControls.setup();
+  try {
+    await TrialControls.setup();
+  } catch (err) {
+    console.error("Failed to set up time trial:", err);
+    const workArea = document.getElementById("work-area");
+    if (workArea) workArea.innerText = "Something went wrong loading this page. Please refresh and try again.";
+  }
 })

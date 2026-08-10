@@ -35,8 +35,8 @@
     </div>
     <% if (mode === "timeTrial") { %>
     <script>
-      window.TRIAL = <%- JSON.stringify(trial || {}) %>
-              window.AUTHOR = "<%- author %>"
+      window.TRIAL = <%- JSON.stringify(trial || {}).replace(/</g, "\\u003c") %>;
+      window.AUTHOR = <%- JSON.stringify(author || "").replace(/</g, "\\u003c") %>;
     </script>
     <script type="module" src="/javascripts/handlers/modes/trialControls.js"></script>
     <% } %>

@@ -1,7 +1,5 @@
 const { tasks = [], user = {} } = window.APP || {};
 
-console.log(window.APP);
-
 let editor;
 
 export const EditorControls = {
@@ -33,6 +31,7 @@ export const EditorControls = {
             };
             reader.onerror = (e) => {
                 console.error('Error reading file:', e.target.error);
+                alert("Could not read that file.");
             };
             reader.readAsText(file);
 
@@ -43,7 +42,9 @@ export const EditorControls = {
         tasks.forEach((item) => {
             let opt = document.createElement("option");
             opt.value = item.id;
-            opt.innerHTML = item.title;
+            // textContent, not innerHTML: task titles are user-authored
+            // content and must never be parsed as markup.
+            opt.textContent = item.title;
             select.appendChild(opt);
         });
     },
@@ -51,9 +52,15 @@ export const EditorControls = {
         const value = document.getElementById("challenge-select").value;
         if (value !== "new") {
             const task = tasks.find((t) => t.id === value);
+            if (!task) {
+                document.getElementById("delete").style.display = "none";
+                document.getElementById("task-title").value = "";
+                editor.reset();
+                return;
+            }
             document.getElementById("delete").style.display = "flex";
             document.getElementById("task-title").value = task.title;
-            editor.setMarkdown(task.description);
+            editor.setMarkdown(task.description || "");
         } else {
             document.getElementById("delete").style.display = "none";
             document.getElementById("task-title").value = "";
@@ -64,46 +71,82 @@ export const EditorControls = {
         let submitbtn = document.getElementById("submit");
         if (submitbtn) {
             submitbtn.addEventListener("click", async () => {
-                let sound = new Audio();
-                sound.src = "../sounds/emblem.wav";
-                document.body.appendChild(sound);
-                sound.volume = 0.5;
-                await sound.play();
-                let author = user.id;
-                let title = document.getElementById("task-title").value;
+                // Decorative sound effect - must never block or fail the
+                // actual save below (autoplay restrictions, a missing file,
+                // etc. would otherwise silently prevent submission).
+                try {
+                    let sound = new Audio();
+                    sound.src = "../sounds/emblem.wav";
+                    document.body.appendChild(sound);
+                    sound.volume = 0.5;
+                    await sound.play();
+                } catch (err) {
+                    console.warn("Sound playback failed:", err);
+                }
+
+                const title = document.getElementById("task-title").value.trim();
+                if (!title) {
+                    alert("Please enter a task title.");
+                    return;
+                }
+
+                const author = user.id;
                 const value = document.getElementById("challenge-select").value;
-                if (value !== "new") {
-                    const res = await fetch(`/editor/update`, {
-                        method: "POST",
-                        credentials: "include",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            id: value,
-                            task: {
+
+                submitbtn.disabled = true;
+                try {
+                    let res;
+                    if (value !== "new") {
+                        res = await fetch(`/editor/update`, {
+                            method: "POST",
+                            credentials: "include",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                id: value,
+                                task: {
+                                    author: author,
+                                    title: title,
+                                    description: editor.getMarkdown(),
+                                },
+                            }),
+                        });
+                    } else {
+                        res = await fetch(`/editor/submit`, {
+                            method: "POST",
+                            credentials: "include",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
                                 author: author,
                                 title: title,
                                 description: editor.getMarkdown(),
-                            },
-                        }),
-                    });
-                } else {
-                    const res = await fetch(`/editor/submit`, {
-                        method: "POST",
-                        credentials: "include",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            author: author,
-                            title: title,
-                            description: editor.getMarkdown(),
-                        }),
-                    });
+                            }),
+                        });
+                    }
+
+                    if (!res.ok) {
+                        console.error("Save failed", res.status);
+                        alert("Failed to save the task. Your changes were not saved - please try again.");
+                        return;
+                    }
+
+                    window.location.reload();
+                } catch (err) {
+                    console.error("Save error", err);
+                    alert("Network error while saving. Your changes were not saved.");
+                } finally {
+                    submitbtn.disabled = false;
                 }
-                window.location.reload();
             });
         }
     },
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await EditorControls.setup();
+    try {
+        await EditorControls.setup();
+    } catch (err) {
+        console.error("Failed to set up editor:", err);
+        const workArea = document.getElementById("work-area");
+        if (workArea) workArea.innerText = "Something went wrong loading this page. Please refresh and try again.";
+    }
 })

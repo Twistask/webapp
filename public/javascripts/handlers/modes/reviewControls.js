@@ -33,8 +33,16 @@ export const ReviewControls = {
     },
     setupTask: async () => {
         let author = user.id;
+        // Only consider answers whose task still exists - filtering this up
+        // front (rather than retrying with a fresh random pick on a miss)
+        // avoids unbounded recursion when the pool contains nothing but
+        // orphaned answers.
         const answersForTask = answers.filter(
-            (a) => a.value && a.value.trim() !== "" && a.author !== author,
+            (a) =>
+                a.value &&
+                a.value.trim() !== "" &&
+                a.author !== author &&
+                tasks.some((t) => t.id === a.target_id),
         );
         if (!answersForTask.length || !tasks.length) {
             console.log("There are no suitable answers!");
@@ -44,17 +52,11 @@ export const ReviewControls = {
         }
 
         const randIndex = Math.floor(Math.random() * answersForTask.length);
-        let chosenAnswer = answersForTask[randIndex];
+        const chosenAnswer = answersForTask[randIndex];
         const task = tasks.find((t) => t.id === chosenAnswer.target_id);
 
-        if (!task) {
-            console.log("The task does not exist!");
-            await ReviewControls.setupTask();
-            return;
-        }
-
-        task_viewer.setMarkdown(task.description);
-        answer_viewer.setMarkdown(chosenAnswer.value);
+        task_viewer.setMarkdown(task.description || "");
+        answer_viewer.setMarkdown(chosenAnswer.value || "");
         editor.reset();
         localStorage.setItem("currentTargetID", chosenAnswer.id);
     },
@@ -62,23 +64,47 @@ export const ReviewControls = {
         let submitbtn = document.getElementById("submit");
         if (submitbtn) {
             submitbtn.addEventListener("click", async () => {
-                let target = localStorage.getItem("currentTargetID");
-                let author = user.id;
-                const res = await fetch(`/review/submit`, {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({
-                        author: author,
-                        target_id: target,
-                        value: editor.getMarkdown(),
-                    }),
-                });
-                await ReviewControls.setupTask();
+                const target = localStorage.getItem("currentTargetID");
+                if (!target) return;
+                const author = user.id;
+
+                submitbtn.disabled = true;
+                try {
+                    const res = await fetch(`/review/submit`, {
+                        method: "POST",
+                        credentials: "include",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify({
+                            author: author,
+                            target_id: target,
+                            value: editor.getMarkdown(),
+                        }),
+                    });
+
+                    if (!res.ok) {
+                        console.error("Submit failed", res.status);
+                        alert("Failed to submit your review. Please try again.");
+                        return;
+                    }
+
+                    await ReviewControls.setupTask();
+                } catch (err) {
+                    console.error("Submit error", err);
+                    alert("Network error while submitting your review.");
+                } finally {
+                    submitbtn.disabled = false;
+                }
             });
         }
     }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await ReviewControls.setup();
+    try {
+        await ReviewControls.setup();
+    } catch (err) {
+        console.error("Failed to set up review mode:", err);
+        const workArea = document.getElementById("work-area");
+        if (workArea) workArea.innerText = "Something went wrong loading this page. Please refresh and try again.";
+    }
 })

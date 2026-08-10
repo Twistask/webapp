@@ -4,22 +4,8 @@ import Database from "../tools/db.js";
 let router = express.Router();
 
 router.get("/profile", async function (req, res, next) {
-  if (!res.locals.auth) res.redirect("login");
+  if (!res.locals.auth) return res.redirect("login");
   try {
-    const token = req.cookies?.twistask_auth;
-    if (!token) {
-      return res.json({ authenticated: false });
-    }
-
-    let user = null;
-    try {
-      user = await Database.functions.getUserFromToken(token);
-    } catch (err) {
-      return res.json({ authenticated: false });
-    }
-
-    if (!user) return res.json({ authenticated: false });
-
     let tasks = await Database.functions.loadContent("tasks");
     let answers = await Database.functions.loadContent("answers");
     let comments = await Database.functions.loadContent("comments");
@@ -31,29 +17,17 @@ router.get("/profile", async function (req, res, next) {
 });
 
 router.get("/settings", function (req, res, next) {
-  if (!res.locals.auth) res.redirect("login");
+  if (!res.locals.auth) return res.redirect("login");
   res.locals.err = "";
   res.render("settings");
 });
 
 router.delete("/delete", async function (req, res, next) {
-  if (!res.locals.auth) res.status(403);
+  if (!res.locals.auth) return res.status(403).json({ ok: false, message: "Not authenticated" });
   try {
     const token = req.cookies?.twistask_auth;
-    if (!token) {
-      return res.json({ authenticated: false });
-    }
-
-    let user = null;
-    try {
-      user = await Database.functions.getUserFromToken(token);
-    } catch (err) {
-      return res.json({ authenticated: false });
-    }
-
-    if (!user) return res.json({ authenticated: false });
-    let result = await Database.functions.deleteUser(user.record.id);
-    if (result.status === 200) res.clearCookie("twistask_auth", {
+    await Database.functions.deleteUser(res.locals.user.id, token);
+    res.clearCookie("twistask_auth", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
@@ -66,24 +40,12 @@ router.delete("/delete", async function (req, res, next) {
 });
 
 router.post("/settings", async function (req, res, next) {
-  if (!res.locals.auth) res.status(403);
+  if (!res.locals.auth) return res.status(403).json({ ok: false, message: "Not authenticated" });
   const body = req.body;
   try {
     const token = req.cookies?.twistask_auth;
-    if (!token) {
-      return res.json({ authenticated: false });
-    }
-
-    let user = null;
-    try {
-      user = await Database.functions.getUserFromToken(token);
-    } catch (err) {
-      return res.json({ authenticated: false });
-    }
-
-    if (!user) return res.json({ authenticated: false });
-    let result = await Database.functions.changePassword(user.record.id, body);
-    if (result.status === 200) res.clearCookie("twistask_auth", {
+    await Database.functions.changePassword(res.locals.user.id, body, token);
+    res.clearCookie("twistask_auth", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",

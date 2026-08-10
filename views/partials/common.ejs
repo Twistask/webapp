@@ -1,11 +1,15 @@
 <link rel="stylesheet" href="/stylesheets/common.css" />
 <script>
-    window.APP = {
-        auth: <%- JSON.stringify(auth || false) %>,
-        user: <%- JSON.stringify(user || {}) %>,
-        tasks: <%- JSON.stringify(tasks || []) %>,
-        answers: <%- JSON.stringify(answers || []) %>,
-        comments: <%- JSON.stringify(comments || []) %>,
-        mode: "<%- mode %>",
-    }
+    // JSON.stringify does not escape a literal script-closing tag, so any
+    // stored task/answer/comment text containing one would otherwise close
+    // this script block and inject arbitrary markup. Replacing every
+    // angle bracket with its unicode escape neutralizes that.
+    window.APP = <%- JSON.stringify({
+        auth: auth || false,
+        user: user || {},
+        tasks: tasks || [],
+        answers: answers || [],
+        comments: comments || [],
+        mode: mode || "none",
+    }).replace(/</g, "\\u003c") %>;
 </script>

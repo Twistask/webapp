@@ -1,64 +1,103 @@
 import "dotenv/config";
 import PocketBase from "pocketbase";
 
+const DB_CONN = process.env.DB_CONN;
+if (!DB_CONN) {
+  console.error("DB_CONN is not set - database calls will fail until it is configured.");
+}
+
+// Shared client for operations that are not scoped to a specific
+// authenticated user (anonymous reads, admin-less collection writes).
+const connection = new PocketBase(DB_CONN);
+connection.autoCancellation(false);
+
+// PocketBase's authStore lives on the Client instance, and authRefresh()/
+// the request Authorization header are derived from *that instance's*
+// authStore - not from any token passed as an argument. Reusing a single
+// module-level client across every request (as this file used to) means
+// one request's login could populate the shared authStore and a
+// concurrent request's authRefresh() would silently authenticate as that
+// other user. Every call that must act as a specific user's session gets
+// its own short-lived client instead, so auth state never leaks between
+// requests.
+const clientForToken = (token) => {
+  const client = new PocketBase(DB_CONN);
+  client.autoCancellation(false);
+  if (token) client.authStore.save(token, null);
+  return client;
+};
+
+// Explicit field whitelists so a crafted request body can't smuggle extra
+// fields (role, verified, id, ...) into a create/update call - only the
+// fields the corresponding form actually submits are forwarded.
+const USER_CREATE_FIELDS = ["email", "password", "passwordConfirm", "name", "role"];
+const USER_PASSWORD_FIELDS = ["oldPassword", "password", "passwordConfirm"];
+const TASK_FIELDS = ["title", "description", "author"];
+
+const pick = (source, keys) => {
+  const result = {};
+  for (const key of keys) {
+    if (source && Object.prototype.hasOwnProperty.call(source, key)) {
+      result[key] = source[key];
+    }
+  }
+  return result;
+};
+
 const Database = {
-  connection: new PocketBase(process.env.DB_CONN),
+  connection,
   functions: {
     loadContent: async (type) => {
-      return await Database.connection.collection(type).getFullList();
+      return await connection.collection(type).getFullList();
     },
 
     loadContentbyUser: async (type, id) => {
-      return await Database.connection.collection(type).getFullList({
-        filter: `author = '${id}'`,
+      return await connection.collection(type).getFullList({
+        filter: connection.filter("author = {:id}", { id }),
       });
     },
 
     getContent: async (type, id) => {
-      return await Database.connection.collection(`${type}s`).getOne(id);
+      return await connection.collection(`${type}s`).getOne(id);
     },
 
-    sendContent: async (type, body) => {
-      return await Database.connection.collection(`${type}s`).create(body);
+    sendContent: async (type, body, token) => {
+      const client = clientForToken(token);
+      return await client.collection(`${type}s`).create(body);
     },
 
-    createTask: async (body) => {
-      return await Database.connection.collection("tasks").create(body);
+    createTask: async (body, token) => {
+      const client = clientForToken(token);
+      return await client.collection("tasks").create(pick(body, TASK_FIELDS));
     },
 
-    updateTask: async (id, body) => {
-      return await Database.connection.collection("tasks").update(id, body);
+    updateTask: async (id, body, token) => {
+      const client = clientForToken(token);
+      return await client.collection("tasks").update(id, pick(body, TASK_FIELDS));
     },
 
     getAnswersForTask: async (id) => {
-      return await Database.connection
-          .collection("answers")
-          .getFullList({
-            filter: `target_id = '${id}'`,
-          });
+      return await connection.collection("answers").getFullList({
+        filter: connection.filter("target_id = {:id}", { id }),
+      });
     },
 
     getCommentsForAnswer: async (id) => {
-      return await Database.connection
-          .collection("comments")
-          .getFullList({
-            filter: `target_id = '${id}'`,
-          });
+      return await connection.collection("comments").getFullList({
+        filter: connection.filter("target_id = {:id}", { id }),
+      });
     },
 
-    deleteTask: async (id) => {
-      const batch = Database.connection.createBatch();
-      const answerList = await Database.connection
-        .collection("answers")
-        .getFullList({
-          filter: `target_id = '${id}'`,
-        });
+    deleteTask: async (id, token) => {
+      const client = clientForToken(token);
+      const batch = client.createBatch();
+      const answerList = await client.collection("answers").getFullList({
+        filter: client.filter("target_id = {:id}", { id }),
+      });
       for (const ans of answerList) {
-        const commentList = await Database.connection
-          .collection("comments")
-          .getFullList({
-            filter: `target_id = '${ans.id}'`,
-          });
+        const commentList = await client.collection("comments").getFullList({
+          filter: client.filter("target_id = {:id}", { id: ans.id }),
+        });
         for (const comm of commentList) {
           batch.collection("comments").delete(comm.id);
         }
@@ -69,31 +108,27 @@ const Database = {
     },
 
     createUser: async (body) => {
-      let user = await Database.connection.collection("users").create(body);
-      if (user && body.email) await Database.connection.collection('users').requestVerification(body.email);
+      const user = await connection.collection("users").create(pick(body, USER_CREATE_FIELDS));
+      if (user && body.email) await connection.collection("users").requestVerification(body.email);
+      return user;
     },
 
     verifyUser: async (token) => {
-      return await Database.connection.collection('users').confirmVerification(token)
+      return await connection.collection("users").confirmVerification(token);
     },
 
-    deleteUser: async (id) => {
-      const batch = Database.connection.createBatch();
-      const answerList = await Database.connection
-        .collection("answers")
-        .getFullList({
-          filter: `author = '${id}'`,
-        });
-      const commentList = await Database.connection
-        .collection("comments")
-        .getFullList({
-          filter: `author = '${id}'`,
-        });
-      const tasksList = await Database.connection
-        .collection("tasks")
-        .getFullList({
-          filter: `author = '${id}'`,
-        });
+    deleteUser: async (id, token) => {
+      const client = clientForToken(token);
+      const batch = client.createBatch();
+      const answerList = await client.collection("answers").getFullList({
+        filter: client.filter("author = {:id}", { id }),
+      });
+      const commentList = await client.collection("comments").getFullList({
+        filter: client.filter("author = {:id}", { id }),
+      });
+      const tasksList = await client.collection("tasks").getFullList({
+        filter: client.filter("author = {:id}", { id }),
+      });
       for (const ans of answerList) {
         batch.collection("answers").delete(ans.id);
       }
@@ -101,28 +136,32 @@ const Database = {
         batch.collection("comments").delete(comm.id);
       }
       for (const task of tasksList) {
-        await Database.functions.deleteTask(task.id);
+        await Database.functions.deleteTask(task.id, token);
       }
       batch.collection("users").delete(id);
-      await batch.send();
+      return await batch.send();
     },
 
     loginUser: async (username, pass) => {
-      return await Database.connection
-        .collection("users")
-        .authWithPassword(username, pass);
+      // Ephemeral client: never populate the shared connection's authStore
+      // with a caller's session.
+      const client = clientForToken(null);
+      return await client.collection("users").authWithPassword(username, pass);
     },
 
     logoutUser: async () => {
-      return Database.connection.authStore.clear();
+      // PocketBase auth tokens are stateless JWTs - there is no server-side
+      // session here to invalidate. The route layer clears the client's
+      // cookie; nothing on the shared connection holds this user's state.
+      return true;
     },
 
     requestPasswordReset: async (email) => {
-      return await Database.connection.collection('users').requestPasswordReset(email);
+      return await connection.collection("users").requestPasswordReset(email);
     },
 
     resetPassword: async (token, pw) => {
-      return await Database.connection.collection('users').confirmPasswordReset(
+      return await connection.collection("users").confirmPasswordReset(
           token,
           pw,
           pw,
@@ -130,27 +169,30 @@ const Database = {
     },
 
     getUserFromToken: async (token) => {
+      if (!token || typeof token !== "string") return false;
       try {
-        return await Database.connection.collection("users").authRefresh(token);
+        const client = clientForToken(token);
+        return await client.collection("users").authRefresh();
       } catch (err) {
-        if (err.status === 401) return false;
+        if (err?.status === 401) return false;
+        throw err;
       }
     },
 
     getUserbyId: async (id) => {
       try {
-        return await Database.connection.collection("users").getOne(id);
-      } catch (e) {
-        console.log(e);
+        return await connection.collection("users").getOne(id);
+      } catch (err) {
+        console.error("getUserbyId failed:", err?.message ?? err);
+        return null;
       }
     },
 
-    changePassword: async (id, body) => {
-      return await Database.connection.collection("users").update(id, body);
+    changePassword: async (id, body, token) => {
+      const client = clientForToken(token);
+      return await client.collection("users").update(id, pick(body, USER_PASSWORD_FIELDS));
     }
   },
 };
-
-Database.connection.autoCancellation(false);
 
 export default Database;

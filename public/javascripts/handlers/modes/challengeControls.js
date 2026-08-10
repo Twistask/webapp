@@ -31,50 +31,89 @@ export const ChallengeControls = {
         tasks.forEach((item) => {
             let opt = document.createElement("option");
             opt.value = item.id;
-            opt.innerHTML = item.title;
+            // textContent, not innerHTML: task titles are user-authored
+            // content and must never be parsed as markup.
+            opt.textContent = item.title;
             select.appendChild(opt);
         });
     },
     setupTask: () => {
         const value = document.getElementById("challenge-select").value;
         const task = tasks.find((t) => t.id === value);
-        viewer.setMarkdown(task.description);
+        const submitbtn = document.getElementById("submit");
+        if (!task) {
+            viewer.setMarkdown("There are currently no challenges available!");
+            editor.reset();
+            if (submitbtn) submitbtn.disabled = true;
+            return;
+        }
+        if (submitbtn) submitbtn.disabled = false;
+        viewer.setMarkdown(task.description || "");
         editor.reset();
         localStorage.setItem("currentTargetID", task.id);
     },
     setupSubmit: async () => {
         let submitbtn = document.getElementById("submit");
         submitbtn.addEventListener("click", async () => {
-            let target = localStorage.getItem("currentTargetID");
+            const target = localStorage.getItem("currentTargetID");
             let author;
-            if (document.getElementById("author-name") !== null) {
-                author = document.getElementById("author-name").value;
+            const authorField = document.getElementById("author-name");
+            if (authorField !== null) {
+                author = authorField.value.trim();
             } else {
                 author = user.id;
             }
-            const res = await fetch(`/challenge/submit`, {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    author: author,
-                    target_id: target,
-                    value: editor.getMarkdown(),
-                }),
-            });
-            const select = document.getElementById("challenge-select");
-            const current = select.selectedIndex;
-            const lastIndex = select.options.length - 1;
 
-            if (current < lastIndex) {
-                select.selectedIndex = current + 1;
-            } else {
-                select.selectedIndex = 0;
+            if (!target) {
+                alert("No challenge selected. Please pick one first.");
+                return;
             }
-            ChallengeControls.setupTask();
+            if (!author) {
+                alert("Please enter your name before submitting.");
+                return;
+            }
+
+            submitbtn.disabled = true;
+            try {
+                const res = await fetch(`/challenge/submit`, {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        author: author,
+                        target_id: target,
+                        value: editor.getMarkdown(),
+                    }),
+                });
+
+                if (!res.ok) {
+                    console.error("Submit failed", res.status);
+                    alert("Failed to submit your answer. Please try again.");
+                    return;
+                }
+
+                const select = document.getElementById("challenge-select");
+                const current = select.selectedIndex;
+                const lastIndex = select.options.length - 1;
+
+                select.selectedIndex = current < lastIndex ? current + 1 : 0;
+                ChallengeControls.setupTask();
+            } catch (err) {
+                console.error("Submit error", err);
+                alert("Network error while submitting your answer.");
+            } finally {
+                submitbtn.disabled = false;
+            }
         })
     },
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await ChallengeControls.setup();
+    try {
+        await ChallengeControls.setup();
+    } catch (err) {
+        console.error("Failed to set up challenge mode:", err);
+        const workArea = document.getElementById("work-area");
+        if (workArea) workArea.innerText = "Something went wrong loading this page. Please refresh and try again.";
+    }
 })
