@@ -3,10 +3,8 @@
   <% if (mode !== "timeTrial") { %>
   <div id="common">
     <a href="/" id="home-link">Home</a>
-    <a href="/challenge" id="challenge-link">Challenge Mode</a>
     <a href="/timeTrial" id="timeTrial-link">Time Trial</a>
     <% if (auth) { %>
-    <a href="/review" id="review-link">Review Mode</a>
     <% if (user.role !== "student") { %>
       <a href="/editor" id="editor-link">Task Editor</a>
     <% } %>
@@ -43,7 +41,7 @@
       </div>
     </div>
       <script type="module" src="/javascripts/handlers/menu/userMenuDropdown.js"></script>
-      <script type="module" src="/javascripts/handlers/menu/logoutSetup.js"></script>
+      <script type="module" src="/javascripts/handlers/menu/menuSetup.js"></script>
     <% } %>
   </div>
     <% } %>
