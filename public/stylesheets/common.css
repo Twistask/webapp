@@ -278,7 +278,9 @@ select {
      unbounded elsewhere in this file - inputs shouldn't). clamp() keeps
      the same fluid feel on small screens but caps it at a normal size on
      large ones. */
-  font-size: clamp(0.85rem, 1vmax, 1rem);
+
+  /* TODO: FIX CLAMP AND SIZE */
+  font-size: clamp(0.70rem, 1vmax, 1rem);
   padding: clamp(0.35rem, 0.5vmax, 0.55rem) clamp(0.5rem, 0.7vmax, 0.7rem);
   margin: 0.3vmax 0 0.8vmax;
   border: 1px solid var(--primary);

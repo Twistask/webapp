@@ -28,19 +28,19 @@
         <div id="how-it-works-grid">
           <div class="feature-card">
             <h3>Solve Tasks</h3>
-            <p>Browse the task directory and solve any challenge at your own pace &mdash; no account required.</p>
-            <a href="/tasks">Browse Tasks &rarr;</a>
+            <p>Browse the tasks and solve any challenge at your own pace!</p>
+            <a href="/tasks">Browse Tasks</a>
           </div>
           <div class="feature-card">
-            <h3>Time Trial</h3>
-            <p>Race the clock across a set of tasks and see how many you can solve before time runs out.</p>
-            <a href="/timeTrial">Start a Trial &rarr;</a>
+            <h3>Trial Mode</h3>
+            <p>Solve a set of tasks before the time runs out! Try the Super Hard mode for an extra challenge!</p>
+            <a href="/timeTrial">Start Trial</a>
           </div>
           <div class="feature-card">
             <h3>Peer Review</h3>
-            <p>Sign in to leave feedback on how others solved a task &mdash; and get feedback on your own.</p>
+            <p>Sign in to leave feedback on how others solved your tasks and get feedback on your own.</p>
             <% if (auth) { %>
-              <a href="/tasks">Browse Tasks &rarr;</a>
+              <a href="/users/profile">Check out Your Profile</a>
             <% } else { %>
               <a href="/auth/register">Create an Account &rarr;</a>
             <% } %>
