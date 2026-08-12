@@ -38,7 +38,7 @@ export const ReviewControls = {
                 a.value &&
                 a.value.trim() !== "" &&
                 a.author !== author &&
-                tasks.some((t) => t.id === a.target_id),
+                tasks.some((t) => t.id === a.target_id && t.language === sessionStorage.getItem("language")),
         );
         if (!answersForTask.length || !tasks.length) {
             console.log("There are no suitable answers!");
@@ -74,6 +74,7 @@ export const ReviewControls = {
                             author: author,
                             target_id: target,
                             value: editor.getMarkdown(),
+                            language: sessionStorage.getItem("language")
                         }),
                     });
 
