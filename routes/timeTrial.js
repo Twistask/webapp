@@ -10,11 +10,15 @@ const DIFFICULTY_TIME_SETTINGS = {
   superHard: 0,
 };
 
+// superHard isn't a fixed count here - it means "every available task",
+// resolved below against the actual task list. A placeholder sentinel
+// (this used to be 9999999) would need to beat `tasksAmount >
+// res.locals.tasks.length` a few lines down, which it never can - that
+// made Super Hard trials fail to start 100% of the time.
 const DIFFICULTY_TASK_SETTINGS = {
   easy: 3,
   medium: 5,
   hard: 7,
-  superHard: 9999999,
 };
 
 router.get("/", async (req, res, next) => {
@@ -37,7 +41,8 @@ router.post("/start", async (req, res, next) => {
     }
 
     const trialTime = DIFFICULTY_TIME_SETTINGS[difficulty];
-    const tasksAmount = DIFFICULTY_TASK_SETTINGS[difficulty];
+    const tasksAmount =
+      difficulty === "superHard" ? res.locals.tasks.length : DIFFICULTY_TASK_SETTINGS[difficulty];
 
     if (!Number.isFinite(tasksAmount) || tasksAmount < 1 || tasksAmount > res.locals.tasks.length) {
       return res.status(400).json({ ok: false, message: "Invalid tasksAmount" });

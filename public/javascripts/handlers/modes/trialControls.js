@@ -18,7 +18,6 @@ export const TrialControls = {
     TrialControls.setupTimer(trial.trialTime);
     TrialControls.setupSubmit();
     TrialControls.blockInput();
-    if (trial.tasksAmount === 9999999) trial.tasksAmount = tasks.length;
   },
   setupEditor: () => {
     const Editor = toastui.Editor;
@@ -44,6 +43,7 @@ export const TrialControls = {
     const randIndex = Math.floor(Math.random() * availableTasks.length);
     const chosenTask = availableTasks.at(randIndex);
     viewer.setMarkdown(chosenTask.description || "");
+    editor.reset();
     localStorage.setItem("currentTargetID", chosenTask.id);
   },
   setupSubmit: () => {
@@ -51,9 +51,13 @@ export const TrialControls = {
     submitbtn.addEventListener("click", async () => {
       const target = localStorage.getItem("currentTargetID");
       if (!target) return;
+      // Capture the answer before setupTask() below loads the next task
+      // and resets the editor - reading it after would submit blank
+      // content instead of what was just typed.
+      const value = editor.getMarkdown();
       TrialControls.setupTask();
       try {
-        await TrialControls.submitPuzzle(target, editor.getMarkdown());
+        await TrialControls.submitPuzzle(target, value);
       } catch (err) {
         console.error("Failed to submit trial solutions:", err);
         alert("Some of your answers failed to submit. Please check your connection and try again.");
@@ -105,12 +109,16 @@ export const TrialControls = {
     });
   },
   sendSolutions: async () => {
+    // /challenge/submit no longer exists - challenge.js now routes per
+    // task as /challenge/:id. Posting to the old URL didn't 404 (it
+    // matched /challenge/:id with id="submit" instead) so every trial
+    // submission was silently failing against a bogus task id.
     const promises = Array.from(solutions, ([, ans]) => {
-      return fetch("/challenge/submit", {
+      return fetch(`/challenge/${ans.id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ author: author, target_id: ans.id, value: ans.value }),
+        body: JSON.stringify({ author: author, value: ans.value }),
       })
         .then((res) => ({ id: ans.id, ok: res.ok, status: res.status }))
         .catch((err) => ({ id: ans.id, ok: false, error: String(err) }));

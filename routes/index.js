@@ -25,6 +25,7 @@ router.get("/tasks/:id", async function (req, res, next) {
   try {
     res.locals.main = await Database.functions.getContent("task", id);
     res.locals.children = await Database.functions.getAnswersForTask(id);
+    res.locals.childType = "answer";
     res.render("viewer");
   } catch (err) {
     next(err);
@@ -38,6 +39,7 @@ router.get("/answers/:id", async function (req, res, next) {
   try {
     res.locals.main = await Database.functions.getContent("answer", id);
     res.locals.children = await Database.functions.getCommentsForAnswer(id);
+    res.locals.childType = "comment";
     res.render("viewer");
   } catch (err) {
     next(err);

@@ -29,12 +29,20 @@ export const ChallengeControls = {
     setupTask: () => {
         viewer.setMarkdown(task.description || "");
         editor.reset();
-        localStorage.setItem("currentTargetID", task.id);
     },
     setupSubmit: async () => {
         let submitbtn = document.getElementById("submit");
         submitbtn.addEventListener("click", async () => {
-            const target = localStorage.getItem("currentTargetID");
+            // task.id comes straight from the server-rendered page, not
+            // localStorage - localStorage is shared across every tab on
+            // this origin, so solving a different task in another tab
+            // would silently redirect this tab's submission to the wrong
+            // task.
+            if (!task.id) {
+                alert("No challenge selected. Please pick one first.");
+                return;
+            }
+
             let author;
             const authorField = document.getElementById("author-name");
             if (authorField !== null) {
@@ -42,28 +50,24 @@ export const ChallengeControls = {
             } else {
                 author = user.id;
             }
-
-            if (!target) {
-                alert("No challenge selected. Please pick one first.");
-                return;
-            }
             if (!author) {
                 alert("Please enter your name before submitting.");
                 return;
             }
 
+            const value = editor.getMarkdown();
+            if (!value.trim()) {
+                alert("Please write an answer before submitting.");
+                return;
+            }
+
             submitbtn.disabled = true;
             try {
-                const res = await fetch(`/challenge/${target}`, {
+                const res = await fetch(`/challenge/${task.id}`, {
                     method: "POST",
                     credentials: "include",
                     headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({
-                        author: author,
-                        target_id: target,
-                        value: editor.getMarkdown(),
-                        language: sessionStorage.getItem("language")
-                    }),
+                    body: JSON.stringify({ author, value }),
                 });
 
                 if (!res.ok) {
@@ -71,6 +75,9 @@ export const ChallengeControls = {
                     alert("Failed to submit your answer. Please try again.");
                     return;
                 }
+
+                editor.reset();
+                alert("Your answer has been submitted!");
             } catch (err) {
                 console.error("Submit error", err);
                 alert("Network error while submitting your answer.");

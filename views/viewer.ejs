@@ -18,6 +18,7 @@
       window.VIEWER = <%- JSON.stringify({
           main: main || [],
           children: children || [],
+          childType: childType || null,
       }).replace(/</g, "\\u003c") %>;
     </script>
     <script type="module" src="/javascripts/handlers/modes/viewerControls.js"></script>

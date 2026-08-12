@@ -1,5 +1,16 @@
 <link rel="stylesheet" href="/stylesheets/common.css" />
 <script>
+    // The language dropdown that normally seeds this only exists in the
+    // authenticated nav menu (see menuSetup.js) - guests have no way to
+    // set it, so without a default here sessionStorage.language stays
+    // null forever and every language-filtered list (tasks directory,
+    // challenge/review/trial task pools) looks permanently empty to them.
+    // This is a plain (non-module) script, so it runs before any deferred
+    // type="module" page controller regardless of where it sits in the
+    // document.
+    if (!sessionStorage.getItem("language")) sessionStorage.setItem("language", "en");
+</script>
+<script>
     // JSON.stringify does not escape a literal script-closing tag, so any
     // stored task/answer/comment text containing one would otherwise close
     // this script block and inject arbitrary markup. Replacing every

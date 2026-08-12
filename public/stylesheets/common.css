@@ -38,10 +38,6 @@ h2 {
   padding: 1vmax;
 }
 
-#controls {
-  padding-bottom: 1vmax;
-}
-
 /* Content panels: task/answer viewers, the task editor, and any other page
    section marked with .panel all get the same card treatment so pages read
    as structured zones instead of a blank white canvas. #answer-area (the
@@ -295,4 +291,58 @@ select:focus {
 #user-settings form {
   position: static;
   margin: 0 auto 1.5vmax;
+}
+
+/* tasks.ejs / tasksDirectory.js: one card per available task, styled to
+   match the site's light-blue card language rather than the generic
+   nav-style pill buttons `a` gets by default (reset with `all: unset`
+   below, then rebuilt). */
+#task-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14vmax, 1fr));
+  gap: 1vmax;
+  margin-top: 1vmax;
+}
+
+.task-card {
+  all: unset;
+  cursor: pointer;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5vmax;
+  background: var(--light-blue);
+  border-radius: 0.6vmax;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  padding: 1.2vmax;
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.12s ease;
+}
+
+.task-card:hover,
+.task-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.task-card-title {
+  font-size: 1.2vmax;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.task-card-cta {
+  font-size: 0.9vmax;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* viewerControls.js: the "Review this answer" link lives inside each
+   answer's own card (#ch-area > div), not as a separate sibling, so give
+   it some breathing room from the rendered markdown above it. */
+#ch-area .review-link {
+  margin-top: 0.8vmax;
 }

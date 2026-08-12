@@ -2,7 +2,7 @@ let editor;
 let task_viewer;
 let answer_viewer;
 
-const { tasks = [], user = {} } = window.APP || {};
+const { tasks = [] } = window.APP || {};
 
 const { answer = {} } = window.REVIEW || {};
 
@@ -34,32 +34,36 @@ export const ReviewControls = {
         });
     },
     setupTask: async () => {
+        // The task this answer targets may have been deleted since the
+        // answer was submitted (an orphaned answer) - guard against that
+        // instead of throwing on task.description.
         const task = tasks.find((t) => t.id === answer.target_id);
-        task_viewer.setMarkdown(task.description || "");
+        task_viewer.setMarkdown(task ? task.description || "" : "This task is no longer available.");
         answer_viewer.setMarkdown(answer.value || "");
         editor.reset();
-        localStorage.setItem("currentTargetID", answer.id);
     },
     setupSubmit: () => {
         let submitbtn = document.getElementById("submit");
         if (submitbtn) {
             submitbtn.addEventListener("click", async () => {
-                const target = localStorage.getItem("currentTargetID");
-                if (!target) return;
-                const author = user.id;
+                // answer.id comes from the server-rendered page, not
+                // localStorage - see the matching note in
+                // challengeControls.js for why that indirection was unsafe.
+                if (!answer.id) return;
+
+                const value = editor.getMarkdown();
+                if (!value.trim()) {
+                    alert("Please write a review before submitting.");
+                    return;
+                }
 
                 submitbtn.disabled = true;
                 try {
-                    const res = await fetch(`/review/${target}`, {
+                    const res = await fetch(`/review/${answer.id}`, {
                         method: "POST",
                         credentials: "include",
                         headers: {"Content-Type": "application/json"},
-                        body: JSON.stringify({
-                            author: author,
-                            target_id: target,
-                            value: editor.getMarkdown(),
-                            language: sessionStorage.getItem("language")
-                        }),
+                        body: JSON.stringify({ value }),
                     });
 
                     if (!res.ok) {
@@ -68,6 +72,8 @@ export const ReviewControls = {
                         return;
                     }
 
+                    alert("Your review has been submitted!");
+                    window.location.href = "/tasks";
                 } catch (err) {
                     console.error("Submit error", err);
                     alert("Network error while submitting your review.");

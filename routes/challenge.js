@@ -7,7 +7,9 @@ import { isValidRecordId } from "./utils/validateId.js";
 import createError from "http-errors";
 
 router.get("/:id", async (req, res, next) => {
-  if (!res.locals.auth) return res.redirect("../users/login");
+  // Anonymous "guest" challenge mode is a supported flow (see the
+  // author-name field in challenge.ejs and the guest branch in POST
+  // below) - this must stay reachable without logging in.
   const id = req.params.id;
   if (!isValidRecordId(id)) return next(createError(404));
   try {
@@ -20,10 +22,15 @@ router.get("/:id", async (req, res, next) => {
 });
 
 router.post("/:id", async (req, res, next) => {
+  // The target task is taken from the URL, not the request body - the
+  // client used to also send a `target_id` field that could disagree
+  // with the URL it was posted to for no good reason.
+  const id = req.params.id;
+  if (!isValidRecordId(id)) return next(createError(404));
   try {
-    const { target_id, value } = req.body;
-    if (!isValidRecordId(target_id)) {
-      return res.status(400).json({ ok: false, message: "Invalid task id" });
+    const { value } = req.body;
+    if (typeof value !== "string" || !value.trim()) {
+      return res.status(400).json({ ok: false, message: "Answer cannot be empty" });
     }
 
     // Authenticated users can never submit as someone else; guests
@@ -37,12 +44,12 @@ router.post("/:id", async (req, res, next) => {
     }
 
     const token = req.cookies?.twistask_auth;
-    await Database.functions.sendContent("answer", { author, target_id, value }, token);
+    await Database.functions.sendContent("answer", { author, target_id: id, value }, token);
 
     // Best-effort notification: a lookup/mail failure here must not turn a
     // successful submission into a 500 for the client.
     try {
-      const task = await Database.functions.getContent("task", target_id);
+      const task = await Database.functions.getContent("task", id);
       const taskAuthor = task?.author ? await Database.functions.getUserbyId(task.author) : null;
       if (taskAuthor?.email) {
         await MailService.sendEmail(taskAuthor.email, "Your task has been solved!", "Your task has been solved!");
