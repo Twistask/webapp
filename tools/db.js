@@ -30,7 +30,19 @@ const clientForToken = (token) => {
 // Explicit field whitelists so a crafted request body can't smuggle extra
 // fields (role, verified, id, ...) into a create/update call - only the
 // fields the corresponding form actually submits are forwarded.
-const USER_FIELDS = ["email", "password", "passwordConfirm", "name", "role", "language"];
+//
+// REGISTER_FIELDS includes "role" because the registration form lets a new
+// user pick student/teacher for themselves. SETTINGS_FIELDS is deliberately
+// a *separate*, narrower list for the self-service /users/settings update -
+// it must never include "role" or "email", otherwise any authenticated
+// user could POST {"role":"teacher"} and grant themselves teacher-only
+// access (this was possible before this list was split out). It includes
+// "oldPassword" because PocketBase's auth collection requires and verifies
+// that field when a non-superuser changes their own password via a normal
+// record update - dropping it (as the old shared list did) made every
+// password change fail.
+const REGISTER_FIELDS = ["email", "password", "passwordConfirm", "name", "role", "language"];
+const SETTINGS_FIELDS = ["oldPassword", "password", "passwordConfirm", "language"];
 const TASK_FIELDS = ["title", "description", "author", "language"];
 
 const pick = (source, keys) => {
@@ -107,7 +119,7 @@ const Database = {
     },
 
     createUser: async (body) => {
-      const user = await connection.collection("users").create(pick(body, USER_FIELDS));
+      const user = await connection.collection("users").create(pick(body, REGISTER_FIELDS));
       if (user && body.email) await connection.collection("users").requestVerification(body.email);
       return user;
     },
@@ -189,7 +201,7 @@ const Database = {
 
     updateUser: async (id, body, token) => {
       const client = clientForToken(token);
-      return await client.collection("users").update(id, pick(body, USER_FIELDS));
+      return await client.collection("users").update(id, pick(body, SETTINGS_FIELDS));
     }
   },
 };

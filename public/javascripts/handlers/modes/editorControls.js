@@ -10,6 +10,7 @@ export const EditorControls = {
         EditorControls.setupTask();
         EditorControls.setupImporter();
         EditorControls.setupSubmit();
+        EditorControls.setupDelete();
     },
     setupEditor: () => {
         const Editor = toastui.Editor;
@@ -131,6 +132,44 @@ export const EditorControls = {
                 }
             });
         }
+    },
+    // The Delete button was only ever shown/hidden (setupTask, above) -
+    // nothing ever attached a click handler to it, so it was inert.
+    setupDelete: () => {
+        const deleteBtn = document.getElementById("delete");
+        if (!deleteBtn) return;
+        deleteBtn.addEventListener("click", async () => {
+            const value = document.getElementById("challenge-select").value;
+            if (value === "new") return;
+
+            const confirmed = confirm(
+                "Delete this task? All of its submitted answers and reviews will be permanently deleted too. This cannot be undone.",
+            );
+            if (!confirmed) return;
+
+            deleteBtn.disabled = true;
+            try {
+                const res = await fetch("/editor/delete", {
+                    method: "DELETE",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: value }),
+                });
+
+                if (!res.ok) {
+                    console.error("Delete failed", res.status);
+                    alert("Failed to delete the task. Please try again.");
+                    return;
+                }
+
+                window.location.reload();
+            } catch (err) {
+                console.error("Delete error", err);
+                alert("Network error while deleting the task.");
+            } finally {
+                deleteBtn.disabled = false;
+            }
+        });
     },
 }
 
