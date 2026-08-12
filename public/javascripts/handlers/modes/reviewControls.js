@@ -2,7 +2,9 @@ let editor;
 let task_viewer;
 let answer_viewer;
 
-const { tasks = [], answers = [], user = {} } = window.APP || {};
+const { tasks = [], user = {} } = window.APP || {};
+
+const { answer = {} } = window.REVIEW || {};
 
 export const ReviewControls = {
     setup: () => {
@@ -32,29 +34,11 @@ export const ReviewControls = {
         });
     },
     setupTask: async () => {
-        let author = user.id;
-        const answersForTask = answers.filter(
-            (a) =>
-                a.value &&
-                a.value.trim() !== "" &&
-                a.author !== author &&
-                tasks.some((t) => t.id === a.target_id && t.language === sessionStorage.getItem("language")),
-        );
-        if (!answersForTask.length || !tasks.length) {
-            console.log("There are no suitable answers!");
-            document.getElementById("work-area").innerHTML =
-                "There are currently no answers to review!";
-            return;
-        }
-
-        const randIndex = Math.floor(Math.random() * answersForTask.length);
-        const chosenAnswer = answersForTask.at(randIndex);
-        const task = tasks.find((t) => t.id === chosenAnswer.target_id);
-
+        const task = tasks.find((t) => t.id === answer.target_id);
         task_viewer.setMarkdown(task.description || "");
-        answer_viewer.setMarkdown(chosenAnswer.value || "");
+        answer_viewer.setMarkdown(answer.value || "");
         editor.reset();
-        localStorage.setItem("currentTargetID", chosenAnswer.id);
+        localStorage.setItem("currentTargetID", answer.id);
     },
     setupSubmit: () => {
         let submitbtn = document.getElementById("submit");
@@ -66,7 +50,7 @@ export const ReviewControls = {
 
                 submitbtn.disabled = true;
                 try {
-                    const res = await fetch(`/review/submit`, {
+                    const res = await fetch(`/review/${target}`, {
                         method: "POST",
                         credentials: "include",
                         headers: {"Content-Type": "application/json"},
@@ -84,7 +68,6 @@ export const ReviewControls = {
                         return;
                     }
 
-                    await ReviewControls.setupTask();
                 } catch (err) {
                     console.error("Submit error", err);
                     alert("Network error while submitting your review.");

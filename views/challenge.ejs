@@ -41,9 +41,19 @@
     <script type="module" src="/javascripts/handlers/modes/trialControls.js"></script>
     <% } %>
     <% if (mode === "challenge") { %>
+      <script>
+        window.CHALLENGE = <%- JSON.stringify({
+          task: task || {},
+        }).replace(/</g, "\\u003c") %>;
+      </script>
       <script type="module" src="/javascripts/handlers/modes/challengeControls.js"></script>
     <% } %>
     <% if (mode === "review") { %>
+      <script>
+        window.REVIEW = <%- JSON.stringify({
+          answer: answer || {},
+        }).replace(/</g, "\\u003c") %>;
+      </script>
       <script type="module" src="/javascripts/handlers/modes/reviewControls.js"></script>
     <% } %>
   </body>

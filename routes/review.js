@@ -3,21 +3,24 @@ let router = express.Router();
 
 import Database from "../tools/db.js";
 import { isValidRecordId } from "./utils/validateId.js";
+import createError from "http-errors";
 
 /* GET review page. */
-router.get("/", async (req, res, next) => {
+router.get("/:id", async (req, res, next) => {
   if (!res.locals.auth) return res.redirect("../users/login");
+  const id = req.params.id;
+  if (!isValidRecordId(id)) return next(createError(404));
   try {
-    res.locals.mode = "review";
+    res.locals.answer = await Database.functions.getContent("answer", id);
     res.locals.tasks = await Database.functions.loadContent("tasks");
-    res.locals.answers = await Database.functions.loadContent("answers");
+    res.locals.mode = "review";
     res.render("challenge");
   } catch (err) {
-    next(err); // lets Express error middleware handle/log and return a 500
+    next(err);
   }
 });
 
-router.post("/submit", async (req, res, next) => {
+router.post("/:id", async (req, res, next) => {
   if (!res.locals.auth) return res.status(403).json({ ok: false, message: "Not authenticated" });
   try {
     const { target_id, value } = req.body;
