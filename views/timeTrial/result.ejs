@@ -7,10 +7,17 @@
     <%- include('../partials/menu') %>
     <div id="work-area">
       <div class="panel">
-        <h1><%= title %></h1>
-        <p>Trial Completed!</p>
+        <h1 id="result-heading">Trial Completed!</h1>
+        <div id="result-stats"></div>
+      </div>
+      <div class="panel" id="result-solved"></div>
+      <div id="result-actions">
+        <a href="/timeTrial">Try Another Trial &rarr;</a>
+        <a href="/tasks">Browse All Tasks &rarr;</a>
+        <a href="/">Back Home &rarr;</a>
       </div>
     </div>
+    <script type="module" src="/javascripts/handlers/modes/resultControls.js"></script>
   </body>
   <%- include('../partials/common') %>
 </html>

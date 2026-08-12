@@ -346,3 +346,94 @@ select:focus {
 #ch-area .review-link {
   margin-top: 0.8vmax;
 }
+
+/* index.ejs / home.js: the homepage's "Jump Right In" panel reuses
+   #task-grid/.task-card from the tasks directory above for visual
+   consistency between the two task-browsing surfaces. */
+#home-jump-in h2 {
+  margin-top: 0;
+}
+
+#home-stats {
+  font-size: 1.2vmax;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+#browse-all-tasks {
+  margin-top: 1vmax;
+}
+
+/* index.ejs: the three "How It Works" cards. Unlike .task-card, the
+   whole card isn't a link (the CTA link at the bottom is its own
+   element), so no `all: unset` reset is needed here. */
+#how-it-works h2 {
+  color: var(--primary-dark);
+}
+
+#how-it-works-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14vmax, 1fr));
+  gap: 1vmax;
+}
+
+.feature-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6vmax;
+  background: var(--light-blue);
+  border-radius: 0.6vmax;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  padding: 1.2vmax;
+}
+
+.feature-card h3 {
+  margin: 0;
+  color: var(--primary-dark);
+}
+
+.feature-card p {
+  margin: 0;
+  flex-grow: 1;
+}
+
+/* timeTrial/result.ejs / resultControls.js: the trial summary's stat
+   row and solved-tasks list (the latter reuses #task-grid/.task-card
+   from the tasks directory above for visual consistency). */
+#result-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5vmax;
+  margin-top: 1vmax;
+}
+
+.result-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.result-stat-value {
+  font-size: 1.8vmax;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.result-stat-label {
+  font-size: 0.85vmax;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+#result-solved h2 {
+  margin-top: 0;
+  color: var(--primary-dark);
+}
+
+#result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5vmax;
+}

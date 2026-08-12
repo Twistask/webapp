@@ -4,8 +4,13 @@ import Database from "../tools/db.js";
 import { isValidRecordId } from "./utils/validateId.js";
 let router = express.Router();
 
-router.get("/", function (req, res, next) {
-  res.render("index");
+router.get("/", async function (req, res, next) {
+  try {
+    res.locals.tasks = await Database.functions.loadContent("tasks");
+    res.render("index");
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.get("/tasks", async function (req, res, next) {
