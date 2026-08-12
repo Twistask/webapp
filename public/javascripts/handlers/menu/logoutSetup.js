@@ -5,6 +5,7 @@ let setupLanguageSelect = () => {
   if (!lngSelect) return;
 
   if (sessionStorage.getItem("language") !== "") lngSelect.value = sessionStorage.getItem("language");
+  else sessionStorage.setItem("language", lngSelect.value);
 
   lngSelect.addEventListener('change', async (ev) => {
     sessionStorage.setItem("language", lngSelect.value);

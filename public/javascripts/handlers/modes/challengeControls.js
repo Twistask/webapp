@@ -84,6 +84,7 @@ export const ChallengeControls = {
                         author: author,
                         target_id: target,
                         value: editor.getMarkdown(),
+                        language: sessionStorage.getItem("language")
                     }),
                 });
 
