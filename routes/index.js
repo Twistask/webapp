@@ -8,6 +8,15 @@ router.get("/", function (req, res, next) {
   res.render("index");
 });
 
+router.get("/tasks", async function (req, res, next) {
+  try {
+    res.locals.tasks = await Database.functions.loadContent("tasks");
+    res.render("tasks");
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get("/tasks/:id", async function (req, res, next) {
   if (!res.locals.auth) return res.redirect("../users/login");
   if (res.locals.user.role === "student") return res.redirect("../");

@@ -29,7 +29,12 @@ export const ViewerControls = {
       for (const ch of children) {
         let ch_el = document.createElement("div");
         ch_el.id = `ch_${ch.id}`;
+        let review_link = document.createElement("a");
+        review_link.id = `review_${ch.id}`;
+        review_link.href = `/review/${ch.id}`;
+        review_link.textContent = "Review";
         ch_area.appendChild(ch_el);
+        ch_area.appendChild(review_link);
         const Editor = toastui.Editor;
         let ch_view = Editor.factory({
           el: ch_el,
