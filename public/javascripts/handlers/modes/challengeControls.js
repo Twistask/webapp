@@ -28,7 +28,8 @@ export const ChallengeControls = {
     },
     createChallengeItems: () => {
         let select = document.getElementById("challenge-select");
-        tasks.forEach((item) => {
+        let availableTasks = tasks.filter((t) => t.language === sessionStorage.getItem("language"));
+        availableTasks.forEach((item) => {
             let opt = document.createElement("option");
             opt.value = item.id;
             // textContent, not innerHTML: task titles are user-authored

@@ -22,8 +22,7 @@ export const checkAuthStatus = async (token) => {
           id: user.record.id,
           name: user.record.name ?? user.record.email ?? "",
           role: user.record.role ?? null,
-          language: user.record.language,
-          current_language: user.record.language,
+          language: user.record.language
         },
       };
     }

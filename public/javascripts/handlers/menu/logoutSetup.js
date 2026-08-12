@@ -4,9 +4,10 @@ let setupLanguageSelect = () => {
   const lngSelect = document.getElementById("language-select");
   if (!lngSelect) return;
 
+  if (sessionStorage.getItem("language") !== "") lngSelect.value = sessionStorage.getItem("language");
+
   lngSelect.addEventListener('change', async (ev) => {
-    user.current_language = lngSelect.value;
-    console.log(user);
+    sessionStorage.setItem("language", lngSelect.value);
   })
 }
 

@@ -35,12 +35,13 @@ export const TrialControls = {
     });
   },
   setupTask: () => {
-    if (tasks.length === 0) {
+    let availableTasks = tasks.filter((t) => t.language === sessionStorage.getItem("language"));
+    if (availableTasks.length === 0) {
       viewer.setMarkdown("There are currently no tasks available for a time trial.");
       return;
     }
-    const randIndex = Math.floor(Math.random() * tasks.length);
-    const chosenTask = tasks.at(randIndex);
+    const randIndex = Math.floor(Math.random() * availableTasks.length);
+    const chosenTask = availableTasks.at(randIndex);
     viewer.setMarkdown(chosenTask.description || "");
     localStorage.setItem("currentTargetID", chosenTask.id);
   },
