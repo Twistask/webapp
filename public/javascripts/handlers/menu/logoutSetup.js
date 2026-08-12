@@ -1,3 +1,16 @@
+const { user = {} } = window.APP || {};
+
+let setupLanguageSelect = () => {
+  const lngSelect = document.getElementById("language-select");
+  if (!lngSelect) return;
+
+  lngSelect.addEventListener('change', async (ev) => {
+    user.current_language = lngSelect.value;
+    console.log(user);
+  })
+}
+
+
 let setupLogout = () => {
   const logoutBtn = document.getElementById("logout");
   if (!logoutBtn) return;
@@ -24,4 +37,7 @@ let setupLogout = () => {
   });
 };
 
-document.addEventListener('DOMContentLoaded', setupLogout);
+document.addEventListener('DOMContentLoaded', () => {
+  setupLanguageSelect();
+  setupLogout();
+});

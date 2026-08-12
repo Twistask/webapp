@@ -44,13 +44,15 @@ router.post("/settings", async function (req, res, next) {
   const body = req.body;
   try {
     const token = req.cookies?.twistask_auth;
-    await Database.functions.changePassword(res.locals.user.id, body, token);
-    res.clearCookie("twistask_auth", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-    });
+    await Database.functions.updateUser(res.locals.user.id, body, token);
+    if (req.body.password) {
+      res.clearCookie("twistask_auth", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+      });
+    }
     return res.redirect(303, "/");
   } catch (err) {
     res.locals.err = "Failed to change password. Please check if you've entered the information correctly."

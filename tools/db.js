@@ -30,9 +30,8 @@ const clientForToken = (token) => {
 // Explicit field whitelists so a crafted request body can't smuggle extra
 // fields (role, verified, id, ...) into a create/update call - only the
 // fields the corresponding form actually submits are forwarded.
-const USER_CREATE_FIELDS = ["email", "password", "passwordConfirm", "name", "role"];
-const USER_PASSWORD_FIELDS = ["oldPassword", "password", "passwordConfirm"];
-const TASK_FIELDS = ["title", "description", "author"];
+const USER_FIELDS = ["email", "password", "passwordConfirm", "name", "role", "language"];
+const TASK_FIELDS = ["title", "description", "author", "language"];
 
 const pick = (source, keys) => {
   const result = {};
@@ -108,7 +107,7 @@ const Database = {
     },
 
     createUser: async (body) => {
-      const user = await connection.collection("users").create(pick(body, USER_CREATE_FIELDS));
+      const user = await connection.collection("users").create(pick(body, USER_FIELDS));
       if (user && body.email) await connection.collection("users").requestVerification(body.email);
       return user;
     },
@@ -188,9 +187,9 @@ const Database = {
       }
     },
 
-    changePassword: async (id, body, token) => {
+    updateUser: async (id, body, token) => {
       const client = clientForToken(token);
-      return await client.collection("users").update(id, pick(body, USER_PASSWORD_FIELDS));
+      return await client.collection("users").update(id, pick(body, USER_FIELDS));
     }
   },
 };

@@ -55,15 +55,18 @@ export const EditorControls = {
             if (!task) {
                 document.getElementById("delete").style.display = "none";
                 document.getElementById("task-title").value = "";
+                document.getElementById("task-language").value = "en";
                 editor.reset();
                 return;
             }
             document.getElementById("delete").style.display = "flex";
             document.getElementById("task-title").value = task.title;
+            document.getElementById("task-language").value = task.language;
             editor.setMarkdown(task.description || "");
         } else {
             document.getElementById("delete").style.display = "none";
             document.getElementById("task-title").value = "";
+            document.getElementById("task-language").value = "en";
             editor.reset();
         }
     },
@@ -79,6 +82,7 @@ export const EditorControls = {
 
                 const author = user.id;
                 const value = document.getElementById("challenge-select").value;
+                const language = document.getElementById("task-language").value;
 
                 submitbtn.disabled = true;
                 try {
@@ -94,6 +98,7 @@ export const EditorControls = {
                                     author: author,
                                     title: title,
                                     description: editor.getMarkdown(),
+                                    language: language
                                 },
                             }),
                         });
@@ -106,6 +111,7 @@ export const EditorControls = {
                                 author: author,
                                 title: title,
                                 description: editor.getMarkdown(),
+                                language: language
                             }),
                         });
                     }
