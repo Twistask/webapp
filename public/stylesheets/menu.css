@@ -88,6 +88,24 @@ nav #common {
   width: 100%;
 }
 
+/* trialControls.js appends a live countdown <div><p> into #trial-menu
+   next to the "Give Up" link. Without this, the <p>'s default browser
+   margins make that box taller than the nav's fixed 3vmax height, so the
+   timer gets clipped above and below instead of sitting inside the bar. */
+#trial-menu {
+  display: flex;
+  align-items: center;
+  gap: 1vmax;
+  height: 100%;
+  padding-right: 1vmax;
+}
+
+#trial-menu p {
+  margin: 0;
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
 @media (max-width: 700px) {
   nav {
     padding: 0.8vmax 1.2vmax;

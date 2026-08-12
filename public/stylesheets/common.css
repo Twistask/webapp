@@ -7,6 +7,14 @@
   --danger: #e53935;
 }
 
+html {
+  /* Without this, browsers/OSes in dark mode paint the default canvas
+     black since nothing here sets a background - every light-blue card
+     would then float in a black void instead of on a page. */
+  color-scheme: light;
+  background: #ffffff;
+}
+
 body {
   font-family:
     "Segoe UI",
@@ -18,6 +26,7 @@ body {
   font-size: 1.15vmax;
   padding: 0;
   margin: 0;
+  background: #ffffff;
 }
 
 h1,
@@ -239,4 +248,32 @@ select:focus {
 
 #error-box:empty {
   display: none;
+}
+
+/* settings.ejs's account-deletion button is a same-styled blue button as
+   Change Password right next to it, giving no visual warning that it's a
+   destructive, irreversible action. --danger is already defined for this
+   exact purpose (see #error-box) but was never applied to a button. */
+#delete_account {
+  background: linear-gradient(#f4511e, var(--danger));
+}
+
+/* index.ejs's welcome logo has no intrinsic sizing in the markup, so it
+   was rendering at the source file's native 350x350px - too large next to
+   the welcome text and not responsive on narrow viewports. */
+.panel > img {
+  max-width: 12vmax;
+  border-radius: 0.6vmax;
+  float: left;
+  margin: 0 1.2vmax 0.8vmax 0;
+}
+
+/* settings.ejs has two independent forms on one page. The generic `form`
+   rule above fixed-positions and centers every form in the viewport, which
+   works for single-form auth pages but stacks both settings forms directly
+   on top of each other. Return them to normal document flow, stacked with
+   a gap, instead. */
+#user-settings form {
+  position: static;
+  margin: 0 auto 1.5vmax;
 }

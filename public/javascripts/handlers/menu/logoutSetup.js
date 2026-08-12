@@ -4,7 +4,12 @@ let setupLanguageSelect = () => {
   const lngSelect = document.getElementById("language-select");
   if (!lngSelect) return;
 
-  if (sessionStorage.getItem("language") !== "") lngSelect.value = sessionStorage.getItem("language");
+  // getItem() returns null (not "") when nothing is stored yet - the old
+  // `!== ""` check treated that as "already stored" and assigned the
+  // literal string "null" to .value, which matches no <option> and left
+  // the select blank instead of showing the default language.
+  const stored = sessionStorage.getItem("language");
+  if (stored) lngSelect.value = stored;
   else sessionStorage.setItem("language", lngSelect.value);
 
   lngSelect.addEventListener('change', async (ev) => {

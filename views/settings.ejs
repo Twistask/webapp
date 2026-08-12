@@ -18,14 +18,14 @@
         </form>
         <form id="password-change" action="/users/settings" method="post">
             <label for="old_password">Current Password:  </label
-            ><input type="password" id="password" name="oldPassword" required /><br />
+            ><input type="password" id="old_password" name="oldPassword" required /><br />
             <label for="password">New Password: </label
             ><input type="password" id="password" name="password" required /><br />
             <label for="password_repeat">Confirm New Password: </label
             ><input type="password" id="password_repeat" name="passwordConfirm" required /><br />
             <button type="submit" id="submit_pw">Change Password</button><br />
             <div id="error-box"><%= err %></div>
-            <button id="delete_account">Delete Account</button>
+            <button type="button" id="delete_account">Delete Account</button>
         </form>
     </div>
 </div>
