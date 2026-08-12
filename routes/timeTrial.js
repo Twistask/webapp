@@ -3,11 +3,18 @@ let router = express.Router();
 
 import Database from "../tools/db.js";
 
-const DIFFICULTY_SETTINGS = {
+const DIFFICULTY_TIME_SETTINGS = {
   easy: 30 * 60 * 1000,
   medium: 20 * 60 * 1000,
   hard: 15 * 60 * 1000,
   superHard: 0,
+};
+
+const DIFFICULTY_TASK_SETTINGS = {
+  easy: 3,
+  medium: 5,
+  hard: 7,
+  superHard: 9999999,
 };
 
 router.get("/", async (req, res, next) => {
@@ -25,13 +32,12 @@ router.post("/start", async (req, res, next) => {
     res.locals.mode = "timeTrial";
 
     const difficulty = req.body.difficulty;
-    if (!Object.prototype.hasOwnProperty.call(DIFFICULTY_SETTINGS, difficulty)) {
+    if (!Object.prototype.hasOwnProperty.call(DIFFICULTY_TIME_SETTINGS, difficulty)) {
       return res.status(400).json({ ok: false, message: "Invalid difficulty" });
     }
 
-    const trialTime = DIFFICULTY_SETTINGS[difficulty];
-    const tasksAmount =
-      difficulty === "superHard" ? res.locals.tasks.length : Number(req.body.tasksAmount);
+    const trialTime = DIFFICULTY_TIME_SETTINGS[difficulty];
+    const tasksAmount = DIFFICULTY_TASK_SETTINGS[difficulty];
 
     if (!Number.isFinite(tasksAmount) || tasksAmount < 1 || tasksAmount > res.locals.tasks.length) {
       return res.status(400).json({ ok: false, message: "Invalid tasksAmount" });

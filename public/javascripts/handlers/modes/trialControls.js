@@ -18,6 +18,7 @@ export const TrialControls = {
     TrialControls.setupTimer(trial.trialTime);
     TrialControls.setupSubmit();
     TrialControls.blockInput();
+    if (trial.tasksAmount === 9999999) trial.tasksAmount = tasks.length;
   },
   setupEditor: () => {
     const Editor = toastui.Editor;
