@@ -19,13 +19,19 @@ const buildTaskCard = (task) => {
     return card;
 };
 
-const setup = () => {
+const render = () => {
     const { tasks = [] } = window.APP || {};
     const availableTasks = tasks.filter((t) => t.language === sessionStorage.getItem("language"));
 
     const statsEl = document.getElementById("home-stats");
     const featuredEl = document.getElementById("featured-tasks");
     if (!statsEl || !featuredEl) return;
+
+    // Clear out whatever was rendered for the previous language before
+    // rebuilding - this runs again on "app:languagechange", not just
+    // once at page load.
+    statsEl.textContent = "";
+    featuredEl.innerHTML = "";
 
     if (availableTasks.length === 0) {
         statsEl.textContent = "No tasks are available yet in this language - check back soon!";
@@ -55,6 +61,11 @@ const setup = () => {
         browseAll.textContent = `Browse all ${availableTasks.length} tasks →`;
         featuredEl.appendChild(browseAll);
     }
+};
+
+const setup = () => {
+    render();
+    window.addEventListener("app:languagechange", render);
 };
 
 document.addEventListener("DOMContentLoaded", () => {

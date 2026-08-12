@@ -1,16 +1,5 @@
 <link rel="stylesheet" href="/stylesheets/common.css" />
 <script>
-    // The language dropdown that normally seeds this only exists in the
-    // authenticated nav menu (see menuSetup.js) - guests have no way to
-    // set it, so without a default here sessionStorage.language stays
-    // null forever and every language-filtered list (tasks directory,
-    // challenge/review/trial task pools) looks permanently empty to them.
-    // This is a plain (non-module) script, so it runs before any deferred
-    // type="module" page controller regardless of where it sits in the
-    // document.
-    if (!sessionStorage.getItem("language")) sessionStorage.setItem("language", "en");
-</script>
-<script>
     // JSON.stringify does not escape a literal script-closing tag, so any
     // stored task/answer/comment text containing one would otherwise close
     // this script block and inject arbitrary markup. Replacing every
@@ -23,4 +12,20 @@
         comments: comments || [],
         mode: mode || "none",
     }).replace(/</g, "\\u003c") %>;
+</script>
+<script>
+    // The nav's language <select> (menuSetup.js) only seeds this from its
+    // own default option, and only once it's mounted - guests browsing a
+    // page without it, or the very first script that runs on any page,
+    // would otherwise see sessionStorage.language stay null forever, and
+    // every language-filtered list (tasks directory, challenge/review/
+    // trial task pools) would look permanently empty. A signed-in user's
+    // saved preference (window.APP.user.language) wins if they have one;
+    // "en" otherwise. This is a plain (non-module) script, so it runs
+    // before any deferred type="module" page controller regardless of
+    // where it sits in the document - and after window.APP above, in the
+    // same document, so that data is already available here.
+    if (!sessionStorage.getItem("language")) {
+        sessionStorage.setItem("language", (window.APP.user && window.APP.user.language) || "en");
+    }
 </script>

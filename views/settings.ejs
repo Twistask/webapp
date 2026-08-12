@@ -9,7 +9,14 @@
     <div id="user-settings">
         <h1>Settings</h1>
         <form id="language-change" action="/users/settings" method="post">
-            <label for="language-select">Select your main language: </label><select id="language-select" name="language">
+            <!-- Distinct id from the nav's #language-select (partials/menu.ejs):
+                 that one only sets this session's task-language filter, this
+                 one persists your account's saved preference. Sharing an id
+                 with the nav's select (as this used to) broke this label's
+                 for-association, since the nav's select comes first in the
+                 document and getElementById/label "for" both resolve to the
+                 first match. -->
+            <label for="account-language-select">Select your main language: </label><select id="account-language-select" name="language">
                 <option value="en">English</option>
                 <option value="ru">Russian</option>
                 <option value="cn">Chinese</option>

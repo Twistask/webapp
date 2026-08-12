@@ -14,6 +14,13 @@ let setupLanguageSelect = () => {
 
   lngSelect.addEventListener('change', async (ev) => {
     sessionStorage.setItem("language", lngSelect.value);
+    // Lets any language-filtered list already on the page (tasks
+    // directory, homepage) re-render immediately instead of only taking
+    // effect on the next navigation. Pages showing one specific task/
+    // answer (challenge, review) don't listen for this - swapping the
+    // task out from under someone mid-answer would be worse than the
+    // switch just not being instant there.
+    window.dispatchEvent(new CustomEvent("app:languagechange", { detail: { language: lngSelect.value } }));
   })
 }
 

@@ -13,6 +13,14 @@
   </div>
 
   <div id="menu-right">
+    <div id="language-picker">
+      <label for="language-select">Language: </label>
+      <select id="language-select">
+        <option value="en">English</option>
+        <option value="ru">Russian</option>
+        <option value="cn">Chinese</option>
+      </select>
+    </div>
     <% if (!auth) { %>
     <div id="logged-out" data-access="guestOnly">
       <a href="/auth/register" id="register-link">Register</a>
@@ -31,19 +39,17 @@
         <span aria-hidden="true">&#9662;</span>
       </button>
       <div id="user-menu" role="menu" aria-labelledby="user-menu-toggle" hidden>
-        <label for="language-select">Language: </label><select id="language-select" role="menuitem">
-          <option value="en">English</option>
-          <option value="ru">Russian</option>
-          <option value="cn">Chinese</option>
-        </select>
         <a href="/users/profile" id="profile-link" role="menuitem">Profile</a>
         <a href="/users/settings" id="settings-link" role="menuitem">Settings</a>
         <a id="logout" role="menuitem" tabindex="0">Logout</a>
       </div>
     </div>
       <script type="module" src="/javascripts/handlers/menu/userMenuDropdown.js"></script>
-      <script type="module" src="/javascripts/handlers/menu/menuSetup.js"></script>
     <% } %>
+    <!-- Language select above needs this regardless of auth state - it
+         used to only be loaded in the auth branch because the select
+         itself only used to exist there. -->
+    <script type="module" src="/javascripts/handlers/menu/menuSetup.js"></script>
   </div>
     <% } %>
   <% if (mode === "timeTrial") { %>

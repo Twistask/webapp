@@ -1,7 +1,18 @@
 export const TasksDirectory = {
     setup: () => {
+        TasksDirectory.render();
+        window.addEventListener("app:languagechange", TasksDirectory.render);
+    },
+    render: () => {
         const { tasks = [] } = window.APP || {};
         const taskList = document.getElementById("task-list");
+        if (!taskList) return;
+
+        // Clear out whatever was rendered for the previous language
+        // before rebuilding - this runs again on "app:languagechange",
+        // not just once at page load.
+        taskList.innerHTML = "";
+
         const availableTasks = tasks.filter((t) => t.language === sessionStorage.getItem("language"));
 
         if (availableTasks.length === 0) {
