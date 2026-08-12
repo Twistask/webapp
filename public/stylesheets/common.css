@@ -88,6 +88,25 @@ h2 {
   overflow: hidden;
 }
 
+p a {
+  background: initial;
+  font-family: initial;
+  font-weight: initial;
+  font-size: initial;
+  line-height: initial;
+  white-space: initial;
+  text-align: initial;
+  color: initial;
+  padding: initial;
+  margin: initial;
+  text-decoration: initial;
+  box-shadow: initial;
+  transition: initial;
+  display: initial;
+  align-items: initial;
+  justify-content: initial;
+}
+
 /* viewer.ejs: the task/answer title above the read-only viewer, and each
    child answer/comment gets its own white card inside the light-blue
    #ch-area frame so a list of replies reads as distinct items instead of
