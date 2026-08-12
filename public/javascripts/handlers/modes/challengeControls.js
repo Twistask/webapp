@@ -1,13 +1,13 @@
-const { tasks = [], user = {} } = window.APP || {};
+const { user = {} } = window.APP || {};
+
+const { task = {} } = window.CHALLENGE || {};
 
 let editor;
 let viewer;
 
 export const ChallengeControls = {
     setup: () => {
-        ChallengeControls.createChallengeItems(tasks);
         ChallengeControls.setupEditor();
-        document.getElementById("challenge-select").onchange = ChallengeControls.setupTask;
         ChallengeControls.setupTask();
         ChallengeControls.setupSubmit();
     },
@@ -26,29 +26,7 @@ export const ChallengeControls = {
             initialValue: "# hello",
         });
     },
-    createChallengeItems: () => {
-        let select = document.getElementById("challenge-select");
-        let availableTasks = tasks.filter((t) => t.language === sessionStorage.getItem("language"));
-        availableTasks.forEach((item) => {
-            let opt = document.createElement("option");
-            opt.value = item.id;
-            // textContent, not innerHTML: task titles are user-authored
-            // content and must never be parsed as markup.
-            opt.textContent = item.title;
-            select.appendChild(opt);
-        });
-    },
     setupTask: () => {
-        const value = document.getElementById("challenge-select").value;
-        const task = tasks.find((t) => t.id === value);
-        const submitbtn = document.getElementById("submit");
-        if (!task) {
-            viewer.setMarkdown("There are currently no challenges available!");
-            editor.reset();
-            if (submitbtn) submitbtn.disabled = true;
-            return;
-        }
-        if (submitbtn) submitbtn.disabled = false;
         viewer.setMarkdown(task.description || "");
         editor.reset();
         localStorage.setItem("currentTargetID", task.id);
@@ -76,7 +54,7 @@ export const ChallengeControls = {
 
             submitbtn.disabled = true;
             try {
-                const res = await fetch(`/challenge/submit`, {
+                const res = await fetch(`/challenge/${target}`, {
                     method: "POST",
                     credentials: "include",
                     headers: {"Content-Type": "application/json"},
@@ -93,13 +71,6 @@ export const ChallengeControls = {
                     alert("Failed to submit your answer. Please try again.");
                     return;
                 }
-
-                const select = document.getElementById("challenge-select");
-                const current = select.selectedIndex;
-                const lastIndex = select.options.length - 1;
-
-                select.selectedIndex = current < lastIndex ? current + 1 : 0;
-                ChallengeControls.setupTask();
             } catch (err) {
                 console.error("Submit error", err);
                 alert("Network error while submitting your answer.");
