@@ -103,12 +103,14 @@ p a {
   justify-content: initial;
 }
 
-/* viewer.ejs: the task/answer title above the read-only viewer, and each
-   child answer/comment gets its own white card inside the light-blue
-   #ch-area frame so a list of replies reads as distinct items instead of
-   one continuous block. Scoped under #main-area so it can't also catch
+/* viewer.ejs and challenge.ejs (challenge/review/trial modes) both show a
+   task title above its content; each child answer/comment on the viewer
+   also gets its own white card inside the light-blue #ch-area frame so a
+   list of replies reads as distinct items instead of one continuous
+   block. Scoped under #main-area/#task-area so this can't also catch
    editor.ejs's unrelated #task-title text input. */
-#main-area #task-title {
+#main-area #task-title,
+#task-area #task-title {
   font-size: 1.6vmax;
   font-weight: 700;
   color: var(--primary-dark);
@@ -124,6 +126,21 @@ p a {
 
 #ch-area > div + div {
   margin-top: 1vmax;
+}
+
+/* editor.ejs's "Select a challenge / task title / language" row isn't
+   inside a <form> (it's plain JS-driven, not a native submit), so the
+   `form label` rule above doesn't reach it - same cramped label-to-
+   control spacing problem, needs its own rule. */
+#controls {
+  padding-bottom: 1vmax;
+}
+
+#controls label {
+  display: inline-block;
+  color: var(--primary-dark);
+  font-weight: 600;
+  margin-right: 0.5em;
 }
 
 /* editor.ejs: the markdown-import row and the native file input, styled to
@@ -227,11 +244,20 @@ form {
   padding: 2vmax 2.6vmax;
 }
 
+/* Every label+input pair in this file's forms relied on a manually-typed
+   trailing space inside the label's text ("E-mail: ") for spacing, with
+   the markup going out of its way (a `</label\n>` line break) to suppress
+   the browser's own whitespace-collapsing gap so only that one character
+   controlled it - fragile, inconsistent size, and cramped now that input
+   font-size dropped to a normal size (see the input/select rule below).
+   A real margin here replaces both; the labels have since been cleaned
+   up to drop the redundant trailing space and sit directly adjacent to
+   their control in the markup. */
 form label {
   display: inline-block;
   color: var(--primary-dark);
   font-weight: 600;
-  margin-top: 0.6vmax;
+  margin: 0.6vmax 0.5em 0 0;
 }
 
 input[type="text"],
@@ -240,8 +266,14 @@ input[type="password"],
 input[type="number"],
 select {
   font-family: inherit;
-  font-size: 1vmax;
-  padding: 0.5vmax 0.7vmax;
+  /* Plain `vmax` has no ceiling: on a 2200px-wide viewport this was
+     rendering at 22px font / 54px tall, well past the ~14-16px/36-40px
+     convention for form controls (buttons/headings intentionally scale
+     unbounded elsewhere in this file - inputs shouldn't). clamp() keeps
+     the same fluid feel on small screens but caps it at a normal size on
+     large ones. */
+  font-size: clamp(0.85rem, 1vmax, 1rem);
+  padding: clamp(0.35rem, 0.5vmax, 0.55rem) clamp(0.5rem, 0.7vmax, 0.7rem);
   margin: 0.3vmax 0 0.8vmax;
   border: 1px solid var(--primary);
   border-radius: 0.4vmax;
@@ -293,11 +325,13 @@ select:focus {
   margin: 0 auto 1.5vmax;
 }
 
-/* tasks.ejs / tasksDirectory.js: one card per available task, styled to
-   match the site's light-blue card language rather than the generic
-   nav-style pill buttons `a` gets by default (reset with `all: unset`
-   below, then rebuilt). */
-#task-grid {
+/* tasks.ejs / tasksDirectory.js (and every other page that lists task
+   cards - home.js, resultControls.js, profileHandler.js): one card per
+   task, styled to match the site's light-blue card language rather than
+   the generic nav-style pill buttons `a` gets by default (reset with
+   `all: unset` below, then rebuilt). A class, not an id: profile.ejs can
+   render more than one of these grids on the same page. */
+.task-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(14vmax, 1fr));
   gap: 1vmax;
@@ -348,7 +382,7 @@ select:focus {
 }
 
 /* index.ejs / home.js: the homepage's "Jump Right In" panel reuses
-   #task-grid/.task-card from the tasks directory above for visual
+   .task-grid/.task-card from the tasks directory above for visual
    consistency between the two task-browsing surfaces. */
 #home-jump-in h2 {
   margin-top: 0;
@@ -399,7 +433,7 @@ select:focus {
 }
 
 /* timeTrial/result.ejs / resultControls.js: the trial summary's stat
-   row and solved-tasks list (the latter reuses #task-grid/.task-card
+   row and solved-tasks list (the latter reuses .task-grid/.task-card
    from the tasks directory above for visual consistency). */
 #result-stats {
   display: flex;

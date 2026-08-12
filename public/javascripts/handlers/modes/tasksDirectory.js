@@ -21,7 +21,7 @@ export const TasksDirectory = {
         }
 
         const grid = document.createElement("div");
-        grid.id = "task-grid";
+        grid.className = "task-grid";
         for (const task of availableTasks) {
             grid.appendChild(TasksDirectory.buildCard(task));
         }

@@ -27,6 +27,8 @@ export const ChallengeControls = {
         });
     },
     setupTask: () => {
+        const titleEl = document.getElementById("task-title");
+        if (titleEl) titleEl.textContent = task.title || "";
         viewer.setMarkdown(task.description || "");
         editor.reset();
     },

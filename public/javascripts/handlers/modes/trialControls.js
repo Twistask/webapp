@@ -39,12 +39,15 @@ export const TrialControls = {
   },
   setupTask: () => {
     let availableTasks = tasks.filter((t) => t.language === sessionStorage.getItem("language"));
+    const titleEl = document.getElementById("task-title");
     if (availableTasks.length === 0) {
+      if (titleEl) titleEl.textContent = "";
       viewer.setMarkdown("There are currently no tasks available for a time trial.");
       return;
     }
     const randIndex = Math.floor(Math.random() * availableTasks.length);
     const chosenTask = availableTasks.at(randIndex);
+    if (titleEl) titleEl.textContent = chosenTask.title;
     viewer.setMarkdown(chosenTask.description || "");
     editor.reset();
     localStorage.setItem("currentTargetID", chosenTask.id);

@@ -44,6 +44,13 @@ nav #common {
   padding-right: 1vmax;
 }
 
+/* The 0.1vmax gap above is fine for icon-ish single-child rows like
+   #logged-out/#logged-in, but is too tight between the "Language:" text
+   and its <select> - give this one a proper word-spacing gap instead. */
+#language-picker {
+  gap: 0.5em;
+}
+
 #logged-in {
   position: relative;
 }

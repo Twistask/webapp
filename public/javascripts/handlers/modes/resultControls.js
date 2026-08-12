@@ -92,7 +92,7 @@ const setup = () => {
     const heading = document.createElement("h2");
     heading.textContent = "Tasks You Solved";
     const grid = document.createElement("div");
-    grid.id = "task-grid";
+    grid.className = "task-grid";
     for (const task of solvedTasks) {
         grid.appendChild(buildTaskCard(task));
     }

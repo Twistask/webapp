@@ -38,6 +38,8 @@ export const ReviewControls = {
         // answer was submitted (an orphaned answer) - guard against that
         // instead of throwing on task.description.
         const task = tasks.find((t) => t.id === answer.target_id);
+        const titleEl = document.getElementById("task-title");
+        if (titleEl) titleEl.textContent = task ? task.title : "";
         task_viewer.setMarkdown(task ? task.description || "" : "This task is no longer available.");
         answer_viewer.setMarkdown(answer.value || "");
         editor.reset();

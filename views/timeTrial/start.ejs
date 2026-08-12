@@ -7,16 +7,14 @@
     <%- include('../partials/menu') %>
     <div id="work-area">
       <form action="/timeTrial/start" method="post">
-        <label>Select your difficulty:
-          <select name="difficulty">
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-            <option value="superHard">Super Hard</option>
-          </select>
-        </label><br>
+        <label for="difficulty">Select your difficulty:</label><select name="difficulty" id="difficulty">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+          <option value="superHard">Super Hard</option>
+        </select><br>
         <% if (!auth) { %>
-          <label for="username">Enter your name: </label><input type="text" id="username" name="author" required><br>
+          <label for="username">Enter your name:</label><input type="text" id="username" name="author" required><br>
         <% } %>
         <button type="submit" id="startTrial">Start</button>
       </form>

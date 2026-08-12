@@ -48,7 +48,7 @@ const render = () => {
     const featured = [...availableTasks].sort(() => Math.random() - 0.5).slice(0, FEATURED_COUNT);
 
     const grid = document.createElement("div");
-    grid.id = "task-grid";
+    grid.className = "task-grid";
     for (const task of featured) {
         grid.appendChild(buildTaskCard(task));
     }
