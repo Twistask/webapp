@@ -6,8 +6,12 @@ import { isValidRecordId } from "./utils/validateId.js";
 
 /* GET editor page. */
 router.get("/", async (req, res, next) => {
-  if (!res.locals.auth) return res.redirect("../users/login");
-  if (res.locals.user.role === "student") return res.redirect("../");
+  // The login page is at /auth/login, not /users/login - this pointed
+  // at a route that doesn't exist (a site-wide bug, see the other
+  // routes fixed alongside this one). Absolute, not relative: safe
+  // regardless of how this route is nested/mounted.
+  if (!res.locals.auth) return res.redirect("/auth/login");
+  if (res.locals.user.role === "student") return res.redirect("/");
   try {
     if (res.locals.user.role === "admin") res.locals.tasks = await Database.functions.loadContent("tasks");
     else res.locals.tasks = await Database.functions.loadContentbyUser(
@@ -53,7 +57,12 @@ router.post("/update", async (req, res, next) => {
       return res.status(403).json({ ok: false, message: "Forbidden" });
     }
     const token = req.cookies?.twistask_auth;
-    const body = { ...task, author: res.locals.user.id };
+    // Preserve the task's real author rather than always reassigning to
+    // whoever's editing - otherwise an admin fixing a typo in someone
+    // else's task would silently strip that teacher of ownership (it
+    // would vanish from their own "My Tasks" list) and hand it to the
+    // admin instead.
+    const body = { ...task, author: existing.author };
     await Database.functions.updateTask(id, body, token);
     return res.status(200).json({ ok: true });
   } catch (err) {

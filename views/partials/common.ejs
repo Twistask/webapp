@@ -10,6 +10,10 @@
         tasks: tasks || [],
         answers: answers || [],
         comments: comments || [],
+        // Only ever populated by GET /admin (admin-role-gated) - every
+        // other route leaves res.locals.users unset, so this stays []
+        // (and no user list/emails reach the page) everywhere else.
+        users: users || [],
         mode: mode || "none",
     }).replace(/</g, "\\u003c") %>;
 </script>

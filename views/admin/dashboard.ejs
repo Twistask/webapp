@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+</head>
+<body>
+<%- include('../partials/menu') %>
+<div id="work-area">
+    <h1>Admin Panel</h1>
+
+    <div class="panel" id="admin-tasks-panel">
+        <h2>Tasks</h2>
+        <div id="admin-task-stats"></div>
+        <div id="admin-task-list"></div>
+    </div>
+
+    <div class="panel" id="admin-users-panel">
+        <h2>Users</h2>
+        <div id="admin-user-stats"></div>
+        <div id="admin-user-list"></div>
+    </div>
+</div>
+<script>
+    window.ADMIN = <%- JSON.stringify({ usersError: usersError || false }).replace(/</g, "\\u003c") %>;
+</script>
+<script type="module" src="/javascripts/handlers/users/adminHandler.js"></script>
+</body>
+<%- include('../partials/common') %>
+</html>

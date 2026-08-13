@@ -7,7 +7,10 @@ import createError from "http-errors";
 
 /* GET review page. */
 router.get("/:id", async (req, res, next) => {
-  if (!res.locals.auth) return res.redirect("../users/login");
+  // The login page is at /auth/login, not /users/login - this pointed
+  // at a route that doesn't exist (a site-wide bug, see the other
+  // routes fixed alongside this one).
+  if (!res.locals.auth) return res.redirect("/auth/login");
   const id = req.params.id;
   if (!isValidRecordId(id)) return next(createError(404));
   try {

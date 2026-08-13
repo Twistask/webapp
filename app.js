@@ -11,6 +11,7 @@ import challengeRouter from "./routes/challenge.js";
 import timeTrialRouter from "./routes/timeTrial.js";
 import reviewRouter from "./routes/review.js";
 import editorRouter from "./routes/editor.js";
+import adminRouter from "./routes/admin.js";
 
 let app = express();
 
@@ -69,6 +70,7 @@ app.use(async (req, res, next) => {
   res.locals.tasks = [];
   res.locals.answers = [];
   res.locals.comments = [];
+  res.locals.users = [];
   res.locals.auth = false;
   res.locals.user = null;
   try {
@@ -91,6 +93,7 @@ app.use("/challenge", challengeRouter);
 app.use("/timeTrial", timeTrialRouter);
 app.use("/review", reviewRouter);
 app.use("/editor", editorRouter);
+app.use("/admin", adminRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

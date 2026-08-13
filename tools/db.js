@@ -202,7 +202,26 @@ const Database = {
     updateUser: async (id, body, token) => {
       const client = clientForToken(token);
       return await client.collection("users").update(id, pick(body, SETTINGS_FIELDS));
-    }
+    },
+
+    // Admin-only: lists every account. Uses the caller's own token (not
+    // the shared anonymous `connection`) since PocketBase's "users"
+    // collection list rule needs to recognize the admin role to permit
+    // this at all.
+    loadUsers: async (token) => {
+      const client = clientForToken(token);
+      return await client.collection("users").getFullList();
+    },
+
+    // Admin-only: changes another account's role. Deliberately a
+    // separate function from updateUser/SETTINGS_FIELDS above - that
+    // whitelist exists specifically to keep "role" out of the
+    // self-service settings path, so reusing it here would defeat the
+    // purpose. Only ever call this from an admin-gated route.
+    updateUserRole: async (id, role, token) => {
+      const client = clientForToken(token);
+      return await client.collection("users").update(id, { role });
+    },
   },
 };
 

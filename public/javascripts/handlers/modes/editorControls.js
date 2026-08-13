@@ -7,10 +7,20 @@ export const EditorControls = {
         EditorControls.createChallengeItems(tasks);
         document.getElementById("challenge-select").onchange = EditorControls.setupTask;
         EditorControls.setupEditor();
+        EditorControls.preselectFromQuery();
         EditorControls.setupTask();
         EditorControls.setupImporter();
         EditorControls.setupSubmit();
         EditorControls.setupDelete();
+    },
+    // The admin panel links here as /editor?task=<id> so "Edit" jumps
+    // straight to a specific task instead of leaving the admin to find
+    // it again in the dropdown themselves.
+    preselectFromQuery: () => {
+        const taskId = new URLSearchParams(window.location.search).get("task");
+        if (!taskId) return;
+        const select = document.getElementById("challenge-select");
+        if (tasks.some((t) => t.id === taskId)) select.value = taskId;
     },
     setupEditor: () => {
         const Editor = toastui.Editor;

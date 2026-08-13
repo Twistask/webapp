@@ -22,19 +22,12 @@ router.get("/tasks", async function (req, res, next) {
   }
 });
 
-router.get("/admin", async function (req, res, next) {
-  if (res.locals.user.role !== "admin") return res.redirect("/");
-  try {
-    res.locals.tasks = await Database.functions.loadContent("tasks");
-    res.render("admin/tasks");
-  } catch (err) {
-    next(err);
-  }
-});
-
 router.get("/tasks/:id", async function (req, res, next) {
-  if (!res.locals.auth) return res.redirect("../users/login");
-  if (res.locals.user.role === "student") return res.redirect("../");
+  // The login page is at /auth/login, not /users/login - this pointed
+  // at a route that doesn't exist (a site-wide bug, see the other
+  // routes fixed alongside this one).
+  if (!res.locals.auth) return res.redirect("/auth/login");
+  if (res.locals.user.role === "student") return res.redirect("/");
   const id = req.params.id;
   if (!isValidRecordId(id)) return next(createError(404));
   try {
@@ -48,7 +41,7 @@ router.get("/tasks/:id", async function (req, res, next) {
 });
 
 router.get("/answers/:id", async function (req, res, next) {
-  if (!res.locals.auth) return res.redirect("../users/login");
+  if (!res.locals.auth) return res.redirect("/auth/login");
   const id = req.params.id;
   if (!isValidRecordId(id)) return next(createError(404));
   try {

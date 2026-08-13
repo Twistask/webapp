@@ -406,6 +406,37 @@ select:focus {
   margin-top: 1vmax;
 }
 
+/* admin/dashboard.ejs / adminHandler.js: also reuses .task-grid/.task-card
+   for the task and user lists, but each card here needs room for more
+   than one action (View/Edit/Delete, or a role <select>/Delete), so it's
+   a plain <div> instead of the single-link .task-card elsewhere - `all:
+   unset` in .task-card only resets the element itself, not this extra
+   row of children. */
+#admin-tasks-panel h2,
+#admin-users-panel h2 {
+  margin-top: 0;
+  color: var(--primary-dark);
+}
+
+#admin-task-stats,
+#admin-user-stats {
+  font-size: 1.2vmax;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.admin-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5vmax;
+  margin-top: 0.3vmax;
+}
+
+.admin-item-actions select {
+  margin: 0;
+}
+
 /* index.ejs: the three "How It Works" cards. Unlike .task-card, the
    whole card isn't a link (the CTA link at the bottom is its own
    element), so no `all: unset` reset is needed here. */

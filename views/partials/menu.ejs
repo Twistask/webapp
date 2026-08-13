@@ -9,6 +9,9 @@
     <% if (user.role !== "student") { %>
       <a href="/editor" id="editor-link">Task Editor</a>
     <% } %>
+    <% if (user.role === "admin") { %>
+      <a href="/admin" id="admin-link">Admin Panel</a>
+    <% } %>
     <% } %>
   </div>
 
