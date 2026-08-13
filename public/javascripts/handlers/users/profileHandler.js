@@ -21,8 +21,14 @@ const buildCard = (href, title, cta) => {
 
 const renderGrid = (container, cards, emptyMessage) => {
     if (!container) return;
+    // Append, don't overwrite: profile.ejs's #my-tasks/#my-answers/
+    // #my-reviews each already contain a static <h1> heading - setting
+    // .textContent here would wipe that heading out along with whatever
+    // was rendered before it.
     if (cards.length === 0) {
-        container.textContent = emptyMessage;
+        const empty = document.createElement("p");
+        empty.textContent = emptyMessage;
+        container.appendChild(empty);
         return;
     }
     const grid = document.createElement("div");

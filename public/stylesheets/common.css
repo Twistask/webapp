@@ -277,10 +277,16 @@ select {
      convention for form controls (buttons/headings intentionally scale
      unbounded elsewhere in this file - inputs shouldn't). clamp() keeps
      the same fluid feel on small screens but caps it at a normal size on
-     large ones. */
-
-  /* TODO: FIX CLAMP AND SIZE */
-  font-size: clamp(0.70rem, 1vmax, 1rem);
+     large ones.
+     Floor is 0.85rem (13.6px): most ordinary browser windows (under
+     ~1360px in both dimensions) sit at this floor rather than the fluid
+     middle value, so it's effectively the everyday size, not an edge
+     case - a lower floor (0.70rem/11.2px was tried here) reads as too
+     small at that size, not just on tiny viewports. Mobile always hits
+     the 1rem/16px ceiling instead (vmax there is driven by the taller
+     viewport dimension), which doubles as the size that avoids iOS
+     Safari's zoom-on-focus for inputs under 16px. */
+  font-size: clamp(0.85rem, 1vmax, 1rem);
   padding: clamp(0.35rem, 0.5vmax, 0.55rem) clamp(0.5rem, 0.7vmax, 0.7rem);
   margin: 0.3vmax 0 0.8vmax;
   border: 1px solid var(--primary);

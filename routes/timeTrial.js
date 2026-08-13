@@ -70,7 +70,12 @@ router.post("/", async (req, res, next) => {
 
 router.get("/result", async (req, res, next) => {
   try {
-    //TODO: Do not show result if a trial has not been started
+    // Whether a trial was actually completed lives entirely in
+    // sessionStorage (trialControls.js), not on the server - there's no
+    // session/DB state here to check it against. resultControls.js
+    // already handles a direct visit gracefully: it reads that data once
+    // and falls back to a plain "start a trial" message if there isn't
+    // any, rather than showing stale or fabricated results.
     res.render("timeTrial/result");
   } catch (err) {
     next(err); // lets Express error middleware handle/log and return a 500

@@ -38,8 +38,14 @@ const DB_PING_CACHE_MS = Number(process.env.DB_PING_CACHE_MS) || 5000;
 let _lastDbPing = { timestamp: 0, result: null };
 
 app.use(async (req, res, next) => {
-  // skip health checks for favicon and health endpoints
-  if (req.path === "/favicon.ico" || req.path.startsWith("/public/")) return next();
+  // Existing static assets never reach here at all - express.static above
+  // already serves them directly. This only matters for requests to
+  // static-looking paths that *don't* exist on disk (typos, stale
+  // references); skip the DB ping for those too rather than pinging just
+  // to 404 anyway. "/public/" never matched anything real: the static
+  // middleware serves from the public/ directory at the URL root (e.g.
+  // /stylesheets/x.css), not under a "/public" prefix.
+  if (req.path === "/favicon.ico" || /^\/(stylesheets|javascripts|images|src)\//.test(req.path)) return next();
 
   try {
     const now = Date.now();
