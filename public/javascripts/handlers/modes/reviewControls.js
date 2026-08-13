@@ -75,7 +75,7 @@ export const ReviewControls = {
                     }
 
                     alert("Your review has been submitted!");
-                    window.location.href = "/tasks";
+                    window.location.assign(`/users/profile`);
                 } catch (err) {
                     console.error("Submit error", err);
                     alert("Network error while submitting your review.");

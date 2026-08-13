@@ -80,6 +80,7 @@ export const ChallengeControls = {
 
                 editor.reset();
                 alert("Your answer has been submitted!");
+                window.location.assign(`/tasks`);
             } catch (err) {
                 console.error("Submit error", err);
                 alert("Network error while submitting your answer.");
