@@ -74,4 +74,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (err) {
         console.error("Failed to load profile:", err);
     }
-})
+});

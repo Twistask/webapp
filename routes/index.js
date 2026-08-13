@@ -22,6 +22,16 @@ router.get("/tasks", async function (req, res, next) {
   }
 });
 
+router.get("/admin", async function (req, res, next) {
+  if (res.locals.user.role !== "admin") return res.redirect("/");
+  try {
+    res.locals.tasks = await Database.functions.loadContent("tasks");
+    res.render("admin/tasks");
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get("/tasks/:id", async function (req, res, next) {
   if (!res.locals.auth) return res.redirect("../users/login");
   if (res.locals.user.role === "student") return res.redirect("../");
