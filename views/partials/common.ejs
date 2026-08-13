@@ -1,11 +1,35 @@
 <link rel="stylesheet" href="/stylesheets/common.css" />
 <script>
-    window.APP = {
-        auth: <%- JSON.stringify(auth || false) %>,
-        user: <%- JSON.stringify(user || {}) %>,
-        tasks: <%- JSON.stringify(tasks || []) %>,
-        answers: <%- JSON.stringify(answers || []) %>,
-        comments: <%- JSON.stringify(comments || []) %>,
-        mode: "<%- mode %>",
+    // JSON.stringify does not escape a literal script-closing tag, so any
+    // stored task/answer/comment text containing one would otherwise close
+    // this script block and inject arbitrary markup. Replacing every
+    // angle bracket with its unicode escape neutralizes that.
+    window.APP = <%- JSON.stringify({
+        auth: auth || false,
+        user: user || {},
+        tasks: tasks || [],
+        answers: answers || [],
+        comments: comments || [],
+        // Only ever populated by GET /admin (admin-role-gated) - every
+        // other route leaves res.locals.users unset, so this stays []
+        // (and no user list/emails reach the page) everywhere else.
+        users: users || [],
+        mode: mode || "none",
+    }).replace(/</g, "\\u003c") %>;
+</script>
+<script>
+    // The nav's language <select> (menuSetup.js) only seeds this from its
+    // own default option, and only once it's mounted - guests browsing a
+    // page without it, or the very first script that runs on any page,
+    // would otherwise see sessionStorage.language stay null forever, and
+    // every language-filtered list (tasks directory, challenge/review/
+    // trial task pools) would look permanently empty. A signed-in user's
+    // saved preference (window.APP.user.language) wins if they have one;
+    // "en" otherwise. This is a plain (non-module) script, so it runs
+    // before any deferred type="module" page controller regardless of
+    // where it sits in the document - and after window.APP above, in the
+    // same document, so that data is already available here.
+    if (!sessionStorage.getItem("language")) {
+        sessionStorage.setItem("language", (window.APP.user && window.APP.user.language) || "en");
     }
 </script>

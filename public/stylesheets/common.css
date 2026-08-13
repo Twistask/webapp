@@ -2,6 +2,17 @@
   --muted: #6b7280;
   --light-blue: #cfeeff;
   --primary: #1e88e5;
+  --primary-dark: #0d47a1;
+  --accent-green: #7ed957;
+  --danger: #e53935;
+}
+
+html {
+  /* Without this, browsers/OSes in dark mode paint the default canvas
+     black since nothing here sets a background - every light-blue card
+     would then float in a black void instead of on a page. */
+  color-scheme: light;
+  background: #ffffff;
 }
 
 body {
@@ -15,23 +26,170 @@ body {
   font-size: 1.15vmax;
   padding: 0;
   margin: 0;
+  background: #ffffff;
+}
+
+h1,
+h2 {
+  color: var(--primary-dark);
+}
+
+.page-title {
+  text-align: center;
+  align-content: center;
+  align-self: center;
 }
 
 #work-area {
   padding: 1vmax;
 }
 
-#controls,
+/* Content panels: task/answer viewers, the task editor, and any other page
+   section marked with .panel all get the same card treatment so pages read
+   as structured zones instead of a blank white canvas. #answer-area (the
+   user's own input) is visually distinct in green, with a floating divider
+   bar separating it from whatever read-only content sits above it. */
 #task-area,
-#answer-area,
-#review-answer-area {
-  padding-bottom: 1vmax;
+#review-answer-area,
+#main-area,
+#ch-area,
+#editor-area,
+.panel {
+  background: var(--light-blue);
+  border-radius: 0.6vmax;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  padding: 1.2vmax;
+  margin-bottom: 1.5vmax;
+}
+
+#answer-area {
+  position: relative;
+  background: var(--accent-green);
+  border-radius: 0.6vmax;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  padding: 1.2vmax;
+  margin-top: 2.2vmax;
+}
+
+#answer-area::before {
+  content: "";
+  position: absolute;
+  top: -1.35vmax;
+  left: 0;
+  right: 0;
+  height: 0.45vmax;
+  background: var(--primary);
+  border-radius: 0.25vmax;
 }
 
 #editor,
 #viewer,
 #answer-viewer {
   padding: 0.2vmax;
+  border-radius: 0.3vmax;
+  overflow: hidden;
+}
+
+p a {
+  background: initial;
+  font-family: initial;
+  font-weight: initial;
+  font-size: initial;
+  line-height: initial;
+  white-space: initial;
+  text-align: initial;
+  color: initial;
+  padding: initial;
+  margin: initial;
+  text-decoration: initial;
+  box-shadow: initial;
+  transition: initial;
+  display: initial;
+  align-items: initial;
+  justify-content: initial;
+}
+
+/* viewer.ejs and challenge.ejs (challenge/review/trial modes) both show a
+   task title above its content; each child answer/comment on the viewer
+   also gets its own white card inside the light-blue #ch-area frame so a
+   list of replies reads as distinct items instead of one continuous
+   block. Scoped under #main-area/#task-area so this can't also catch
+   editor.ejs's unrelated #task-title text input. */
+#main-area #task-title,
+#task-area #task-title {
+  font-size: 1.6vmax;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 0.8vmax;
+}
+
+#ch-area > div {
+  background: #ffffff;
+  border-radius: 0.4vmax;
+  padding: 0.8vmax;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+#ch-area > div + div {
+  margin-top: 1vmax;
+}
+
+/* editor.ejs's "Select a challenge / task title / language" row isn't
+   inside a <form> (it's plain JS-driven, not a native submit), so the
+   `form label` rule above doesn't reach it - same cramped label-to-
+   control spacing problem, needs its own rule. */
+#controls {
+  padding-bottom: 1vmax;
+}
+
+#controls label {
+  display: inline-block;
+  color: var(--primary-dark);
+  font-weight: 600;
+  margin-right: 0.5em;
+}
+
+/* editor.ejs: the markdown-import row and the native file input, styled to
+   match the site's pill buttons since a bare file input looks jarring next
+   to everything else. */
+#import-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6vmax;
+  margin: 1vmax 0;
+}
+
+#import-row label {
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
+input[type="file"] {
+  font-family: inherit;
+  font-size: 0.95vmax;
+  color: var(--muted);
+}
+
+input[type="file"]::file-selector-button {
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 1vmax;
+  color: #ffffff;
+  background: linear-gradient(#2b9bf6, var(--primary));
+  border: none;
+  border-radius: 0.4vmax;
+  padding: 0.5vmax 1vmax;
+  margin-right: 0.6vmax;
+  cursor: pointer;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.18);
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.12s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
 }
 
 button,
@@ -86,4 +244,275 @@ form {
   align-content: center;
   height: fit-content;
   width: fit-content;
+  background: var(--light-blue);
+  border-radius: 0.8vmax;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  padding: 2vmax 2.6vmax;
+}
+
+/* Every label+input pair in this file's forms relied on a manually-typed
+   trailing space inside the label's text ("E-mail: ") for spacing, with
+   the markup going out of its way (a `</label\n>` line break) to suppress
+   the browser's own whitespace-collapsing gap so only that one character
+   controlled it - fragile, inconsistent size, and cramped now that input
+   font-size dropped to a normal size (see the input/select rule below).
+   A real margin here replaces both; the labels have since been cleaned
+   up to drop the redundant trailing space and sit directly adjacent to
+   their control in the markup. */
+form label {
+  display: inline-block;
+  color: var(--primary-dark);
+  font-weight: 600;
+  margin: 0.6vmax 0.5em 0 0;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select {
+  font-family: inherit;
+  /* Plain `vmax` has no ceiling: on a 2200px-wide viewport this was
+     rendering at 22px font / 54px tall, well past the ~14-16px/36-40px
+     convention for form controls (buttons/headings intentionally scale
+     unbounded elsewhere in this file - inputs shouldn't). clamp() keeps
+     the same fluid feel on small screens but caps it at a normal size on
+     large ones.
+     Floor is 0.85rem (13.6px): most ordinary browser windows (under
+     ~1360px in both dimensions) sit at this floor rather than the fluid
+     middle value, so it's effectively the everyday size, not an edge
+     case - a lower floor (0.70rem/11.2px was tried here) reads as too
+     small at that size, not just on tiny viewports. Mobile always hits
+     the 1rem/16px ceiling instead (vmax there is driven by the taller
+     viewport dimension), which doubles as the size that avoids iOS
+     Safari's zoom-on-focus for inputs under 16px. */
+  font-size: clamp(0.85rem, 1vmax, 1rem);
+  padding: clamp(0.35rem, 0.5vmax, 0.55rem) clamp(0.5rem, 0.7vmax, 0.7rem);
+  margin: 0.3vmax 0 0.8vmax;
+  border: 1px solid var(--primary);
+  border-radius: 0.4vmax;
+  background: #ffffff;
+  color: #1a1a1a;
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+#error-box {
+  color: var(--danger);
+  font-weight: 600;
+  margin-top: 0.8vmax;
+}
+
+#error-box:empty {
+  display: none;
+}
+
+/* settings.ejs's account-deletion button is a same-styled blue button as
+   Change Password right next to it, giving no visual warning that it's a
+   destructive, irreversible action. --danger is already defined for this
+   exact purpose (see #error-box) but was never applied to a button. */
+#delete_account {
+  background: linear-gradient(#f4511e, var(--danger));
+}
+
+/* index.ejs's welcome logo has no intrinsic sizing in the markup, so it
+   was rendering at the source file's native 350x350px - too large next to
+   the welcome text and not responsive on narrow viewports. */
+.panel > img {
+  max-width: 12vmax;
+  border-radius: 0.6vmax;
+  float: left;
+  margin: 0 1.2vmax 0.8vmax 0;
+}
+
+/* settings.ejs has two independent forms on one page. The generic `form`
+   rule above fixed-positions and centers every form in the viewport, which
+   works for single-form auth pages but stacks both settings forms directly
+   on top of each other. Return them to normal document flow, stacked with
+   a gap, instead. */
+#user-settings form {
+  position: static;
+  margin: 0 auto 1.5vmax;
+}
+
+/* tasks.ejs / tasksDirectory.js (and every other page that lists task
+   cards - home.js, resultControls.js, profileHandler.js): one card per
+   task, styled to match the site's light-blue card language rather than
+   the generic nav-style pill buttons `a` gets by default (reset with
+   `all: unset` below, then rebuilt). A class, not an id: profile.ejs can
+   render more than one of these grids on the same page. */
+.task-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14vmax, 1fr));
+  gap: 1vmax;
+  margin-top: 1vmax;
+}
+
+.task-card {
+  all: unset;
+  cursor: pointer;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5vmax;
+  background: var(--light-blue);
+  border-radius: 0.6vmax;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  padding: 1.2vmax;
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.12s ease;
+}
+
+.task-card:hover,
+.task-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.task-card-title {
+  font-size: 1.2vmax;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.task-card-cta {
+  font-size: 0.9vmax;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* viewerControls.js: the "Review this answer" link lives inside each
+   answer's own card (#ch-area > div), not as a separate sibling, so give
+   it some breathing room from the rendered markdown above it. */
+#ch-area .review-link {
+  margin-top: 0.8vmax;
+}
+
+/* index.ejs / home.js: the homepage's "Jump Right In" panel reuses
+   .task-grid/.task-card from the tasks directory above for visual
+   consistency between the two task-browsing surfaces. */
+#home-jump-in h2 {
+  margin-top: 0;
+}
+
+#home-stats {
+  font-size: 1.2vmax;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+#browse-all-tasks {
+  margin-top: 1vmax;
+}
+
+/* admin/dashboard.ejs / adminHandler.js: also reuses .task-grid/.task-card
+   for the task and user lists, but each card here needs room for more
+   than one action (View/Edit/Delete, or a role <select>/Delete), so it's
+   a plain <div> instead of the single-link .task-card elsewhere - `all:
+   unset` in .task-card only resets the element itself, not this extra
+   row of children. */
+#admin-tasks-panel h2,
+#admin-users-panel h2 {
+  margin-top: 0;
+  color: var(--primary-dark);
+}
+
+#admin-task-stats,
+#admin-user-stats {
+  font-size: 1.2vmax;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.admin-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5vmax;
+  margin-top: 0.3vmax;
+}
+
+.admin-item-actions select {
+  margin: 0;
+}
+
+/* index.ejs: the three "How It Works" cards. Unlike .task-card, the
+   whole card isn't a link (the CTA link at the bottom is its own
+   element), so no `all: unset` reset is needed here. */
+#how-it-works h2 {
+  color: var(--primary-dark);
+}
+
+#how-it-works-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14vmax, 1fr));
+  gap: 1vmax;
+}
+
+.feature-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6vmax;
+  background: var(--light-blue);
+  border-radius: 0.6vmax;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  padding: 1.2vmax;
+}
+
+.feature-card h3 {
+  margin: 0;
+  color: var(--primary-dark);
+}
+
+.feature-card p {
+  margin: 0;
+  flex-grow: 1;
+}
+
+/* timeTrial/result.ejs / resultControls.js: the trial summary's stat
+   row and solved-tasks list (the latter reuses .task-grid/.task-card
+   from the tasks directory above for visual consistency). */
+#result-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5vmax;
+  margin-top: 1vmax;
+}
+
+.result-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.result-stat-value {
+  font-size: 1.8vmax;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.result-stat-label {
+  font-size: 0.85vmax;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+#result-solved h2 {
+  margin-top: 0;
+  color: var(--primary-dark);
+}
+
+#result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5vmax;
 }

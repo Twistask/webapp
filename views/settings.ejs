@@ -7,17 +7,31 @@
 <%- include('partials/menu') %>
 <div id="work-area">
     <div id="user-settings">
+        <h1 class="page-title">Settings</h1>
+        <form id="language-change" action="/users/settings" method="post">
+            <h2>Language Settings</h2>
+            <!-- Distinct id from the nav's #language-select (partials/menu.ejs):
+                 that one only sets this session's task-language filter, this
+                 one persists your account's saved preference. Sharing an id
+                 with the nav's select (as this used to) broke this label's
+                 for-association, since the nav's select comes first in the
+                 document and getElementById/label "for" both resolve to the
+                 first match. -->
+            <label for="account-language-select">Select your main language:</label><select id="account-language-select" name="language">
+                <option value="en">English</option>
+                <option value="ru">Russian</option>
+                <option value="cn">Chinese</option>
+            </select>
+            <button type="submit" id="submit_lng">Confirm</button><br />
+        </form>
         <form id="password-change" action="/users/settings" method="post">
-            <h1>Settings</h1>
-            <label for="old_password">Current Password: </label
-            ><input type="password" id="password" name="oldPassword" required /><br />
-            <label for="password">New Password: </label
-            ><input type="password" id="password" name="password" required /><br />
-            <label for="password_repeat">Confirm New Password: </label
-            ><input type="password" id="password_repeat" name="passwordConfirm" required /><br />
+            <h2>Security Settings</h2>
+            <label for="old_password">Current Password:</label><input type="password" id="old_password" name="oldPassword" required /><br />
+            <label for="password">New Password:</label><input type="password" id="password" name="password" required /><br />
+            <label for="password_repeat">Confirm New Password:</label><input type="password" id="password_repeat" name="passwordConfirm" required /><br />
             <button type="submit" id="submit_pw">Change Password</button><br />
             <div id="error-box"><%= err %></div>
-            <button id="delete_account">Delete Account</button>
+            <button type="button" id="delete_account">Delete Account</button>
         </form>
     </div>
 </div>

@@ -3,26 +3,62 @@ let router = express.Router();
 
 import Database from "../tools/db.js";
 import MailService from "../tools/mail.js";
+import { isValidRecordId } from "./utils/validateId.js";
+import createError from "http-errors";
 
-router.get("/", async (req, res, next) => {
+router.get("/:id", async (req, res, next) => {
+  // Anonymous "guest" challenge mode is a supported flow (see the
+  // author-name field in challenge.ejs and the guest branch in POST
+  // below) - this must stay reachable without logging in.
+  const id = req.params.id;
+  if (!isValidRecordId(id)) return next(createError(404));
   try {
-    res.locals.tasks = await Database.functions.loadContent("tasks");
+    res.locals.task = await Database.functions.getContent("task", id);
     res.locals.mode = "challenge";
-    if (res.locals.user) res.locals.author = res.locals.user.id;
     res.render("challenge");
   } catch (err) {
-    next(err); // lets Express error middleware handle/log and return a 500
+    next(err);
   }
 });
 
-router.post("/submit", async (req, res, next) => {
+router.post("/:id", async (req, res, next) => {
+  // The target task is taken from the URL, not the request body - the
+  // client used to also send a `target_id` field that could disagree
+  // with the URL it was posted to for no good reason.
+  const id = req.params.id;
+  if (!isValidRecordId(id)) return next(createError(404));
   try {
-    let body = req.body;
-    const result = await Database.functions.sendContent("answer", body);
-    const task = await Database.functions.getContent("task", body.target_id);
-    const user = await Database.functions.getUserbyId(task.author);
-    const mail = MailService.sendEmail(user.email, "Your task has been solved!", "Your task has been solved!");
-    if (result) res.status(200).json({ ok: true });
+    const { value } = req.body;
+    if (typeof value !== "string" || !value.trim()) {
+      return res.status(400).json({ ok: false, message: "Answer cannot be empty" });
+    }
+
+    // Authenticated users can never submit as someone else; guests
+    // (anonymous challenge mode) supply a free-text name instead.
+    const author = res.locals.auth
+      ? res.locals.user.id
+      : String(req.body.author || "").trim().slice(0, 100);
+
+    if (!author) {
+      return res.status(400).json({ ok: false, message: "Missing author" });
+    }
+
+    const token = req.cookies?.twistask_auth;
+    const ans = await Database.functions.sendContent("answer", { author, target_id: id, value }, token);
+
+    // Best-effort notification: a lookup/mail failure here must not turn a
+    // successful submission into a 500 for the client.
+    try {
+      const task = await Database.functions.getContent("task", id);
+      const taskAuthor = task?.author ? await Database.functions.getUserbyId(task.author) : null;
+      if (taskAuthor?.email) {
+        await MailService.sendEmail(taskAuthor.email, "Someone has submitted an answer to one of your tasks!", "", MailService.prepareTemplate("./tools/mail-templates/answer-submit.html", task.title, ans.id));
+      }
+    } catch (notifyErr) {
+      console.error("Failed to send task-solved notification:", notifyErr?.message ?? notifyErr);
+    }
+
+    return res.status(200).json({ ok: true });
   } catch (err) {
     next(err); // lets Express error middleware handle/log and return a 500
   }

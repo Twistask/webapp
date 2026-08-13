@@ -8,15 +8,17 @@
     "prettier": "npx prettier --plugin=prettier-plugin-ejs \"**/*.js\" \"**/*.ejs\" \"**/*.css\" --write"
   },
   "dependencies": {
-    "cookie-parser": "~1.4.4",
-    "debug": "~2.6.9",
+    "cookie-parser": "~1.4.7",
+    "debug": "~4.4.3",
     "dotenv": "^17.4.2",
-    "ejs": "~2.6.1",
-    "express": "~4.16.1",
-    "http-errors": "~1.6.3",
-    "morgan": "~1.9.1",
+    "ejs": "~6.0.1",
+    "express": "~5.2.1",
+    "express-rate-limit": "^8.6.2",
+    "fs-extra": "^11.4.0",
+    "http-errors": "~2.0.1",
+    "morgan": "~1.11.0",
     "nodemailer": "^9.0.5",
-    "pocketbase": "^0.27.0"
+    "pocketbase": "^0.27.1"
   },
   "devDependencies": {
     "prettier": "^3.9.6",

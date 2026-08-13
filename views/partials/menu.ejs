@@ -3,31 +3,55 @@
   <% if (mode !== "timeTrial") { %>
   <div id="common">
     <a href="/" id="home-link">Home</a>
-    <a href="/challenge" id="challenge-link">Challenge Mode</a>
-    <a href="/timeTrial" id="timeTrial-link">Time Trial</a>
+    <a href="/tasks" id="tasks-link">Tasks Directory</a>
+    <a href="/timeTrial" id="timeTrial-link">Trial Mode</a>
     <% if (auth) { %>
-    <a href="/review" id="review-link">Review Mode</a>
     <% if (user.role !== "student") { %>
       <a href="/editor" id="editor-link">Task Editor</a>
+    <% } %>
+    <% if (user.role === "admin") { %>
+      <a href="/admin" id="admin-link">Admin Panel</a>
     <% } %>
     <% } %>
   </div>
 
   <div id="menu-right">
+    <div id="language-picker">
+      <label for="language-select">Language:</label><select id="language-select">
+        <option value="en">English</option>
+        <option value="ru">Russian</option>
+        <option value="cn">Chinese</option>
+      </select>
+    </div>
     <% if (!auth) { %>
     <div id="logged-out" data-access="guestOnly">
-      <a href="/users/register" id="register-link">Register</a>
-      <a href="/users/login" id="login-link">Login</a>
+      <a href="/auth/register" id="register-link">Register</a>
+      <a href="/auth/login" id="login-link">Login</a>
     </div>
     <% } else { %>
     <div id="logged-in" data-access="authOnly">
-      <a href="/users/profile" id="profile-link">Profile</a>
-      <a href="/users/settings" id="settings-link">Settings</a>
-      <a id="logout">Logout</a>
-      <div id="menu-user"><%= user?.name %></div>
+      <button
+        type="button"
+        id="user-menu-toggle"
+        aria-haspopup="menu"
+        aria-expanded="false"
+        aria-controls="user-menu"
+      >
+        <%= user?.name %>
+        <span aria-hidden="true">&#9662;</span>
+      </button>
+      <div id="user-menu" role="menu" aria-labelledby="user-menu-toggle" hidden>
+        <a href="/users/profile" id="profile-link" role="menuitem">Profile</a>
+        <a href="/users/settings" id="settings-link" role="menuitem">Settings</a>
+        <a id="logout" role="menuitem" tabindex="0">Logout</a>
+      </div>
     </div>
-      <script type="module" src="/javascripts/handlers/menu/logoutSetup.js"></script>
+      <script type="module" src="/javascripts/handlers/menu/userMenuDropdown.js"></script>
     <% } %>
+    <!-- Language select above needs this regardless of auth state - it
+         used to only be loaded in the auth branch because the select
+         itself only used to exist there. -->
+    <script type="module" src="/javascripts/handlers/menu/menuSetup.js"></script>
   </div>
     <% } %>
   <% if (mode === "timeTrial") { %>

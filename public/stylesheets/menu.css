@@ -41,7 +41,76 @@ nav #common {
   display: flex;
   align-items: center;
   gap: 0.1vmax;
-  padding-right: 0.5vmax;
+  padding-right: 1vmax;
+}
+
+/* The 0.1vmax gap above is fine for icon-ish single-child rows like
+   #logged-out/#logged-in, but is too tight between the "Language:" text
+   and its <select> - give this one a proper word-spacing gap instead. */
+#language-picker {
+  gap: 0.5em;
+}
+
+#logged-in {
+  position: relative;
+}
+
+#user-menu-toggle {
+  border: none;
+  cursor: pointer;
+  gap: 0.3vmax;
+}
+
+#user-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.4vmax;
+  background: var(--nav-bg-top);
+  border-radius: 0.5vmax;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  padding: 0.4vmax;
+  min-width: 9vmax;
+  z-index: 60;
+}
+
+/* Scoping the visible layout to :not([hidden]) - rather than putting
+   display:flex directly on #user-menu - keeps the browser's native
+   [hidden] { display: none } behavior in charge of the closed state,
+   since an id selector would otherwise outrank it and the menu would
+   never actually hide. */
+#user-menu:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+#user-menu a {
+  /* border-box, not the site-wide default content-box: otherwise the
+     0.5vmax padding inherited from the global `button, a` rule gets added
+     on top of width:100%, overflowing the panel and pushing the whole
+     page into horizontal scroll. */
+  box-sizing: border-box;
+  margin: 0.15vmax 0;
+  width: 100%;
+}
+
+/* trialControls.js appends a live countdown <div><p> into #trial-menu
+   next to the "Give Up" link. Without this, the <p>'s default browser
+   margins make that box taller than the nav's fixed 3vmax height, so the
+   timer gets clipped above and below instead of sitting inside the bar. */
+#trial-menu {
+  display: flex;
+  align-items: center;
+  gap: 1vmax;
+  height: 100%;
+  padding-right: 1vmax;
+}
+
+#trial-menu p {
+  margin: 0;
+  color: var(--primary-dark);
+  font-weight: 600;
 }
 
 @media (max-width: 700px) {

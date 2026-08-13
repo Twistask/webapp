@@ -7,13 +7,8 @@
   <body>
     <%- include('partials/menu') %>
     <div id="work-area">
-      <% if (mode === "challenge") { %>
-      <div id="controls">
-        <label for="challenge-select">Select a challenge:</label>
-        <select id="challenge-select"></select>
-      </div>
-      <% } %>
       <div id="task-area">
+        <div id="task-title"></div>
         <div id="viewer"></div>
       </div>
       <% if (mode === "review") { %>
@@ -23,8 +18,7 @@
       <% } %>
       <div id="answer-area">
         <% if (!auth && mode === "challenge") { %>
-        <label for="author-name">Input your name: </label>
-        <input id="author-name" type="text" />
+        <label for="author-name">Input your name:</label><input id="author-name" type="text" />
         <% } %>
         <div id="editor">
           <p>Type here.</p>
@@ -35,15 +29,25 @@
     </div>
     <% if (mode === "timeTrial") { %>
     <script>
-      window.TRIAL = <%- JSON.stringify(trial || {}) %>
-              window.AUTHOR = "<%- author %>"
+      window.TRIAL = <%- JSON.stringify(trial || {}).replace(/</g, "\\u003c") %>;
+      window.AUTHOR = <%- JSON.stringify(author || "").replace(/</g, "\\u003c") %>;
     </script>
     <script type="module" src="/javascripts/handlers/modes/trialControls.js"></script>
     <% } %>
     <% if (mode === "challenge") { %>
+      <script>
+        window.CHALLENGE = <%- JSON.stringify({
+          task: task || {},
+        }).replace(/</g, "\\u003c") %>;
+      </script>
       <script type="module" src="/javascripts/handlers/modes/challengeControls.js"></script>
     <% } %>
     <% if (mode === "review") { %>
+      <script>
+        window.REVIEW = <%- JSON.stringify({
+          answer: answer || {},
+        }).replace(/</g, "\\u003c") %>;
+      </script>
       <script type="module" src="/javascripts/handlers/modes/reviewControls.js"></script>
     <% } %>
   </body>

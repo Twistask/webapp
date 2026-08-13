@@ -6,16 +6,18 @@
   <body>
     <%- include('../partials/menu') %>
     <div id="work-area">
-      <h1><%= title %></h1>
-      <p>Trial Completed!</p>
+      <div class="panel">
+        <h1 id="result-heading">Trial Completed!</h1>
+        <div id="result-stats"></div>
+      </div>
+      <div class="panel" id="result-solved"></div>
+      <div id="result-actions">
+        <a href="/timeTrial">New Trial</a>
+        <a href="/tasks">Browse All Tasks</a>
+        <a href="/">Home</a>
+      </div>
     </div>
-    <script>
-      let sound = new Audio();
-      sound.src = "../sounds/trial_clear.mp3";
-      document.body.appendChild(sound);
-      sound.volume = 0.5;
-      sound.play();
-    </script>
+    <script type="module" src="/javascripts/handlers/modes/resultControls.js"></script>
   </body>
   <%- include('../partials/common') %>
 </html>

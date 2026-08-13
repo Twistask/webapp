@@ -1,13 +1,13 @@
-const { tasks = [], user = {} } = window.APP || {};
+const { user = {} } = window.APP || {};
+
+const { task = {} } = window.CHALLENGE || {};
 
 let editor;
 let viewer;
 
 export const ChallengeControls = {
     setup: () => {
-        ChallengeControls.createChallengeItems(tasks);
         ChallengeControls.setupEditor();
-        document.getElementById("challenge-select").onchange = ChallengeControls.setupTask;
         ChallengeControls.setupTask();
         ChallengeControls.setupSubmit();
     },
@@ -26,55 +26,77 @@ export const ChallengeControls = {
             initialValue: "# hello",
         });
     },
-    createChallengeItems: () => {
-        let select = document.getElementById("challenge-select");
-        tasks.forEach((item) => {
-            let opt = document.createElement("option");
-            opt.value = item.id;
-            opt.innerHTML = item.title;
-            select.appendChild(opt);
-        });
-    },
     setupTask: () => {
-        const value = document.getElementById("challenge-select").value;
-        const task = tasks.find((t) => t.id === value);
-        viewer.setMarkdown(task.description);
+        const titleEl = document.getElementById("task-title");
+        if (titleEl) titleEl.textContent = task.title || "";
+        viewer.setMarkdown(task.description || "");
         editor.reset();
-        localStorage.setItem("currentTargetID", task.id);
     },
     setupSubmit: async () => {
         let submitbtn = document.getElementById("submit");
         submitbtn.addEventListener("click", async () => {
-            let target = localStorage.getItem("currentTargetID");
+            // task.id comes straight from the server-rendered page, not
+            // localStorage - localStorage is shared across every tab on
+            // this origin, so solving a different task in another tab
+            // would silently redirect this tab's submission to the wrong
+            // task.
+            if (!task.id) {
+                alert("No challenge selected. Please pick one first.");
+                return;
+            }
+
             let author;
-            if (document.getElementById("author-name") !== null) {
-                author = document.getElementById("author-name").value;
+            const authorField = document.getElementById("author-name");
+            if (authorField !== null) {
+                author = authorField.value.trim();
             } else {
                 author = user.id;
             }
-            const res = await fetch(`/challenge/submit`, {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    author: author,
-                    target_id: target,
-                    value: editor.getMarkdown(),
-                }),
-            });
-            const select = document.getElementById("challenge-select");
-            const current = select.selectedIndex;
-            const lastIndex = select.options.length - 1;
-
-            if (current < lastIndex) {
-                select.selectedIndex = current + 1;
-            } else {
-                select.selectedIndex = 0;
+            if (!author) {
+                alert("Please enter your name before submitting.");
+                return;
             }
-            ChallengeControls.setupTask();
+
+            const value = editor.getMarkdown();
+            if (!value.trim()) {
+                alert("Please write an answer before submitting.");
+                return;
+            }
+
+            submitbtn.disabled = true;
+            try {
+                const res = await fetch(`/challenge/${task.id}`, {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({ author, value }),
+                });
+
+                if (!res.ok) {
+                    console.error("Submit failed", res.status);
+                    alert("Failed to submit your answer. Please try again.");
+                    return;
+                }
+
+                editor.reset();
+                alert("Your answer has been submitted!");
+                window.location.assign(`/tasks`);
+            } catch (err) {
+                console.error("Submit error", err);
+                alert("Network error while submitting your answer.");
+            } finally {
+                submitbtn.disabled = false;
+            }
         })
     },
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await ChallengeControls.setup();
+    try {
+        await ChallengeControls.setup();
+    } catch (err) {
+        console.error("Failed to set up challenge mode:", err);
+        const workArea = document.getElementById("work-area");
+        if (workArea) workArea.innerText = "Something went wrong loading this page. Please refresh and try again.";
+    }
 })

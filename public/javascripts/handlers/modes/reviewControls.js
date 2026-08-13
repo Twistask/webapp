@@ -2,7 +2,9 @@ let editor;
 let task_viewer;
 let answer_viewer;
 
-const { tasks = [], answers = [], user = {} } = window.APP || {};
+const { tasks = [] } = window.APP || {};
+
+const { answer = {} } = window.REVIEW || {};
 
 export const ReviewControls = {
     setup: () => {
@@ -32,53 +34,65 @@ export const ReviewControls = {
         });
     },
     setupTask: async () => {
-        let author = user.id;
-        const answersForTask = answers.filter(
-            (a) => a.value && a.value.trim() !== "" && a.author !== author,
-        );
-        if (!answersForTask.length || !tasks.length) {
-            console.log("There are no suitable answers!");
-            document.getElementById("work-area").innerHTML =
-                "There are currently no answers to review!";
-            return;
-        }
-
-        const randIndex = Math.floor(Math.random() * answersForTask.length);
-        let chosenAnswer = answersForTask[randIndex];
-        const task = tasks.find((t) => t.id === chosenAnswer.target_id);
-
-        if (!task) {
-            console.log("The task does not exist!");
-            await ReviewControls.setupTask();
-            return;
-        }
-
-        task_viewer.setMarkdown(task.description);
-        answer_viewer.setMarkdown(chosenAnswer.value);
+        // The task this answer targets may have been deleted since the
+        // answer was submitted (an orphaned answer) - guard against that
+        // instead of throwing on task.description.
+        const task = tasks.find((t) => t.id === answer.target_id);
+        const titleEl = document.getElementById("task-title");
+        if (titleEl) titleEl.textContent = task ? task.title : "";
+        task_viewer.setMarkdown(task ? task.description || "" : "This task is no longer available.");
+        answer_viewer.setMarkdown(answer.value || "");
         editor.reset();
-        localStorage.setItem("currentTargetID", chosenAnswer.id);
     },
     setupSubmit: () => {
         let submitbtn = document.getElementById("submit");
         if (submitbtn) {
             submitbtn.addEventListener("click", async () => {
-                let target = localStorage.getItem("currentTargetID");
-                let author = user.id;
-                const res = await fetch(`/review/submit`, {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({
-                        author: author,
-                        target_id: target,
-                        value: editor.getMarkdown(),
-                    }),
-                });
-                await ReviewControls.setupTask();
+                // answer.id comes from the server-rendered page, not
+                // localStorage - see the matching note in
+                // challengeControls.js for why that indirection was unsafe.
+                if (!answer.id) return;
+
+                const value = editor.getMarkdown();
+                if (!value.trim()) {
+                    alert("Please write a review before submitting.");
+                    return;
+                }
+
+                submitbtn.disabled = true;
+                try {
+                    const res = await fetch(`/review/${answer.id}`, {
+                        method: "POST",
+                        credentials: "include",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify({ value }),
+                    });
+
+                    if (!res.ok) {
+                        console.error("Submit failed", res.status);
+                        alert("Failed to submit your review. Please try again.");
+                        return;
+                    }
+
+                    alert("Your review has been submitted!");
+                    window.location.assign(`/users/profile`);
+                } catch (err) {
+                    console.error("Submit error", err);
+                    alert("Network error while submitting your review.");
+                } finally {
+                    submitbtn.disabled = false;
+                }
             });
         }
     }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await ReviewControls.setup();
+    try {
+        await ReviewControls.setup();
+    } catch (err) {
+        console.error("Failed to set up review mode:", err);
+        const workArea = document.getElementById("work-area");
+        if (workArea) workArea.innerText = "Something went wrong loading this page. Please refresh and try again.";
+    }
 })
