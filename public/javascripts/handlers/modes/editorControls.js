@@ -96,7 +96,6 @@ export const EditorControls = {
                             body: JSON.stringify({
                                 id: value,
                                 task: {
-                                    author: author,
                                     title: title,
                                     description: editor.getMarkdown(),
                                     language: language

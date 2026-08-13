@@ -9,7 +9,8 @@ router.get("/", async (req, res, next) => {
   if (!res.locals.auth) return res.redirect("../users/login");
   if (res.locals.user.role === "student") return res.redirect("../");
   try {
-    res.locals.tasks = await Database.functions.loadContentbyUser(
+    if (res.locals.user.role === "admin") res.locals.tasks = await Database.functions.loadContent("tasks");
+    else res.locals.tasks = await Database.functions.loadContentbyUser(
       "tasks",
       res.locals.user.id,
     );
@@ -48,7 +49,7 @@ router.post("/update", async (req, res, next) => {
     // task content and, since the body below reassigns `author`, hijack
     // its ownership outright.
     const existing = await Database.functions.getContent("task", id);
-    if (existing.author !== res.locals.user.id) {
+    if (existing.author !== res.locals.user.id && res.locals.user.role !== "admin") {
       return res.status(403).json({ ok: false, message: "Forbidden" });
     }
     const token = req.cookies?.twistask_auth;
@@ -73,7 +74,7 @@ router.delete("/delete", async (req, res, next) => {
     // teacher could delete any other teacher's task, cascading away all
     // of its students' answers and reviews too.
     const existing = await Database.functions.getContent("task", id);
-    if (existing.author !== res.locals.user.id) {
+    if (existing.author !== res.locals.user.id && res.locals.user.role !== "admin") {
       return res.status(403).json({ ok: false, message: "Forbidden" });
     }
     const token = req.cookies?.twistask_auth;
