@@ -44,7 +44,7 @@ router.post("/:id", async (req, res, next) => {
     }
 
     const token = req.cookies?.twistask_auth;
-    await Database.functions.sendContent("answer", { author, target_id: id, value }, token);
+    const ans = await Database.functions.sendContent("answer", { author, target_id: id, value }, token);
 
     // Best-effort notification: a lookup/mail failure here must not turn a
     // successful submission into a 500 for the client.
@@ -52,7 +52,7 @@ router.post("/:id", async (req, res, next) => {
       const task = await Database.functions.getContent("task", id);
       const taskAuthor = task?.author ? await Database.functions.getUserbyId(task.author) : null;
       if (taskAuthor?.email) {
-        await MailService.sendEmail(taskAuthor.email, "Your task has been solved!", "Your task has been solved!");
+        await MailService.sendEmail(taskAuthor.email, "Someone has submitted an answer to one of your tasks!", "", MailService.prepareTemplate("./tools/mail-templates/answer-submit.html", task.title, ans.id));
       }
     } catch (notifyErr) {
       console.error("Failed to send task-solved notification:", notifyErr?.message ?? notifyErr);

@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import fs from "fs-extra";
 
 // Defaults target a local dev SMTP catcher (e.g. MailHog). Set MAIL_HOST /
 // MAIL_PORT / MAIL_SECURE / MAIL_USERNAME / MAIL_PASSWORD to point at a real
@@ -24,7 +25,7 @@ const MailService = {
         greetingTimeout: MAIL_TIMEOUT_MS,
         socketTimeout: MAIL_TIMEOUT_MS,
     }),
-    sendEmail: async (to, subject, text, html = null) => {
+    sendEmail: async (to, subject, text = "", html = null) => {
         if (!to || typeof to !== "string") {
             console.error("sendEmail: refusing to send, missing/invalid recipient");
             return { success: false, message: "Missing recipient" };
@@ -34,7 +35,7 @@ const MailService = {
                 from: process.env.MAIL_USERNAME,
                 to,
                 subject,
-                text,
+                text: "",
                 html,
             };
             const info = await MailService.transporter.sendMail(mailOptions);
@@ -44,6 +45,10 @@ const MailService = {
             console.error("Error sending email:", error?.message ?? error);
             return { success: false, message: "Email sending failed" };
         }
+    },
+    prepareTemplate: (path, title, id) => {
+        let html = fs.readFileSync(path).toString();
+        return html.replaceAll("{task}", title).replaceAll("{link}", process.env.APP_LINK).replaceAll("{id}", id);
     }
 }
 

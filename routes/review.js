@@ -4,6 +4,7 @@ let router = express.Router();
 import Database from "../tools/db.js";
 import { isValidRecordId } from "./utils/validateId.js";
 import createError from "http-errors";
+import MailService from "../tools/mail.js";
 
 /* GET review page. */
 router.get("/:id", async (req, res, next) => {
@@ -50,11 +51,22 @@ router.post("/:id", async (req, res, next) => {
     }
 
     const token = req.cookies?.twistask_auth;
-    await Database.functions.sendContent("comment", {
+    const review = await Database.functions.sendContent("comment", {
       author: res.locals.user.id,
       target_id: id,
       value,
     }, token);
+
+    try {
+      const task = await Database.functions.getContent("task", answer.target_id);
+      const ansAuthor = answer?.author ? await Database.functions.getUserbyId(answer.author) : null;
+      if (ansAuthor?.email) {
+        await MailService.sendEmail(ansAuthor.email, "Someone has submitted a review to one of your answers!", "", MailService.prepareTemplate("./tools/mail-templates/review-submit.html", task.title, answer.id));
+      }
+    } catch (notifyErr) {
+      console.error("Failed to send task-solved notification:", notifyErr?.message ?? notifyErr);
+    }
+
     return res.status(200).json({ ok: true });
   } catch (err) {
     next(err); // lets Express error middleware handle/log and return a 500
