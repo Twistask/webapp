@@ -10,6 +10,13 @@ import {
 
 let router = express.Router();
 
+// The register form only ever offers these two - "admin" must never be
+// reachable through self-registration. Database.functions.createUser
+// forwards body.role as-is (REGISTER_FIELDS deliberately allows a new
+// user to pick their own role), so without this check a crafted POST
+// with role=admin would attempt to create an admin account.
+const VALID_SELF_REGISTER_ROLES = ["student", "teacher"];
+
 router.get("/register", function (req, res, next) {
     if (res.locals.auth) return res.redirect("../");
     res.locals.err = "";
@@ -20,6 +27,10 @@ router.post("/register", registerLimiter, async (req, res, next) => {
     if (res.locals.auth) {
         res.locals.err = "You are already logged in.";
         return res.status(409).render("auth/register");
+    }
+    if (!VALID_SELF_REGISTER_ROLES.includes(req.body.role)) {
+        res.locals.err = "Please select whether you're a student or a teacher.";
+        return res.status(400).render("auth/register");
     }
     try {
         const body = req.body;

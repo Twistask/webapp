@@ -35,7 +35,7 @@ const MailService = {
                 from: process.env.MAIL_USERNAME,
                 to,
                 subject,
-                text: "",
+                text,
                 html,
             };
             const info = await MailService.transporter.sendMail(mailOptions);
