@@ -43,13 +43,28 @@ router.post("/:id", async (req, res, next) => {
       return res.status(400).json({ ok: false, message: "Missing author" });
     }
 
+    // The answer inherits the task's language. This used to be a
+    // client-supplied `language: sessionStorage.getItem("language")`
+    // field (the submitter's current UI language selection), but that
+    // stopped being sent during the challenge/review rewrite and the
+    // server never picked it back up - every answer since has been
+    // saved with an empty language. Deriving it from the task here
+    // instead of trusting the client also means it can't drift from the
+    // task actually being answered, which a client-supplied value could
+    // (this flow lets you open /challenge/:id for any task directly,
+    // without first filtering task choice by your current language).
+    const task = await Database.functions.getContent("task", id);
+
     const token = req.cookies?.twistask_auth;
-    const ans = await Database.functions.sendContent("answer", { author, target_id: id, value }, token);
+    const ans = await Database.functions.sendContent(
+      "answer",
+      { author, target_id: id, value, language: task.language },
+      token,
+    );
 
     // Best-effort notification: a lookup/mail failure here must not turn a
     // successful submission into a 500 for the client.
     try {
-      const task = await Database.functions.getContent("task", id);
       const taskAuthor = task?.author ? await Database.functions.getUserbyId(task.author) : null;
       if (taskAuthor?.email) {
         await MailService.sendEmail(taskAuthor.email, "Someone has submitted an answer to one of your tasks!", "", MailService.prepareTemplate("./tools/mail-templates/answer-submit.html", task.title, ans.id));

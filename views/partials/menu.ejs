@@ -6,6 +6,7 @@
     <a href="/tasks" id="tasks-link">Tasks Directory</a>
     <a href="/timeTrial" id="timeTrial-link">Trial Mode</a>
     <% if (auth) { %>
+    <a href="/review" id="review-link">Review Answers</a>
     <% if (user.role !== "student") { %>
       <a href="/editor" id="editor-link">Task Editor</a>
     <% } %>

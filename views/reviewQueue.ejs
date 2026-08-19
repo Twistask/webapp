@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+</head>
+<body>
+<%- include('partials/menu') %>
+<div id="work-area">
+    <h1>Answers to Review</h1>
+    <p>Pick an answer below to leave a review on it.</p>
+    <div id="review-list"></div>
+</div>
+<script type="module" src="/javascripts/handlers/modes/reviewQueue.js"></script>
+</body>
+<%- include('partials/common') %>
+</html>

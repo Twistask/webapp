@@ -6,6 +6,26 @@ import { isValidRecordId } from "./utils/validateId.js";
 import createError from "http-errors";
 import MailService from "../tools/mail.js";
 
+/* GET review queue - every answer any authenticated user (other than its
+   own author) may review. Any signed-in user can review any answer except
+   their own - there's no role restriction here, unlike /tasks/:id which
+   is teacher/admin-only and would otherwise be the only way to discover
+   an answer id to review. */
+router.get("/", async (req, res, next) => {
+  if (!res.locals.auth) return res.redirect("/auth/login");
+  try {
+    const [tasks, answers] = await Promise.all([
+      Database.functions.loadContent("tasks"),
+      Database.functions.loadContent("answers"),
+    ]);
+    res.locals.tasks = tasks;
+    res.locals.answers = answers.filter((a) => a.author !== res.locals.user.id);
+    res.render("reviewQueue");
+  } catch (err) {
+    next(err);
+  }
+});
+
 /* GET review page. */
 router.get("/:id", async (req, res, next) => {
   // The login page is at /auth/login, not /users/login - this pointed
@@ -51,10 +71,13 @@ router.post("/:id", async (req, res, next) => {
     }
 
     const token = req.cookies?.twistask_auth;
+    // Inherits the answer's language - same reasoning as the matching
+    // change in routes/challenge.js.
     const review = await Database.functions.sendContent("comment", {
       author: res.locals.user.id,
       target_id: id,
       value,
+      language: answer.language,
     }, token);
 
     try {
