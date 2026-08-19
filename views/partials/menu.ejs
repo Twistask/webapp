@@ -2,32 +2,32 @@
 <nav id="menu" role="navigation" aria-label="Main">
   <% if (mode !== "timeTrial") { %>
   <div id="common">
-    <a href="/" id="home-link">Home</a>
-    <a href="/tasks" id="tasks-link">Tasks Directory</a>
-    <a href="/timeTrial" id="timeTrial-link">Trial Mode</a>
+    <a href="/" id="home-link" data-i18n="nav.home"><%= t('nav.home') %></a>
+    <a href="/tasks" id="tasks-link" data-i18n="nav.tasksDirectory"><%= t('nav.tasksDirectory') %></a>
+    <a href="/timeTrial" id="timeTrial-link" data-i18n="nav.trialMode"><%= t('nav.trialMode') %></a>
     <% if (auth) { %>
-    <a href="/review" id="review-link">Review Answers</a>
+    <a href="/review" id="review-link" data-i18n="nav.reviewAnswers"><%= t('nav.reviewAnswers') %></a>
     <% if (user.role !== "student") { %>
-      <a href="/editor" id="editor-link">Task Editor</a>
+      <a href="/editor" id="editor-link" data-i18n="nav.editor"><%= t('nav.editor') %></a>
     <% } %>
     <% if (user.role === "admin") { %>
-      <a href="/admin" id="admin-link">Admin Panel</a>
+      <a href="/admin" id="admin-link" data-i18n="nav.admin"><%= t('nav.admin') %></a>
     <% } %>
     <% } %>
   </div>
 
   <div id="menu-right">
     <div id="language-picker">
-      <label for="language-select">Language:</label><select id="language-select">
-        <option value="en">English</option>
-        <option value="ru">Russian</option>
-        <option value="cn">Chinese</option>
+      <label for="language-select" data-i18n="nav.languageLabel"><%= t('nav.languageLabel') %></label><select id="language-select">
+        <option value="en" data-i18n="common.lang.en"><%= t('common.lang.en') %></option>
+        <option value="ru" data-i18n="common.lang.ru"><%= t('common.lang.ru') %></option>
+        <option value="cn" data-i18n="common.lang.cn"><%= t('common.lang.cn') %></option>
       </select>
     </div>
     <% if (!auth) { %>
     <div id="logged-out" data-access="guestOnly">
-      <a href="/auth/register" id="register-link">Register</a>
-      <a href="/auth/login" id="login-link">Login</a>
+      <a href="/auth/register" id="register-link" data-i18n="nav.register"><%= t('nav.register') %></a>
+      <a href="/auth/login" id="login-link" data-i18n="nav.login"><%= t('nav.login') %></a>
     </div>
     <% } else { %>
     <div id="logged-in" data-access="authOnly">
@@ -42,9 +42,9 @@
         <span aria-hidden="true">&#9662;</span>
       </button>
       <div id="user-menu" role="menu" aria-labelledby="user-menu-toggle" hidden>
-        <a href="/users/profile" id="profile-link" role="menuitem">Profile</a>
-        <a href="/users/settings" id="settings-link" role="menuitem">Settings</a>
-        <a id="logout" role="menuitem" tabindex="0">Logout</a>
+        <a href="/users/profile" id="profile-link" role="menuitem" data-i18n="nav.profile"><%= t('nav.profile') %></a>
+        <a href="/users/settings" id="settings-link" role="menuitem" data-i18n="nav.settings"><%= t('nav.settings') %></a>
+        <a id="logout" role="menuitem" tabindex="0" data-i18n="nav.logout"><%= t('nav.logout') %></a>
       </div>
     </div>
       <script type="module" src="/javascripts/handlers/menu/userMenuDropdown.js"></script>
@@ -57,7 +57,7 @@
     <% } %>
   <% if (mode === "timeTrial") { %>
   <div id="trial-menu">
-    <a href="/" id="home-link" data-mode="home">Give Up</a>
+    <a href="/" id="home-link" data-mode="home" data-i18n="nav.giveUp"><%= t('nav.giveUp') %></a>
   </div>
   <% } %>
 </nav>

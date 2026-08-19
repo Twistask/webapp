@@ -1,3 +1,5 @@
+import { t } from "../../utils/i18n.js";
+
 let editor;
 let task_viewer;
 let answer_viewer;
@@ -37,10 +39,10 @@ export const ReviewControls = {
         // The task this answer targets may have been deleted since the
         // answer was submitted (an orphaned answer) - guard against that
         // instead of throwing on task.description.
-        const task = tasks.find((t) => t.id === answer.target_id);
+        const task = tasks.find((tk) => tk.id === answer.target_id);
         const titleEl = document.getElementById("task-title");
         if (titleEl) titleEl.textContent = task ? task.title : "";
-        task_viewer.setMarkdown(task ? task.description || "" : "This task is no longer available.");
+        task_viewer.setMarkdown(task ? task.description || "" : t('review.taskUnavailable'));
         answer_viewer.setMarkdown(answer.value || "");
         editor.reset();
     },
@@ -55,7 +57,7 @@ export const ReviewControls = {
 
                 const value = editor.getMarkdown();
                 if (!value.trim()) {
-                    alert("Please write a review before submitting.");
+                    alert(t('review.enterReviewFirst'));
                     return;
                 }
 
@@ -70,15 +72,15 @@ export const ReviewControls = {
 
                     if (!res.ok) {
                         console.error("Submit failed", res.status);
-                        alert("Failed to submit your review. Please try again.");
+                        alert(t('review.submitFailed'));
                         return;
                     }
 
-                    alert("Your review has been submitted!");
+                    alert(t('review.submitSuccess'));
                     window.location.assign(`/users/profile`);
                 } catch (err) {
                     console.error("Submit error", err);
-                    alert("Network error while submitting your review.");
+                    alert(t('review.submitNetworkError'));
                 } finally {
                     submitbtn.disabled = false;
                 }
@@ -93,6 +95,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (err) {
         console.error("Failed to set up review mode:", err);
         const workArea = document.getElementById("work-area");
-        if (workArea) workArea.innerText = "Something went wrong loading this page. Please refresh and try again.";
+        if (workArea) workArea.innerText = t('common.pageLoadError');
     }
 })

@@ -8,28 +8,28 @@
     <%- include('partials/menu') %>
     <div id="work-area">
       <div id="controls">
-        <label for="challenge-select">Select a challenge:</label><select id="challenge-select">
-          <option value="new">New Task</option>
+        <label for="challenge-select" data-i18n="editor.selectChallengeLabel"><%= t('editor.selectChallengeLabel') %></label><select id="challenge-select">
+          <option value="new" data-i18n="editor.newTaskOption"><%= t('editor.newTaskOption') %></option>
         </select>
         <br />
-        <label for="task-title">Enter the name of the task:</label><input id="task-title" type="text" /><br>
-        <label for="task-language">Select the language:</label><select id="task-language">
-          <option value="en">English</option>
-          <option value="ru">Russian</option>
-          <option value="cn">Chinese</option>
+        <label for="task-title" data-i18n="editor.taskTitleLabel"><%= t('editor.taskTitleLabel') %></label><input id="task-title" type="text" /><br>
+        <label for="task-language" data-i18n="editor.selectLanguageLabel"><%= t('editor.selectLanguageLabel') %></label><select id="task-language">
+          <option value="en" data-i18n="common.lang.en"><%= t('common.lang.en') %></option>
+          <option value="ru" data-i18n="common.lang.ru"><%= t('common.lang.ru') %></option>
+          <option value="cn" data-i18n="common.lang.cn"><%= t('common.lang.cn') %></option>
         </select>
       </div>
       <div id="editor-area">
         <div id="editor">
-          <p>Type the contents of the task here.</p>
+          <p data-i18n="editor.contentPlaceholder"><%= t('editor.contentPlaceholder') %></p>
           <p><br /></p>
         </div>
         <div id="import-row">
-          <label for="markdown-import">Import from Markdown:</label>
+          <label for="markdown-import" data-i18n="editor.importLabel"><%= t('editor.importLabel') %></label>
           <input type="file" id="markdown-import" accept=".md,.txt" />
         </div>
-        <button type="submit" id="submit">Submit</button>
-        <button id="delete">Delete</button>
+        <button type="submit" id="submit" data-i18n="common.submit"><%= t('common.submit') %></button>
+        <button id="delete" data-i18n="common.delete"><%= t('common.delete') %></button>
       </div>
     </div>
     <script type="module" src="/javascripts/handlers/modes/editorControls.js"></script>

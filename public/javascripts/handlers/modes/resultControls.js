@@ -1,16 +1,17 @@
 import { convertToString } from "../../utils/timeConverter.js";
+import { t } from "../../utils/i18n.js";
 
 const DIFFICULTY_LABELS = {
-    easy: "Easy",
-    medium: "Medium",
-    hard: "Hard",
-    superHard: "Super Hard",
+    easy: () => t('common.difficulty.easy'),
+    medium: () => t('common.difficulty.medium'),
+    hard: () => t('common.difficulty.hard'),
+    superHard: () => t('common.difficulty.superHard'),
 };
 
 const STATUS_COPY = {
-    completed: { emoji: "🎉", heading: "Trial Completed!" },
-    timeout: { emoji: "⏰", heading: "Time's Up!" },
-    gaveUp: { emoji: "🏳️", heading: "Trial Ended" },
+    completed: () => t('trial.result.completed'),
+    timeout: () => t('trial.result.timeout'),
+    gaveUp: () => t('trial.result.gaveUp'),
 };
 
 const buildStat = (label, value) => {
@@ -42,7 +43,7 @@ const buildTaskCard = (task) => {
 
     const cta = document.createElement("span");
     cta.className = "task-card-cta";
-    cta.textContent = "View this task →";
+    cta.textContent = t('common.viewThisTask');
 
     card.append(title, cta);
     return card;
@@ -59,7 +60,7 @@ const setup = () => {
     const raw = sessionStorage.getItem("trialResult");
     sessionStorage.removeItem("trialResult");
     if (!raw) {
-        solvedEl.textContent = "Start a time trial to see your results here.";
+        solvedEl.textContent = t('trial.result.startPrompt');
         return;
     }
 
@@ -68,29 +69,30 @@ const setup = () => {
         summary = JSON.parse(raw);
     } catch (err) {
         console.error("Failed to parse trial result summary:", err);
-        solvedEl.textContent = "Start a time trial to see your results here.";
+        solvedEl.textContent = t('trial.result.startPrompt');
         return;
     }
 
-    const copy = STATUS_COPY[summary.status] || STATUS_COPY.completed;
-    headingEl.textContent = `${copy.emoji} ${copy.heading}`;
+    const getCopy = STATUS_COPY[summary.status] || STATUS_COPY.completed;
+    headingEl.textContent = getCopy();
 
     const solvedTasks = Array.isArray(summary.solvedTasks) ? summary.solvedTasks : [];
-    const difficultyLabel = DIFFICULTY_LABELS[summary.difficulty] || summary.difficulty || "Unknown";
+    const getDifficultyLabel = DIFFICULTY_LABELS[summary.difficulty];
+    const difficultyLabel = getDifficultyLabel ? getDifficultyLabel() : summary.difficulty || t('common.difficulty.unknown');
 
     statsEl.append(
-        buildStat("Difficulty", difficultyLabel),
-        buildStat("Solved", `${solvedTasks.length} / ${summary.tasksAmount}`),
-        buildStat("Time Taken", convertToString(summary.timeTakenMs || 0)),
+        buildStat(t('trial.result.difficultyLabel'), difficultyLabel),
+        buildStat(t('trial.result.solvedLabel'), `${solvedTasks.length} / ${summary.tasksAmount}`),
+        buildStat(t('trial.result.timeTakenLabel'), convertToString(summary.timeTakenMs || 0)),
     );
 
     if (solvedTasks.length === 0) {
-        solvedEl.textContent = "You didn't submit any answers this time - give it another shot!";
+        solvedEl.textContent = t('trial.result.noneSolved');
         return;
     }
 
     const heading = document.createElement("h2");
-    heading.textContent = "Tasks You Solved";
+    heading.textContent = t('trial.result.tasksSolved');
     const grid = document.createElement("div");
     grid.className = "task-grid";
     for (const task of solvedTasks) {

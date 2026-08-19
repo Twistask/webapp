@@ -1,3 +1,5 @@
+import { t } from "../../utils/i18n.js";
+
 let viewer;
 
 const { main = {}, children = [], childType = null } = window.VIEWER || {};
@@ -25,7 +27,7 @@ export const ViewerControls = {
   setupChildren: () => {
     let ch_area = document.getElementById("ch-area");
     if (children.length === 0) {
-      ch_area.innerText = "There's currently nothing to display here!";
+      ch_area.innerText = t('viewer.empty');
     } else {
       for (const ch of children) {
         let ch_el = document.createElement("div");
@@ -52,7 +54,7 @@ export const ViewerControls = {
           review_link.id = `review_${ch.id}`;
           review_link.className = "review-link";
           review_link.href = `/review/${ch.id}`;
-          review_link.textContent = "Review this answer";
+          review_link.textContent = t('viewer.reviewThisAnswer');
           ch_el.appendChild(review_link);
         }
       }
@@ -66,6 +68,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {
     console.error("Failed to set up viewer:", err);
     const workArea = document.getElementById("work-area");
-    if (workArea) workArea.innerText = "Something went wrong loading this page. Please refresh and try again.";
+    if (workArea) workArea.innerText = t('common.pageLoadError');
   }
 })

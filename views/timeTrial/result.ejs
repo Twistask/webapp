@@ -7,14 +7,14 @@
     <%- include('../partials/menu') %>
     <div id="work-area">
       <div class="panel">
-        <h1 id="result-heading">Trial Completed!</h1>
+        <h1 id="result-heading"><%= t('trial.result.completed') %></h1>
         <div id="result-stats"></div>
       </div>
       <div class="panel" id="result-solved"></div>
       <div id="result-actions">
-        <a href="/timeTrial">New Trial</a>
-        <a href="/tasks">Browse All Tasks</a>
-        <a href="/">Home</a>
+        <a href="/timeTrial" data-i18n="trial.result.newTrial"><%= t('trial.result.newTrial') %></a>
+        <a href="/tasks" data-i18n="trial.result.browseAllTasks"><%= t('trial.result.browseAllTasks') %></a>
+        <a href="/" data-i18n="nav.home"><%= t('nav.home') %></a>
       </div>
     </div>
     <script type="module" src="/javascripts/handlers/modes/resultControls.js"></script>

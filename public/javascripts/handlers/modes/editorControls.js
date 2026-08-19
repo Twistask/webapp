@@ -1,3 +1,5 @@
+import { t } from "../../utils/i18n.js";
+
 const { tasks = [], user = {} } = window.APP || {};
 
 let editor;
@@ -20,7 +22,7 @@ export const EditorControls = {
         const taskId = new URLSearchParams(window.location.search).get("task");
         if (!taskId) return;
         const select = document.getElementById("challenge-select");
-        if (tasks.some((t) => t.id === taskId)) select.value = taskId;
+        if (tasks.some((tk) => tk.id === taskId)) select.value = taskId;
     },
     setupEditor: () => {
         const Editor = toastui.Editor;
@@ -42,7 +44,7 @@ export const EditorControls = {
             };
             reader.onerror = (e) => {
                 console.error('Error reading file:', e.target.error);
-                alert("Could not read that file.");
+                alert(t('editor.importReadError'));
             };
             reader.readAsText(file);
 
@@ -62,7 +64,7 @@ export const EditorControls = {
     setupTask: () => {
         const value = document.getElementById("challenge-select").value;
         if (value !== "new") {
-            const task = tasks.find((t) => t.id === value);
+            const task = tasks.find((tk) => tk.id === value);
             if (!task) {
                 document.getElementById("delete").style.display = "none";
                 document.getElementById("task-title").value = "";
@@ -87,7 +89,7 @@ export const EditorControls = {
             submitbtn.addEventListener("click", async () => {
                 const title = document.getElementById("task-title").value.trim();
                 if (!title) {
-                    alert("Please enter a task title.");
+                    alert(t('editor.titleRequired'));
                     return;
                 }
 
@@ -128,14 +130,14 @@ export const EditorControls = {
 
                     if (!res.ok) {
                         console.error("Save failed", res.status);
-                        alert("Failed to save the task. Your changes were not saved - please try again.");
+                        alert(t('editor.saveFailed'));
                         return;
                     }
 
                     window.location.reload();
                 } catch (err) {
                     console.error("Save error", err);
-                    alert("Network error while saving. Your changes were not saved.");
+                    alert(t('editor.saveNetworkError'));
                 } finally {
                     submitbtn.disabled = false;
                 }
@@ -151,9 +153,7 @@ export const EditorControls = {
             const value = document.getElementById("challenge-select").value;
             if (value === "new") return;
 
-            const confirmed = confirm(
-                "Delete this task? All of its submitted answers and reviews will be permanently deleted too. This cannot be undone.",
-            );
+            const confirmed = confirm(t('editor.deleteConfirm'));
             if (!confirmed) return;
 
             deleteBtn.disabled = true;
@@ -167,14 +167,14 @@ export const EditorControls = {
 
                 if (!res.ok) {
                     console.error("Delete failed", res.status);
-                    alert("Failed to delete the task. Please try again.");
+                    alert(t('editor.deleteFailed'));
                     return;
                 }
 
                 window.location.reload();
             } catch (err) {
                 console.error("Delete error", err);
-                alert("Network error while deleting the task.");
+                alert(t('editor.deleteNetworkError'));
             } finally {
                 deleteBtn.disabled = false;
             }
@@ -188,6 +188,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (err) {
         console.error("Failed to set up editor:", err);
         const workArea = document.getElementById("work-area");
-        if (workArea) workArea.innerText = "Something went wrong loading this page. Please refresh and try again.";
+        if (workArea) workArea.innerText = t('common.pageLoadError');
     }
 })

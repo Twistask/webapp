@@ -19,6 +19,7 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { checkAuthStatus } from "./middleware/checkAuthStatus.js";
 import { pingDatabase } from "./middleware/pingDatabase.js";
+import { translate, dictionaries } from "./tools/i18n.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -89,6 +90,21 @@ app.use(async (req, res, next) => {
     res.locals.auth = false;
     res.locals.user = null;
   }
+  return next();
+});
+
+// Attach translation helpers to res.locals for views/route handlers.
+// Server-rendered text uses the signed-in user's saved language
+// preference - it's the only language signal the server can see, since a
+// guest's choice lives only in sessionStorage and never reaches it. The
+// client-side counterpart (public/javascripts/utils/i18n.js) reconciles
+// this against sessionStorage on every page load and on
+// "app:languagechange", the same two-step pattern already used for
+// content filtering (see tasksDirectory.js, home.js).
+app.use((req, res, next) => {
+  const lang = res.locals.user?.language || "en";
+  res.locals.t = (key, vars) => translate(lang, key, vars);
+  res.locals.i18n = dictionaries;
   return next();
 });
 

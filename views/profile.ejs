@@ -8,14 +8,14 @@
     <div id="work-area">
       <% if (user.role !== "student") { %>
         <div id="my-tasks" class="panel">
-          <h1>My Tasks</h1>
+          <h1 data-i18n="profile.myTasks"><%= t('profile.myTasks') %></h1>
         </div>
       <% } %>
       <div id="my-answers" class="panel">
-        <h1>My Answers</h1>
+        <h1 data-i18n="profile.myAnswers"><%= t('profile.myAnswers') %></h1>
       </div>
       <div id="my-reviews" class="panel">
-        <h1>My Reviews</h1>
+        <h1 data-i18n="profile.myReviews"><%= t('profile.myReviews') %></h1>
       </div>
     </div>
     <script

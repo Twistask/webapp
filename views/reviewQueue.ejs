@@ -6,8 +6,8 @@
 <body>
 <%- include('partials/menu') %>
 <div id="work-area">
-    <h1>Answers to Review</h1>
-    <p>Pick an answer below to leave a review on it.</p>
+    <h1 data-i18n="review.title"><%= t('review.title') %></h1>
+    <p data-i18n="review.subtitle"><%= t('review.subtitle') %></p>
     <div id="review-list"></div>
 </div>
 <script type="module" src="/javascripts/handlers/modes/reviewQueue.js"></script>

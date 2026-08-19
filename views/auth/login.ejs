@@ -6,12 +6,12 @@
   <body>
     <%- include('../partials/menu') %>
     <div id="work-area">
-      <h1 class="page-title">Login</h1>
+      <h1 class="page-title" data-i18n="nav.login"><%= t('nav.login') %></h1>
       <form action="/auth/login" method="post">
-        <label for="email">E-mail:</label><input type="text" id="email" name="email" required /><br />
-        <label for="password">Password:</label><input type="password" id="password" name="password" required /><br />
-        <a href="/auth/forgot-password">Forgot password?</a>
-        <button type="submit" id="submit">Login</button>
+        <label for="email" data-i18n="auth.emailLabel"><%= t('auth.emailLabel') %></label><input type="text" id="email" name="email" required /><br />
+        <label for="password" data-i18n="auth.passwordLabel"><%= t('auth.passwordLabel') %></label><input type="password" id="password" name="password" required /><br />
+        <a href="/auth/forgot-password" data-i18n="auth.forgotPassword"><%= t('auth.forgotPassword') %></a>
+        <button type="submit" id="submit" data-i18n="nav.login"><%= t('nav.login') %></button>
         <div id="error-box"><%= err %></div>
       </form>
     </div>

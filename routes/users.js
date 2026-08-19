@@ -55,7 +55,7 @@ router.post("/settings", async function (req, res, next) {
     }
     return res.redirect(303, "/");
   } catch (err) {
-    res.locals.err = "Failed to change password. Please check if you've entered the information correctly."
+    res.locals.err = res.locals.t('settings.changePasswordFailed');
     return res.render("settings");
   }
 });

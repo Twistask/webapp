@@ -9,14 +9,16 @@ import rateLimit from "express-rate-limit";
 // deployed behind a reverse proxy/load balancer, `app.set('trust proxy', ...)`
 // must be configured correctly (to the real number of hops) or every
 // request will appear to come from the proxy's IP and share one bucket.
-const authRateLimit = ({ windowMs, max, message, view, localsKey }) =>
+const authRateLimit = ({ windowMs, max, messageKey, view, localsKey }) =>
   rateLimit({
     windowMs,
     limit: max,
     standardHeaders: true,
     legacyHeaders: false,
     handler: (req, res) => {
-      res.locals[localsKey] = message;
+      // res.locals.t is set by app.js's i18n middleware, which runs
+      // before this route-level middleware for every request.
+      res.locals[localsKey] = res.locals.t(messageKey);
       res.status(429).render(view);
     },
   });
@@ -24,7 +26,7 @@ const authRateLimit = ({ windowMs, max, message, view, localsKey }) =>
 export const loginLimiter = authRateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
-  message: "Too many login attempts. Please try again in a few minutes.",
+  messageKey: "auth.rateLimit.login",
   view: "auth/login",
   localsKey: "err",
 });
@@ -32,7 +34,7 @@ export const loginLimiter = authRateLimit({
 export const registerLimiter = authRateLimit({
   windowMs: 60 * 60 * 1000,
   max: 5,
-  message: "Too many registration attempts. Please try again later.",
+  messageKey: "auth.rateLimit.register",
   view: "auth/register",
   localsKey: "err",
 });
@@ -40,7 +42,7 @@ export const registerLimiter = authRateLimit({
 export const forgotPasswordLimiter = authRateLimit({
   windowMs: 60 * 60 * 1000,
   max: 5,
-  message: "Too many password reset requests. Please try again later.",
+  messageKey: "auth.rateLimit.forgotPassword",
   view: "auth/verify",
   localsKey: "msg",
 });
@@ -48,7 +50,7 @@ export const forgotPasswordLimiter = authRateLimit({
 export const resetPasswordLimiter = authRateLimit({
   windowMs: 60 * 60 * 1000,
   max: 5,
-  message: "Too many password reset attempts. Please try again later.",
+  messageKey: "auth.rateLimit.resetPassword",
   view: "auth/verify",
   localsKey: "msg",
 });
@@ -56,7 +58,7 @@ export const resetPasswordLimiter = authRateLimit({
 export const verifyLimiter = authRateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
-  message: "Too many verification attempts. Please try again later.",
+  messageKey: "auth.rateLimit.verify",
   view: "auth/verify",
   localsKey: "msg",
 });

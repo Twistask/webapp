@@ -6,8 +6,8 @@
 <body>
 <%- include('partials/menu') %>
 <div id="work-area">
-    <h1>Tasks Directory</h1>
-    <p>Pick a task below to start solving it.</p>
+    <h1 data-i18n="tasks.title"><%= t('tasks.title') %></h1>
+    <p data-i18n="tasks.subtitle"><%= t('tasks.subtitle') %></p>
     <div id="task-list"></div>
 </div>
 <script type="module" src="/javascripts/handlers/modes/tasksDirectory.js"></script>

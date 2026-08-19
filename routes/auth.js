@@ -25,11 +25,11 @@ router.get("/register", function (req, res, next) {
 
 router.post("/register", registerLimiter, async (req, res, next) => {
     if (res.locals.auth) {
-        res.locals.err = "You are already logged in.";
+        res.locals.err = res.locals.t('auth.alreadyLoggedIn');
         return res.status(409).render("auth/register");
     }
     if (!VALID_SELF_REGISTER_ROLES.includes(req.body.role)) {
-        res.locals.err = "Please select whether you're a student or a teacher.";
+        res.locals.err = res.locals.t('auth.registerRoleRequired');
         return res.status(400).render("auth/register");
     }
     try {
@@ -37,7 +37,7 @@ router.post("/register", registerLimiter, async (req, res, next) => {
         await Database.functions.createUser(body);
         return res.redirect(303, "/");
     } catch (err) {
-        res.locals.err = "Failed to register. Please check if you've entered the information correctly."
+        res.locals.err = res.locals.t('auth.registerFailed');
         return res.render("auth/register");
     }
 });
@@ -50,7 +50,7 @@ router.get("/login", function (req, res, next) {
 
 router.post("/login", loginLimiter, async (req, res, next) => {
     if (res.locals.auth) {
-        res.locals.err = "You are already logged in.";
+        res.locals.err = res.locals.t('auth.alreadyLoggedIn');
         return res.status(409).render("auth/login");
     }
     try {
@@ -78,7 +78,7 @@ router.post("/login", loginLimiter, async (req, res, next) => {
 
         return res.redirect(303, "/");
     } catch (err) {
-        res.locals.err = "Failed to authenticate. Please check your username and password."
+        res.locals.err = res.locals.t('auth.loginFailed');
         return res.render("auth/login");
     }
 });
@@ -133,17 +133,17 @@ router.post("/logout", async function (req, res, next) {
 router.get("/verify", verifyLimiter, async (req, res, next) => {
     const token = String(req.query.token || "").trim();
     if (!token) {
-        res.locals.msg = "Invalid or expired verification token.";
+        res.locals.msg = res.locals.t('auth.verifyInvalidToken');
         return res.render("auth/verify");
     }
     try {
         const result = await Database.functions.verifyUser(token);
         res.locals.msg = result === true
-            ? "Successfully verified your account."
-            : "Invalid or expired verification token.";
+            ? res.locals.t('auth.verifySuccess')
+            : res.locals.t('auth.verifyInvalidToken');
         return res.render("auth/verify");
     } catch (err) {
-        res.locals.msg = "Invalid or expired verification token."
+        res.locals.msg = res.locals.t('auth.verifyInvalidToken');
         return res.render("auth/verify");
     }
 });
@@ -159,10 +159,10 @@ router.post("/forgot-password", forgotPasswordLimiter, async function (req, res,
     let email = req.body.email;
     try {
         await Database.functions.requestPasswordReset(email);
-        res.locals.msg = "Check your email for instructions.";
+        res.locals.msg = res.locals.t('auth.forgotPasswordSent');
         return res.render("auth/verify");
     } catch (err) {
-        res.locals.msg = "Invalid account."
+        res.locals.msg = res.locals.t('auth.forgotPasswordInvalidAccount');
         return res.render("auth/verify");
     }
 });
@@ -179,11 +179,11 @@ router.post("/reset-password", resetPasswordLimiter, async (req, res, next) => {
     try {
         const result = await Database.functions.resetPassword(token, password);
         res.locals.msg = result === true
-            ? "Successfully reset your password."
-            : "Invalid or expired token.";
+            ? res.locals.t('auth.resetPasswordSuccess')
+            : res.locals.t('auth.resetPasswordInvalidToken');
         return res.render("auth/verify");
     } catch (err) {
-        res.locals.msg = "Invalid or expired token."
+        res.locals.msg = res.locals.t('auth.resetPasswordInvalidToken');
         return res.render("auth/verify");
     }
 });

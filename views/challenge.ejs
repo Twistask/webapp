@@ -18,13 +18,13 @@
       <% } %>
       <div id="answer-area">
         <% if (!auth && mode === "challenge") { %>
-        <label for="author-name">Input your name:</label><input id="author-name" type="text" />
+        <label for="author-name" data-i18n="challenge.authorLabel"><%= t('challenge.authorLabel') %></label><input id="author-name" type="text" />
         <% } %>
         <div id="editor">
-          <p>Type here.</p>
+          <p data-i18n="challenge.editorPlaceholder"><%= t('challenge.editorPlaceholder') %></p>
           <p><br /></p>
         </div>
-        <button type="submit" id="submit">Submit</button>
+        <button type="submit" id="submit" data-i18n="common.submit"><%= t('common.submit') %></button>
       </div>
     </div>
     <% if (mode === "timeTrial") { %>

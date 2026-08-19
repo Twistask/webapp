@@ -16,6 +16,7 @@
         users: users || [],
         mode: mode || "none",
     }).replace(/</g, "\\u003c") %>;
+    window.I18N = <%- JSON.stringify(i18n || {}).replace(/</g, "\\u003c") %>;
 </script>
 <script>
     // The nav's language <select> (menuSetup.js) only seeds this from its
@@ -32,4 +33,14 @@
     if (!sessionStorage.getItem("language")) {
         sessionStorage.setItem("language", (window.APP.user && window.APP.user.language) || "en");
     }
+</script>
+<script type="module">
+    // Runs on every page (unlike menuSetup.js, which timeTrial mode's
+    // stripped-down nav doesn't load) so static UI text is translated the
+    // same way language-filtered task/answer lists already are - once on
+    // load, and again whenever the language select fires
+    // "app:languagechange".
+    import { applyTranslations } from "/javascripts/utils/i18n.js";
+    applyTranslations();
+    window.addEventListener("app:languagechange", () => applyTranslations());
 </script>

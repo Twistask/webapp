@@ -6,26 +6,26 @@
   <body>
     <%- include('../partials/menu') %>
     <div id="work-area">
-      <h1 class="page-title">Register</h1>
+      <h1 class="page-title" data-i18n="nav.register"><%= t('nav.register') %></h1>
       <form action="/auth/register" method="post">
-        <label for="email">E-mail:</label><input type="email" id="email" name="email" required /><br />
-        <label for="username">Username:</label><input type="text" id="username" name="name" required /><br />
-        <label for="password">Password:</label><input type="password" id="password" name="password" minlength="8" required /><br />
-        <label for="password_repeat">Confirm password:</label><input
+        <label for="email" data-i18n="auth.emailLabel"><%= t('auth.emailLabel') %></label><input type="email" id="email" name="email" required /><br />
+        <label for="username" data-i18n="auth.usernameLabel"><%= t('auth.usernameLabel') %></label><input type="text" id="username" name="name" required /><br />
+        <label for="password" data-i18n="auth.passwordLabel"><%= t('auth.passwordLabel') %></label><input type="password" id="password" name="password" minlength="8" required /><br />
+        <label for="password_repeat" data-i18n="auth.confirmPasswordLabel"><%= t('auth.confirmPasswordLabel') %></label><input
           type="password"
           id="password_repeat"
           name="passwordConfirm"
           minlength="8"
           required
         /><br />
-        <label for="student_type">I'm a student</label><input type="radio" id="student_type" name="role" value="student"><br>
-        <label for="teacher_type">I'm a teacher</label><input type="radio" id="teacher_type" name="role" value="teacher"><br>
-        <label for="account-language-select">Select your main language:</label><select id="account-language-select" name="language">
-          <option value="en">English</option>
-          <option value="ru">Russian</option>
-          <option value="cn">Chinese</option>
+        <label for="student_type" data-i18n="auth.imStudent"><%= t('auth.imStudent') %></label><input type="radio" id="student_type" name="role" value="student"><br>
+        <label for="teacher_type" data-i18n="auth.imTeacher"><%= t('auth.imTeacher') %></label><input type="radio" id="teacher_type" name="role" value="teacher"><br>
+        <label for="account-language-select" data-i18n="settings.selectMainLanguage"><%= t('settings.selectMainLanguage') %></label><select id="account-language-select" name="language">
+          <option value="en" data-i18n="common.lang.en"><%= t('common.lang.en') %></option>
+          <option value="ru" data-i18n="common.lang.ru"><%= t('common.lang.ru') %></option>
+          <option value="cn" data-i18n="common.lang.cn"><%= t('common.lang.cn') %></option>
         </select><br>
-        <button type="submit" id="submit">Register</button><br /><br />
+        <button type="submit" id="submit" data-i18n="nav.register"><%= t('nav.register') %></button><br /><br />
         <div id="error-box"><%= err %></div>
       </form>
     </div>

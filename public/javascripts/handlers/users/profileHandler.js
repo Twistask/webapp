@@ -1,3 +1,5 @@
+import { t } from "../../utils/i18n.js";
+
 const { tasks = [], answers = [], comments = [], user = {} } = window.APP || {};
 
 const buildCard = (href, title, cta) => {
@@ -45,33 +47,33 @@ let loader = async () => {
     let answersDiv = document.getElementById("my-answers");
     let commentsDiv = document.getElementById("my-reviews");
 
-    const createdTasks = tasks.filter((t) => t.author === user.id);
-    const createdAns = answers.filter((t) => t.author === user.id);
-    const createdComms = comments.filter((t) => t.author === user.id);
+    const createdTasks = tasks.filter((tk) => tk.author === user.id);
+    const createdAns = answers.filter((tk) => tk.author === user.id);
+    const createdComms = comments.filter((tk) => tk.author === user.id);
 
     renderGrid(
         tasksDiv,
-        createdTasks.map((task) => buildCard(`/tasks/${task.id}`, task.title, "View this task →")),
-        "You haven't created any tasks yet.",
+        createdTasks.map((task) => buildCard(`/tasks/${task.id}`, task.title, t('common.viewThisTask'))),
+        t('profile.noTasks'),
     );
 
     const answerCards = [];
     for (const ans of createdAns) {
-        const task = tasks.find((t) => t.id === ans.target_id);
+        const task = tasks.find((tk) => tk.id === ans.target_id);
         if (!task) continue; // orphaned answer (its task was deleted)
-        answerCards.push(buildCard(`/answers/${ans.id}`, task.title, "View your answer →"));
+        answerCards.push(buildCard(`/answers/${ans.id}`, task.title, t('profile.viewAnswer')));
     }
-    renderGrid(answersDiv, answerCards, "You haven't submitted any answers yet.");
+    renderGrid(answersDiv, answerCards, t('profile.noAnswers'));
 
     const commentCards = [];
     for (const comm of createdComms) {
         const answer = answers.find((a) => a.id === comm.target_id);
         if (!answer) continue; // orphaned comment (its answer was deleted)
-        const task = tasks.find((t) => t.id === answer.target_id);
+        const task = tasks.find((tk) => tk.id === answer.target_id);
         if (!task) continue; // orphaned answer (its task was deleted)
-        commentCards.push(buildCard(`/answers/${comm.target_id}`, task.title, "View your review →"));
+        commentCards.push(buildCard(`/answers/${comm.target_id}`, task.title, t('profile.viewReview')));
     }
-    renderGrid(commentsDiv, commentCards, "You haven't left any reviews yet.");
+    renderGrid(commentsDiv, commentCards, t('profile.noReviews'));
 };
 
 document.addEventListener('DOMContentLoaded', async () => {

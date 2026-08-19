@@ -1,3 +1,5 @@
+import { t } from "../../utils/i18n.js";
+
 const { user = {} } = window.APP || {};
 
 const { task = {} } = window.CHALLENGE || {};
@@ -41,7 +43,7 @@ export const ChallengeControls = {
             // would silently redirect this tab's submission to the wrong
             // task.
             if (!task.id) {
-                alert("No challenge selected. Please pick one first.");
+                alert(t('challenge.noChallengeSelected'));
                 return;
             }
 
@@ -53,13 +55,13 @@ export const ChallengeControls = {
                 author = user.id;
             }
             if (!author) {
-                alert("Please enter your name before submitting.");
+                alert(t('challenge.enterNameFirst'));
                 return;
             }
 
             const value = editor.getMarkdown();
             if (!value.trim()) {
-                alert("Please write an answer before submitting.");
+                alert(t('challenge.enterAnswerFirst'));
                 return;
             }
 
@@ -74,16 +76,16 @@ export const ChallengeControls = {
 
                 if (!res.ok) {
                     console.error("Submit failed", res.status);
-                    alert("Failed to submit your answer. Please try again.");
+                    alert(t('challenge.submitFailed'));
                     return;
                 }
 
                 editor.reset();
-                alert("Your answer has been submitted!");
+                alert(t('challenge.submitSuccess'));
                 window.location.assign(`/tasks`);
             } catch (err) {
                 console.error("Submit error", err);
-                alert("Network error while submitting your answer.");
+                alert(t('challenge.submitNetworkError'));
             } finally {
                 submitbtn.disabled = false;
             }
@@ -97,6 +99,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (err) {
         console.error("Failed to set up challenge mode:", err);
         const workArea = document.getElementById("work-area");
-        if (workArea) workArea.innerText = "Something went wrong loading this page. Please refresh and try again.";
+        if (workArea) workArea.innerText = t('common.pageLoadError');
     }
 })

@@ -1,3 +1,5 @@
+import { t } from "../../utils/i18n.js";
+
 const { user = {} } = window.APP || {};
 
 let setupLanguageSelect = () => {
@@ -40,13 +42,13 @@ let setupLogout = () => {
       });
       if (!res.ok) {
         console.error("Logout failed", res.status);
-        alert("Logout failed. Please try again.");
+        alert(t('auth.logoutFailed'));
         return;
       }
       window.location.replace("/");
     } catch (err) {
       console.error("Logout error", err);
-      alert("Network error while logging out.");
+      alert(t('auth.logoutNetworkError'));
     }
   });
 };

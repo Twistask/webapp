@@ -6,16 +6,16 @@
 <body>
 <%- include('../partials/menu') %>
 <div id="work-area">
-    <h1>Admin Panel</h1>
+    <h1 data-i18n="nav.admin"><%= t('nav.admin') %></h1>
 
     <div class="panel" id="admin-tasks-panel">
-        <h2>Tasks</h2>
+        <h2 data-i18n="admin.tasksHeading"><%= t('admin.tasksHeading') %></h2>
         <div id="admin-task-stats"></div>
         <div id="admin-task-list"></div>
     </div>
 
     <div class="panel" id="admin-users-panel">
-        <h2>Users</h2>
+        <h2 data-i18n="admin.usersHeading"><%= t('admin.usersHeading') %></h2>
         <div id="admin-user-stats"></div>
         <div id="admin-user-list"></div>
     </div>

@@ -1,3 +1,5 @@
+import { t } from "../../utils/i18n.js";
+
 const buildCard = (answer, task) => {
     const card = document.createElement("a");
     card.className = "task-card";
@@ -11,7 +13,7 @@ const buildCard = (answer, task) => {
 
     const cta = document.createElement("span");
     cta.className = "task-card-cta";
-    cta.textContent = "Review this answer →";
+    cta.textContent = t('review.reviewThisAnswerCta');
 
     card.append(title, cta);
     return card;
@@ -40,13 +42,13 @@ export const ReviewQueue = {
 
         const cards = [];
         for (const answer of availableAnswers) {
-            const task = tasks.find((t) => t.id === answer.target_id);
+            const task = tasks.find((tk) => tk.id === answer.target_id);
             if (!task) continue; // orphaned answer (its task was deleted)
             cards.push(buildCard(answer, task));
         }
 
         if (cards.length === 0) {
-            list.textContent = "There's nothing to review right now in this language.";
+            list.textContent = t('review.noneInLanguage');
             return;
         }
 
@@ -63,6 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
         console.error("Failed to load review queue:", err);
         const list = document.getElementById("review-list");
-        if (list) list.textContent = "Something went wrong loading this page. Please refresh and try again.";
+        if (list) list.textContent = t('common.pageLoadError');
     }
 });

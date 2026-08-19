@@ -1,3 +1,5 @@
+import { t } from "../utils/i18n.js";
+
 const FEATURED_COUNT = 3;
 
 const buildTaskCard = (task) => {
@@ -13,7 +15,7 @@ const buildTaskCard = (task) => {
 
     const cta = document.createElement("span");
     cta.className = "task-card-cta";
-    cta.textContent = "Solve this task →";
+    cta.textContent = t('home.solveThisTask');
 
     card.append(title, cta);
     return card;
@@ -21,7 +23,7 @@ const buildTaskCard = (task) => {
 
 const render = () => {
     const { tasks = [] } = window.APP || {};
-    const availableTasks = tasks.filter((t) => t.language === sessionStorage.getItem("language"));
+    const availableTasks = tasks.filter((task) => task.language === sessionStorage.getItem("language"));
 
     const statsEl = document.getElementById("home-stats");
     const featuredEl = document.getElementById("featured-tasks");
@@ -34,14 +36,14 @@ const render = () => {
     featuredEl.innerHTML = "";
 
     if (availableTasks.length === 0) {
-        statsEl.textContent = "No tasks are available yet in this language - check back soon!";
+        statsEl.textContent = t('home.noTasks');
         return;
     }
 
     statsEl.textContent =
         availableTasks.length === 1
-            ? "1 task ready to solve:"
-            : `${availableTasks.length} tasks ready to solve:`;
+            ? t('home.tasksReady.one')
+            : t('home.tasksReady.other', { count: availableTasks.length });
 
     // A light shuffle so the homepage highlights a different sample of
     // tasks on each visit instead of always the same first few.
@@ -58,7 +60,7 @@ const render = () => {
         const browseAll = document.createElement("a");
         browseAll.id = "browse-all-tasks";
         browseAll.href = "/tasks";
-        browseAll.textContent = `Browse all ${availableTasks.length} tasks →`;
+        browseAll.textContent = t('home.browseAllTasks', { count: availableTasks.length });
         featuredEl.appendChild(browseAll);
     }
 };

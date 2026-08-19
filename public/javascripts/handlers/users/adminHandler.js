@@ -1,4 +1,6 @@
-const ROLE_LABELS = { student: "Student", teacher: "Teacher", admin: "Admin" };
+import { t } from "../../utils/i18n.js";
+
+const ROLE_LABELS = { student: () => t('admin.role.student'), teacher: () => t('admin.role.teacher'), admin: () => t('admin.role.admin') };
 
 const buildActionsRow = (children) => {
     const row = document.createElement("div");
@@ -19,15 +21,15 @@ const buildTaskCard = (task) => {
 
     const viewLink = document.createElement("a");
     viewLink.href = `/tasks/${task.id}`;
-    viewLink.textContent = "View";
+    viewLink.textContent = t('common.view');
 
     const editLink = document.createElement("a");
     editLink.href = `/editor?task=${task.id}`;
-    editLink.textContent = "Edit";
+    editLink.textContent = t('common.edit');
 
     const deleteBtn = document.createElement("button");
     deleteBtn.type = "button";
-    deleteBtn.textContent = "Delete";
+    deleteBtn.textContent = t('common.delete');
     deleteBtn.addEventListener("click", () => AdminPanel.deleteTask(task.id, task.title));
 
     card.append(title, buildActionsRow([viewLink, editLink, deleteBtn]));
@@ -41,7 +43,7 @@ const buildUserCard = (targetUser, currentUserId) => {
 
     const title = document.createElement("span");
     title.className = "task-card-title";
-    title.textContent = isSelf ? `${targetUser.name} (you)` : targetUser.name || targetUser.id;
+    title.textContent = isSelf ? `${targetUser.name} ${t('admin.you')}` : targetUser.name || targetUser.id;
 
     const meta = document.createElement("span");
     meta.className = "task-card-cta";
@@ -49,10 +51,10 @@ const buildUserCard = (targetUser, currentUserId) => {
 
     const roleSelect = document.createElement("select");
     roleSelect.dataset.previousValue = targetUser.role;
-    for (const [value, label] of Object.entries(ROLE_LABELS)) {
+    for (const [value, getLabel] of Object.entries(ROLE_LABELS)) {
         const opt = document.createElement("option");
         opt.value = value;
-        opt.textContent = label;
+        opt.textContent = getLabel();
         if (value === targetUser.role) opt.selected = true;
         roleSelect.appendChild(opt);
     }
@@ -61,7 +63,7 @@ const buildUserCard = (targetUser, currentUserId) => {
 
     const deleteBtn = document.createElement("button");
     deleteBtn.type = "button";
-    deleteBtn.textContent = "Delete";
+    deleteBtn.textContent = t('common.delete');
     deleteBtn.disabled = isSelf;
     deleteBtn.addEventListener("click", () => AdminPanel.deleteUser(targetUser.id, targetUser.name));
 
@@ -76,10 +78,10 @@ export const AdminPanel = {
 
         const taskStats = document.getElementById("admin-task-stats");
         const taskList = document.getElementById("admin-task-list");
-        if (taskStats) taskStats.textContent = tasks.length === 1 ? "1 task total" : `${tasks.length} tasks total`;
+        if (taskStats) taskStats.textContent = tasks.length === 1 ? t('admin.taskCount.one') : t('admin.taskCount.other', { count: tasks.length });
         if (taskList) {
             if (tasks.length === 0) {
-                taskList.textContent = "No tasks have been created yet.";
+                taskList.textContent = t('admin.noTasks');
             } else {
                 const grid = document.createElement("div");
                 grid.className = "task-grid";
@@ -92,15 +94,14 @@ export const AdminPanel = {
         const userList = document.getElementById("admin-user-list");
         if (usersError) {
             if (userList) {
-                userList.textContent =
-                    "Couldn't load the user list - your account may not have permission to list users in the database.";
+                userList.textContent = t('admin.usersLoadError');
             }
             return;
         }
-        if (userStats) userStats.textContent = users.length === 1 ? "1 user total" : `${users.length} users total`;
+        if (userStats) userStats.textContent = users.length === 1 ? t('admin.userCount.one') : t('admin.userCount.other', { count: users.length });
         if (userList) {
             if (users.length === 0) {
-                userList.textContent = "No users found.";
+                userList.textContent = t('admin.noUsers');
             } else {
                 // PocketBase's default "users" collection List API rule
                 // scopes results to the caller's own record - this app
@@ -109,8 +110,7 @@ export const AdminPanel = {
                 // of silently claiming the system has just one user.
                 if (users.length === 1 && users[0].id === user.id) {
                     const note = document.createElement("p");
-                    note.textContent =
-                        'Only your own account is visible. If other accounts exist, your PocketBase "users" collection List API rule likely needs to allow the admin role, not just @request.auth.id = id.';
+                    note.textContent = t('admin.onlyOwnAccountVisible');
                     userList.appendChild(note);
                 }
                 const grid = document.createElement("div");
@@ -121,9 +121,7 @@ export const AdminPanel = {
         }
     },
     deleteTask: async (id, title) => {
-        const confirmed = confirm(
-            `Delete "${title}"? All of its submitted answers and reviews will be permanently deleted too. This cannot be undone.`,
-        );
+        const confirmed = confirm(t('admin.deleteTaskConfirm', { title }));
         if (!confirmed) return;
         try {
             const res = await fetch("/editor/delete", {
@@ -134,13 +132,13 @@ export const AdminPanel = {
             });
             if (!res.ok) {
                 console.error("Delete task failed", res.status);
-                alert("Failed to delete the task. Please try again.");
+                alert(t('editor.deleteFailed'));
                 return;
             }
             window.location.reload();
         } catch (err) {
             console.error("Delete task error", err);
-            alert("Network error while deleting the task.");
+            alert(t('editor.deleteNetworkError'));
         }
     },
     // PocketBase's default "users" collection API rules typically scope
@@ -153,14 +151,12 @@ export const AdminPanel = {
     // "try again", which won't help.
     describeUserActionFailure: (status) => {
         if (status === 403 || status === 404) {
-            return "Failed - your PocketBase \"users\" collection rules likely restrict this to each account's own owner. Update the View/Update/Delete rules to also allow the admin role.";
+            return t('admin.userActionRuleFailure');
         }
-        return "Failed. Please try again.";
+        return t('admin.actionFailedGeneric');
     },
     deleteUser: async (id, name) => {
-        const confirmed = confirm(
-            `Delete the account "${name}"? All of their tasks, answers, and reviews will be permanently deleted too. This cannot be undone.`,
-        );
+        const confirmed = confirm(t('admin.deleteUserConfirm', { name }));
         if (!confirmed) return;
         try {
             const res = await fetch(`/admin/users/${id}`, {
@@ -175,7 +171,7 @@ export const AdminPanel = {
             window.location.reload();
         } catch (err) {
             console.error("Delete user error", err);
-            alert("Network error while deleting the account.");
+            alert(t('admin.deleteUserNetworkError'));
         }
     },
     changeRole: async (id, selectEl) => {
@@ -198,7 +194,7 @@ export const AdminPanel = {
             selectEl.dataset.previousValue = role;
         } catch (err) {
             console.error("Role change error", err);
-            alert("Network error while changing the user's role.");
+            alert(t('admin.roleChangeNetworkError'));
             selectEl.value = previous;
         } finally {
             selectEl.disabled = false;
@@ -212,6 +208,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
         console.error("Failed to load admin panel:", err);
         const taskList = document.getElementById("admin-task-list");
-        if (taskList) taskList.textContent = "Something went wrong loading this page. Please refresh and try again.";
+        if (taskList) taskList.textContent = t('common.pageLoadError');
     }
 });

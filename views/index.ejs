@@ -6,42 +6,37 @@
   <body>
     <%- include('partials/menu') %>
     <div id="work-area">
-      <h1 class="page-title">Welcome to <%= title %>!</h1>
+      <h1 class="page-title" data-i18n="home.welcome" data-i18n-vars='<%- JSON.stringify({ title }) %>'><%= t('home.welcome', { title }) %></h1>
       <div class="panel">
-        <p>
-          Critical thinking isn’t a talent; it’s a skill. And like any skill, it
-          requires practice. Whether you are making business decisions or
-          navigating daily life, Twistask provides the tools to solve and create
-          complex issues and build bulletproof logic.
-        </p>
+        <p data-i18n="home.intro"><%= t('home.intro') %></p>
       </div>
 
       <div class="panel" id="home-jump-in">
-        <h2 class="page-title">Jump Right In</h2>
+        <h2 class="page-title" data-i18n="home.jumpRightIn"><%= t('home.jumpRightIn') %></h2>
         <div id="home-stats"></div>
         <div id="featured-tasks"></div>
       </div>
 
       <div id="how-it-works">
-        <h2 class="page-title">How It Works</h2>
+        <h2 class="page-title" data-i18n="home.howItWorks"><%= t('home.howItWorks') %></h2>
         <div id="how-it-works-grid">
           <div class="feature-card">
-            <h3>Solve Tasks</h3>
-            <p>Browse the tasks and solve any challenge at your own pace!</p>
-            <a href="/tasks">Browse Tasks</a>
+            <h3 data-i18n="home.solveTasks.title"><%= t('home.solveTasks.title') %></h3>
+            <p data-i18n="home.solveTasks.body"><%= t('home.solveTasks.body') %></p>
+            <a href="/tasks" data-i18n="home.solveTasks.cta"><%= t('home.solveTasks.cta') %></a>
           </div>
           <div class="feature-card">
-            <h3>Trial Mode</h3>
-            <p>Solve a set of tasks before the time runs out! Try the Super Hard mode for an extra challenge!</p>
-            <a href="/timeTrial">Start Trial</a>
+            <h3 data-i18n="nav.trialMode"><%= t('nav.trialMode') %></h3>
+            <p data-i18n="home.trialMode.body"><%= t('home.trialMode.body') %></p>
+            <a href="/timeTrial" data-i18n="home.trialMode.cta"><%= t('home.trialMode.cta') %></a>
           </div>
           <div class="feature-card">
-            <h3>Peer Review</h3>
-            <p>Sign in to leave feedback on how others solved your tasks and get feedback on your own.</p>
+            <h3 data-i18n="home.peerReview.title"><%= t('home.peerReview.title') %></h3>
+            <p data-i18n="home.peerReview.body"><%= t('home.peerReview.body') %></p>
             <% if (auth) { %>
-              <a href="/users/profile">Check out Your Profile</a>
+              <a href="/users/profile" data-i18n="home.peerReview.ctaAuth"><%= t('home.peerReview.ctaAuth') %></a>
             <% } else { %>
-              <a href="/auth/register">Create an Account &rarr;</a>
+              <a href="/auth/register" data-i18n="home.peerReview.ctaGuest"><%= t('home.peerReview.ctaGuest') %></a>
             <% } %>
           </div>
         </div>

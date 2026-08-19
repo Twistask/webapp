@@ -1,3 +1,5 @@
+import { t } from "../../utils/i18n.js";
+
 export const TasksDirectory = {
     setup: () => {
         TasksDirectory.render();
@@ -13,10 +15,10 @@ export const TasksDirectory = {
         // not just once at page load.
         taskList.innerHTML = "";
 
-        const availableTasks = tasks.filter((t) => t.language === sessionStorage.getItem("language"));
+        const availableTasks = tasks.filter((task) => task.language === sessionStorage.getItem("language"));
 
         if (availableTasks.length === 0) {
-            taskList.textContent = "There are currently no tasks available in this language.";
+            taskList.textContent = t('tasks.noneInLanguage');
             return;
         }
 
@@ -41,7 +43,7 @@ export const TasksDirectory = {
 
         const cta = document.createElement("span");
         cta.className = "task-card-cta";
-        cta.textContent = "Solve this task →";
+        cta.textContent = t('home.solveThisTask');
 
         card.append(title, cta);
         return card;
@@ -54,6 +56,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
         console.error("Failed to load tasks directory:", err);
         const taskList = document.getElementById("task-list");
-        if (taskList) taskList.textContent = "Something went wrong loading this page. Please refresh and try again.";
+        if (taskList) taskList.textContent = t('common.pageLoadError');
     }
 });

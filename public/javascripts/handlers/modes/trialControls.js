@@ -6,6 +6,7 @@ let editor;
 let viewer;
 
 import { convertToString } from "../../utils/timeConverter.js";
+import { t } from "../../utils/i18n.js";
 
 const { tasks = [] } = window.APP || {};
 
@@ -38,11 +39,11 @@ export const TrialControls = {
     });
   },
   setupTask: () => {
-    let availableTasks = tasks.filter((t) => t.language === sessionStorage.getItem("language"));
+    let availableTasks = tasks.filter((task) => task.language === sessionStorage.getItem("language"));
     const titleEl = document.getElementById("task-title");
     if (availableTasks.length === 0) {
       if (titleEl) titleEl.textContent = "";
-      viewer.setMarkdown("There are currently no tasks available for a time trial.");
+      viewer.setMarkdown(t('trial.noTasksAvailable'));
       return;
     }
     const randIndex = Math.floor(Math.random() * availableTasks.length);
@@ -66,7 +67,7 @@ export const TrialControls = {
         await TrialControls.submitPuzzle(target, value);
       } catch (err) {
         console.error("Failed to submit trial solutions:", err);
-        alert("Some of your answers failed to submit. Please check your connection and try again.");
+        alert(t('trial.someFailed'));
       }
     })
   },
@@ -79,7 +80,7 @@ export const TrialControls = {
     if (!giveUpLink) return;
     giveUpLink.addEventListener("click", async (ev) => {
       ev.preventDefault();
-      const confirmed = confirm("Give up on this trial? Your current answer will still be submitted, but the trial will end early.");
+      const confirmed = confirm(t('trial.giveUpConfirm'));
       if (!confirmed) return;
       await TrialControls.flushAndFinish("gaveUp");
     });
@@ -93,7 +94,7 @@ export const TrialControls = {
       let time_div = document.createElement("div");
       let timer_value = document.createElement("p");
       setInterval(() => {
-        timer_value.innerText = `Time left: ${convertToString(Math.max(0, trial.trialTime - (Date.now() - start)))}`;
+        timer_value.innerText = t('trial.timeLeft', { time: convertToString(Math.max(0, trial.trialTime - (Date.now() - start))) });
       }, 250);
       time_div.append(timer_value);
       let menu = document.getElementById("trial-menu");
@@ -203,6 +204,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {
     console.error("Failed to set up time trial:", err);
     const workArea = document.getElementById("work-area");
-    if (workArea) workArea.innerText = "Something went wrong loading this page. Please refresh and try again.";
+    if (workArea) workArea.innerText = t('common.pageLoadError');
   }
 })
